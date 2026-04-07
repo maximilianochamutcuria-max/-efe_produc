@@ -7,54 +7,91 @@
 <style>
 body {
   margin: 0;
-  background: black;
-  color: white;
+  background: #f5f5f5;
   font-family: Arial;
-  text-align: center;
 }
 
+/* HEADER */
 h1 {
-  margin: 20px;
+  text-align: center;
+  margin: 30px 0;
 }
 
-/* BOTONES ÁLBUMES */
-#albums {
-  margin-bottom: 20px;
-}
-
-#albums button {
-  padding: 10px 20px;
-  margin: 10px;
-  cursor: pointer;
-  border-radius: 8px;
-  border: none;
-  background: white;
-  color: black;
-  font-weight: bold;
-}
-
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
+/* CONTENEDOR */
+.container {
+  max-width: 1200px;
+  margin: auto;
   padding: 20px;
 }
 
-/* CARD */
-.card {
-  overflow: hidden;
-  border-radius: 12px;
-}
-
-.card img {
-  width: 100%;
-  display: block;
+/* ALBUM CARD */
+.album-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: transform 0.2s;
 }
 
-.card img:hover {
+.album-card:hover {
+  transform: scale(1.02);
+}
+
+.album-card img {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.album-title {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.album-count {
+  color: gray;
+  margin-top: 5px;
+}
+
+/* BOTON VOLVER */
+.back-btn {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background: black;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* GRID PINTEREST */
+.gallery {
+  column-count: 4;
+  column-gap: 15px;
+}
+
+@media (max-width: 1000px) {
+  .gallery { column-count: 3; }
+}
+@media (max-width: 600px) {
+  .gallery { column-count: 2; }
+}
+
+.photo {
+  break-inside: avoid;
+  margin-bottom: 15px;
+}
+
+.photo img {
+  width: 100%;
+  border-radius: 12px;
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.photo img:hover {
   transform: scale(1.05);
 }
 
@@ -72,7 +109,6 @@ h1 {
   z-index: 999;
 }
 
-/* IMAGEN GRANDE */
 .modal img {
   max-width: 90%;
   max-height: 90%;
@@ -85,8 +121,7 @@ h1 {
 
 <h1>@efe_produc</h1>
 
-<div id="albums"></div>
-<div class="grid" id="gallery"></div>
+<div class="container" id="app"></div>
 
 <!-- MODAL -->
 <div class="modal" id="modal" onclick="cerrarModal()">
@@ -95,62 +130,85 @@ h1 {
 
 <script>
 
-// 🔒 BLOQUEO CLICK DERECHO (básico)
-document.addEventListener("contextmenu", e => e.preventDefault());
+// 📂 ÁLBUMES (EDITABLE)
+const albums = [
+  {
+    nombre: "gymna_vs_cariocas",
+    titulo: "FUTSAL TUCUMAN Fecha 3: Malvinas Argentinas vs Alianza"
+  }
+];
 
-// 📂 LISTA DE ÁLBUMES
-const albums = ["gymna_vs_cariocas"];
-
-// 🔘 CREAR BOTONES DE ÁLBUMES
-function cargarAlbums() {
-  const cont = document.getElementById("albums");
+// 🏠 MOSTRAR ÁLBUMES
+function mostrarAlbums() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
 
   albums.forEach(album => {
-    const btn = document.createElement("button");
-    btn.innerText = album;
-    btn.onclick = () => cargarFotos(album);
-    cont.appendChild(btn);
+    const div = document.createElement("div");
+    div.className = "album-card";
+
+    div.innerHTML = `
+      <div class="album-title">${album.titulo}</div>
+      <div class="album-count">Cargando...</div>
+      <img src="/images/${album.nombre}/preview/1.jpg">
+    `;
+
+    // contar fotos automáticamente
+    fetch(`/api/fotos/${album.nombre}`)
+      .then(r => r.json())
+      .then(fotos => {
+        div.querySelector(".album-count").innerText = fotos.length + " Fotos";
+      });
+
+    div.onclick = () => abrirAlbum(album.nombre);
+
+    app.appendChild(div);
   });
 }
 
-// 📸 CARGAR FOTOS (SIN MARCA)
-async function cargarFotos(album) {
-  const res = await fetch(`/api/fotos/${album}`);
+// 📸 ABRIR ÁLBUM
+async function abrirAlbum(nombre) {
+  const app = document.getElementById("app");
+
+  const res = await fetch(`/api/fotos/${nombre}`);
   const fotos = await res.json();
 
+  app.innerHTML = `
+    <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
+    <div class="gallery" id="gallery"></div>
+  `;
+
   const gallery = document.getElementById("gallery");
-  gallery.innerHTML = "";
 
   fotos.forEach(foto => {
     const div = document.createElement("div");
-    div.className = "card";
+    div.className = "photo";
 
     const img = document.createElement("img");
 
-    // 🔥 MINIATURA SIN MARCA
-    img.src = `/images/${album}/preview/${foto}`;
+    // 👇 SIN MARCA
+    img.src = `/images/${nombre}/preview/${foto}`;
 
-    // 🔥 FOTO GRANDE CON WATERMARK
-    img.onclick = () => abrirModal(`/images/${album}/watermarked/${foto}`);
+    // 👇 CON MARCA
+    img.onclick = () => abrirModal(`/images/${nombre}/watermarked/${foto}`);
 
     div.appendChild(img);
     gallery.appendChild(div);
   });
 }
 
-// 🖼️ ABRIR MODAL
+// 🖼️ MODAL
 function abrirModal(src) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("modalImg").src = src;
 }
 
-// ❌ CERRAR MODAL
 function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
 
-// 🚀 INICIAR
-cargarAlbums();
+// 🚀 INIT
+mostrarAlbums();
 
 </script>
 
