@@ -1,131 +1,146 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+<meta charset="UTF-8">
+<title>@efe_produc</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+
+h1 {
+  margin: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 20px;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal img {
+  max-width: 90%;
+  max-height: 80%;
+}
+</style>
 </head>
+
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="es"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;title&gt;@efe_produc&lt;/title&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;style&gt;</span></p>
-<p class="p1"><span class="s1">body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: black;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-family: Arial;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-align: center;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.grid {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: grid;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: 20px;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.card img {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 10px;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.modal {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: none;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>position: fixed;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>top: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>left: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(0,0,0,0.9);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.modal img {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-width: 90%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-height: 80%;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;h1&gt;@efe_produc&lt;/h1&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;div id="albums"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="grid" id="gallery"&gt;&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;div class="modal" id="modal" onclick="cerrarModal()"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;img id="modalImg"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;script&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">const base = "images";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">const albums = [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>"gymna_vs_cariocas"</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function cargarAlbumes() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const albumsDiv = document.getElementById("albums");</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>albums.forEach(album =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const btn = document.createElement("button");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>btn.innerText = album;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>btn.onclick = () =&gt; cargarFotos(album);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>albumsDiv.appendChild(btn);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">async function cargarFotos(album) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const res = await fetch(`${base}/${album}/preview`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const text = await res.text();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const parser = new DOMParser();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const html = parser.parseFromString(text, "text/html");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const links = html.querySelectorAll("a");</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const gallery = document.getElementById("gallery");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gallery.innerHTML = "";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>links.forEach(link =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const file = link.getAttribute("href");</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if(file.endsWith(".jpg")) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const img = document.createElement("img");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>img.src = `${base}/${album}/preview/${file}`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>img.onclick = () =&gt; abrirModal(img.src);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>gallery.appendChild(img);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function abrirModal(src) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("modal").style.display = "flex";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("modalImg").src = src;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function cerrarModal() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("modal").style.display = "none";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">cargarAlbumes();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+
+<h1>@efe_produc</h1>
+
+<div id="albums"></div>
+
+<div class="grid" id="gallery"></div>
+
+<div class="modal" id="modal" onclick="cerrarModal()">
+  <img id="modalImg">
+</div>
+
+<script>
+
+const base = "images";
+
+// 🔥 LISTA DE ÁLBUMES (agregás más acá)
+const albums = [
+  "gymna_vs_cariocas"
+];
+
+// CARGAR ÁLBUMES
+function cargarAlbumes() {
+  const albumsDiv = document.getElementById("albums");
+
+  albums.forEach(album => {
+    const btn = document.createElement("button");
+    btn.innerText = album;
+    btn.onclick = () => cargarFotos(album);
+    albumsDiv.appendChild(btn);
+  });
+}
+
+// CARGAR FOTOS DESDE preview
+async function cargarFotos(album) {
+  try {
+    const res = await fetch(`${base}/${album}/preview`);
+    const text = await res.text();
+
+    const parser = new DOMParser();
+    const html = parser.parseFromString(text, "text/html");
+    const links = html.querySelectorAll("a");
+
+    const gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
+
+    links.forEach(link => {
+      const file = link.getAttribute("href");
+
+      if(file && (file.endsWith(".jpg") || file.endsWith(".png"))) {
+
+        const div = document.createElement("div");
+        div.className = "card";
+
+        const img = document.createElement("img");
+        img.src = `${base}/${album}/preview/${file}`;
+
+        img.onclick = () => abrirModal(img.src);
+
+        div.appendChild(img);
+        gallery.appendChild(div);
+      }
+    });
+
+  } catch (error) {
+    console.error("Error cargando fotos:", error);
+  }
+}
+
+// MODAL
+function abrirModal(src) {
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("modalImg").src = src;
+}
+
+function cerrarModal() {
+  document.getElementById("modal").style.display = "none";
+}
+
+// INICIAR
+cargarAlbumes();
+
+</script>
+
 </body>
 </html>
