@@ -7,25 +7,53 @@
 <style>
 body {
   margin: 0;
-  background: black;
-  color: white;
   font-family: Arial;
+  background: #f5f5f5;
   text-align: center;
 }
 
 h1 {
-  margin: 20px;
+  margin: 30px 0;
 }
 
-button {
-  padding: 10px 20px;
-  margin: 10px;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
+/* GRID ÁLBUMES */
+.albums {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 40px;
+}
+
+.album {
   background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
 }
 
+.album img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.album-info {
+  padding: 15px;
+}
+
+.album-info h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.album-info p {
+  margin: 5px 0 0;
+  color: gray;
+}
+
+/* GALERÍA */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -37,6 +65,13 @@ button {
   width: 100%;
   border-radius: 10px;
   cursor: pointer;
+}
+
+/* BOTÓN VOLVER */
+.back {
+  margin: 20px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 /* MODAL */
@@ -63,10 +98,16 @@ button {
 
 <h1>@efe_produc</h1>
 
-<div id="albums"></div>
+<!-- ÁLBUMES -->
+<div id="albums" class="albums"></div>
 
-<div class="grid" id="gallery"></div>
+<!-- GALERÍA -->
+<div id="gallery" style="display:none;">
+  <div class="back" onclick="volver()">← Volver</div>
+  <div class="grid" id="grid"></div>
+</div>
 
+<!-- MODAL -->
 <div class="modal" id="modal" onclick="cerrarModal()">
   <img id="modalImg">
 </div>
@@ -75,49 +116,70 @@ button {
 
 const base = "images";
 
-// 📸 LISTA DE FOTOS (EDITAR ACÁ)
-const data = {
-  gymna_vs_cariocas: [
-    "DSC_2189-Enhanced-NR.jpg",
-    "DSC_2273-Enhanced-NR.jpg",
-    "DSC_2274.jpg",
-    "DSC_2276.jpg",
-    "DSC_2277.jpg",
-    "DSC_2590-Enhanced-NR.jpg",
-    "DSC_2619-Enhanced-NR.jpg"
-  ]
-};
+// 📸 DATA DE ÁLBUMES
+const albumsData = [
+  {
+    nombre: "FUTSAL TUCUMAN Fecha 3: Gymna vs Cariocas",
+    carpeta: "gymna_vs_cariocas",
+    preview: "DSC_2189-Enhanced-NR.jpg",
+    cantidad: 30,
+    fotos: [
+      "DSC_2189-Enhanced-NR.jpg",
+      "DSC_2273-Enhanced-NR.jpg",
+      "DSC_2274.jpg",
+      "DSC_2276.jpg",
+      "DSC_2277.jpg"
+    ]
+  }
+];
 
-// BOTONES DE ÁLBUM
-function cargarAlbumes() {
-  const albumsDiv = document.getElementById("albums");
+// CARGAR ÁLBUMES
+function cargarAlbums() {
+  const container = document.getElementById("albums");
 
-  Object.keys(data).forEach(album => {
-    const btn = document.createElement("button");
-    btn.innerText = album;
-    btn.onclick = () => cargarFotos(album);
-    albumsDiv.appendChild(btn);
+  albumsData.forEach(album => {
+    const div = document.createElement("div");
+    div.className = "album";
+
+    div.innerHTML = `
+      <img src="${base}/${album.carpeta}/preview/${album.preview}">
+      <div class="album-info">
+        <h3>${album.nombre}</h3>
+        <p>${album.cantidad} fotos</p>
+      </div>
+    `;
+
+    div.onclick = () => abrirAlbum(album);
+
+    container.appendChild(div);
   });
 }
 
-// CARGAR FOTOS
-function cargarFotos(album) {
-  const gallery = document.getElementById("gallery");
-  gallery.innerHTML = "";
+// ABRIR ÁLBUM
+function abrirAlbum(album) {
+  document.getElementById("albums").style.display = "none";
+  document.getElementById("gallery").style.display = "block";
 
-  data[album].forEach(file => {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
 
+  album.fotos.forEach(file => {
     const div = document.createElement("div");
     div.className = "card";
 
     const img = document.createElement("img");
-    img.src = `${base}/${album}/preview/${file}`;
-
+    img.src = `${base}/${album.carpeta}/preview/${file}`;
     img.onclick = () => abrirModal(img.src);
 
     div.appendChild(img);
-    gallery.appendChild(div);
+    grid.appendChild(div);
   });
+}
+
+// VOLVER
+function volver() {
+  document.getElementById("albums").style.display = "grid";
+  document.getElementById("gallery").style.display = "none";
 }
 
 // MODAL
@@ -131,7 +193,7 @@ function cerrarModal() {
 }
 
 // INICIAR
-cargarAlbumes();
+cargarAlbums();
 
 </script>
 
