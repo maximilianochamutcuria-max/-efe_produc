@@ -1,35 +1,30 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// Servir archivos estáticos
 app.use(express.static(__dirname));
 
-// Ruta para obtener imágenes organizadas por carpetas
-app.get('/images', (req, res) => {
-  const imagesPath = path.join(__dirname, 'images');
+// 📸 LISTAR FOTOS DE UN ÁLBUM
+app.get("/api/fotos/:album", (req, res) => {
+  const album = req.params.album;
+  const dir = path.join(__dirname, "images", album, "preview");
 
-  let result = {};
-
-  fs.readdirSync(imagesPath).forEach(folder => {
-    const folderPath = path.join(imagesPath, folder);
-
-    if (fs.lstatSync(folderPath).isDirectory()) {
-      result[folder] = fs.readdirSync(folderPath).map(file => {
-        return `/images/${folder}/${file}`;
-      });
+  fs.readdir(dir, (err, files) => {
+    if (err) {
+      return res.json([]);
     }
-  });
 
-  res.json(result);
+    const images = files.filter(f =>
+      f.endsWith(".jpg") || f.endsWith(".png")
+    );
+
+    res.json(images);
+  });
 });
 
-// Servir carpeta images
-app.use('/images', express.static(path.join(__dirname, 'images')));
-
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log("Servidor corriendo en puerto " + PORT);
 });

@@ -16,7 +16,7 @@ h1 {
   margin: 30px 0;
 }
 
-/* GRID ÁLBUMES */
+/* ÁLBUMES */
 .albums {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -67,7 +67,7 @@ h1 {
   cursor: pointer;
 }
 
-/* BOTÓN VOLVER */
+/* VOLVER */
 .back {
   margin: 20px;
   cursor: pointer;
@@ -116,20 +116,12 @@ h1 {
 
 const base = "images";
 
-// 📸 DATA DE ÁLBUMES
+// 🔥 SOLO CONFIGURÁS ESTO (sin fotos)
 const albumsData = [
   {
     nombre: "FUTSAL TUCUMAN Fecha 3: Gymna vs Cariocas",
     carpeta: "gymna_vs_cariocas",
-    preview: "DSC_2189-Enhanced-NR.jpg",
-    cantidad: 30,
-    fotos: [
-      "DSC_2189-Enhanced-NR.jpg",
-      "DSC_2273-Enhanced-NR.jpg",
-      "DSC_2274.jpg",
-      "DSC_2276.jpg",
-      "DSC_2277.jpg"
-    ]
+    preview: "DSC_2189-Enhanced-NR.jpg"
   }
 ];
 
@@ -145,7 +137,7 @@ function cargarAlbums() {
       <img src="${base}/${album.carpeta}/preview/${album.preview}">
       <div class="album-info">
         <h3>${album.nombre}</h3>
-        <p>${album.cantidad} fotos</p>
+        <p>Ver fotos</p>
       </div>
     `;
 
@@ -155,25 +147,33 @@ function cargarAlbums() {
   });
 }
 
-// ABRIR ÁLBUM
-function abrirAlbum(album) {
+// 🚀 AUTOMÁTICO (LEE DESDE SERVER)
+async function abrirAlbum(album) {
   document.getElementById("albums").style.display = "none";
   document.getElementById("gallery").style.display = "block";
 
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
-  album.fotos.forEach(file => {
-    const div = document.createElement("div");
-    div.className = "card";
+  try {
+    const res = await fetch(`/api/fotos/${album.carpeta}`);
+    const fotos = await res.json();
 
-    const img = document.createElement("img");
-    img.src = `${base}/${album.carpeta}/preview/${file}`;
-    img.onclick = () => abrirModal(img.src);
+    fotos.forEach(file => {
+      const div = document.createElement("div");
+      div.className = "card";
 
-    div.appendChild(img);
-    grid.appendChild(div);
-  });
+      const img = document.createElement("img");
+      img.src = `${base}/${album.carpeta}/preview/${file}`;
+      img.onclick = () => abrirModal(img.src);
+
+      div.appendChild(img);
+      grid.appendChild(div);
+    });
+
+  } catch (error) {
+    console.error("Error cargando fotos:", error);
+  }
 }
 
 // VOLVER
