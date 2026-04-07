@@ -17,17 +17,18 @@ h1 {
   margin: 30px 0;
 }
 
-/* CONTENEDOR (alineado izquierda) */
-.container {
+/* ===== HOME (ÁLBUMES) ===== */
+.home-container {
   width: 900px;
-  margin-left: 40px; /* 👈 clave */
+  margin-left: 40px; /* izquierda */
 }
 
-/* CARD ÁLBUM */
+/* CARD CUADRADA */
 .album-card {
+  width: 420px;
   background: white;
   border-radius: 15px;
-  padding: 20px;
+  padding: 15px;
   margin-bottom: 25px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   cursor: pointer;
@@ -35,24 +36,31 @@ h1 {
 }
 
 .album-card:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
 .album-title {
-  font-size: 26px;
+  font-size: 18px;
   font-weight: bold;
 }
 
 .album-count {
   color: gray;
-  margin: 10px 0;
+  margin: 5px 0 10px;
 }
 
-/* PREVIEW IMAGE */
+/* IMAGEN CUADRADA */
 .album-card img {
   width: 100%;
-  max-width: 600px; /* 👈 tamaño como tu ejemplo */
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border-radius: 10px;
+}
+
+/* ===== GALERÍA (CENTRADA) ===== */
+.gallery-container {
+  max-width: 1200px;
+  margin: auto; /* 👈 centrado */
 }
 
 /* BOTON VOLVER */
@@ -66,7 +74,7 @@ h1 {
   cursor: pointer;
 }
 
-/* GRID PINTEREST */
+/* PINTEREST */
 .gallery {
   column-count: 4;
   column-gap: 15px;
@@ -120,7 +128,7 @@ h1 {
 
 <h1>@efe_produc</h1>
 
-<div class="container" id="app"></div>
+<div id="app"></div>
 
 <!-- MODAL -->
 <div class="modal" id="modal" onclick="cerrarModal()">
@@ -137,10 +145,13 @@ const albums = [
   }
 ];
 
-// 🏠 MOSTRAR ÁLBUMES
+// 🏠 HOME (izquierda + cuadrado)
 function mostrarAlbums() {
   const app = document.getElementById("app");
-  app.innerHTML = "";
+
+  app.innerHTML = `<div class="home-container" id="albums"></div>`;
+
+  const cont = document.getElementById("albums");
 
   albums.forEach(album => {
 
@@ -153,7 +164,6 @@ function mostrarAlbums() {
       <img src="/images/${album.nombre}/preview/1.jpg">
     `;
 
-    // contar fotos
     fetch(`/api/fotos/${album.nombre}`)
       .then(r => r.json())
       .then(fotos => {
@@ -162,11 +172,11 @@ function mostrarAlbums() {
 
     div.onclick = () => abrirAlbum(album.nombre);
 
-    app.appendChild(div);
+    cont.appendChild(div);
   });
 }
 
-// 📸 ABRIR ÁLBUM
+// 📸 ÁLBUM (centrado + pinterest)
 async function abrirAlbum(nombre) {
   const app = document.getElementById("app");
 
@@ -174,8 +184,10 @@ async function abrirAlbum(nombre) {
   const fotos = await res.json();
 
   app.innerHTML = `
-    <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
-    <div class="gallery" id="gallery"></div>
+    <div class="gallery-container">
+      <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
+      <div class="gallery" id="gallery"></div>
+    </div>
   `;
 
   const gallery = document.getElementById("gallery");
