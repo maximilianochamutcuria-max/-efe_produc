@@ -23,6 +23,7 @@ button {
   cursor: pointer;
   border: none;
   border-radius: 8px;
+  background: white;
 }
 
 .grid {
@@ -74,16 +75,24 @@ button {
 
 const base = "images";
 
-// 🔥 LISTA DE ÁLBUMES (agregás más acá)
-const albums = [
-  "gymna_vs_cariocas"
-];
+// 📸 LISTA DE FOTOS (EDITAR ACÁ)
+const data = {
+  gymna_vs_cariocas: [
+    "DSC_2189-Enhanced-NR.jpg",
+    "DSC_2273-Enhanced-NR.jpg",
+    "DSC_2274.jpg",
+    "DSC_2276.jpg",
+    "DSC_2277.jpg",
+    "DSC_2590-Enhanced-NR.jpg",
+    "DSC_2619-Enhanced-NR.jpg"
+  ]
+};
 
-// CARGAR ÁLBUMES
+// BOTONES DE ÁLBUM
 function cargarAlbumes() {
   const albumsDiv = document.getElementById("albums");
 
-  albums.forEach(album => {
+  Object.keys(data).forEach(album => {
     const btn = document.createElement("button");
     btn.innerText = album;
     btn.onclick = () => cargarFotos(album);
@@ -91,40 +100,24 @@ function cargarAlbumes() {
   });
 }
 
-// CARGAR FOTOS DESDE preview
-async function cargarFotos(album) {
-  try {
-    const res = await fetch(`${base}/${album}/preview`);
-    const text = await res.text();
+// CARGAR FOTOS
+function cargarFotos(album) {
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = "";
 
-    const parser = new DOMParser();
-    const html = parser.parseFromString(text, "text/html");
-    const links = html.querySelectorAll("a");
+  data[album].forEach(file => {
 
-    const gallery = document.getElementById("gallery");
-    gallery.innerHTML = "";
+    const div = document.createElement("div");
+    div.className = "card";
 
-    links.forEach(link => {
-      const file = link.getAttribute("href");
+    const img = document.createElement("img");
+    img.src = `${base}/${album}/preview/${file}`;
 
-      if(file && (file.endsWith(".jpg") || file.endsWith(".png"))) {
+    img.onclick = () => abrirModal(img.src);
 
-        const div = document.createElement("div");
-        div.className = "card";
-
-        const img = document.createElement("img");
-        img.src = `${base}/${album}/preview/${file}`;
-
-        img.onclick = () => abrirModal(img.src);
-
-        div.appendChild(img);
-        gallery.appendChild(div);
-      }
-    });
-
-  } catch (error) {
-    console.error("Error cargando fotos:", error);
-  }
+    div.appendChild(img);
+    gallery.appendChild(div);
+  });
 }
 
 // MODAL
