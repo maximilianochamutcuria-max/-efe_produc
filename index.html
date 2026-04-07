@@ -17,19 +17,18 @@ h1 {
   margin: 30px 0;
 }
 
-/* CONTENEDOR */
+/* CONTENEDOR (alineado izquierda) */
 .container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
+  width: 900px;
+  margin-left: 40px; /* 👈 clave */
 }
 
-/* ALBUM CARD */
+/* CARD ÁLBUM */
 .album-card {
   background: white;
   border-radius: 15px;
   padding: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   cursor: pointer;
   transition: transform 0.2s;
@@ -39,26 +38,27 @@ h1 {
   transform: scale(1.02);
 }
 
-.album-card img {
-  width: 100%;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
 .album-title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
 }
 
 .album-count {
   color: gray;
-  margin-top: 5px;
+  margin: 10px 0;
+}
+
+/* PREVIEW IMAGE */
+.album-card img {
+  width: 100%;
+  max-width: 600px; /* 👈 tamaño como tu ejemplo */
+  border-radius: 10px;
 }
 
 /* BOTON VOLVER */
 .back-btn {
   display: inline-block;
-  margin-bottom: 20px;
+  margin: 20px 0;
   padding: 10px 15px;
   background: black;
   color: white;
@@ -106,7 +106,6 @@ h1 {
   background: rgba(0,0,0,0.95);
   justify-content: center;
   align-items: center;
-  z-index: 999;
 }
 
 .modal img {
@@ -130,7 +129,7 @@ h1 {
 
 <script>
 
-// 📂 ÁLBUMES (EDITABLE)
+// 📂 ÁLBUMES
 const albums = [
   {
     nombre: "gymna_vs_cariocas",
@@ -144,6 +143,7 @@ function mostrarAlbums() {
   app.innerHTML = "";
 
   albums.forEach(album => {
+
     const div = document.createElement("div");
     div.className = "album-card";
 
@@ -153,7 +153,7 @@ function mostrarAlbums() {
       <img src="/images/${album.nombre}/preview/1.jpg">
     `;
 
-    // contar fotos automáticamente
+    // contar fotos
     fetch(`/api/fotos/${album.nombre}`)
       .then(r => r.json())
       .then(fotos => {
@@ -186,10 +186,10 @@ async function abrirAlbum(nombre) {
 
     const img = document.createElement("img");
 
-    // 👇 SIN MARCA
+    // SIN marca
     img.src = `/images/${nombre}/preview/${foto}`;
 
-    // 👇 CON MARCA
+    // CON marca
     img.onclick = () => abrirModal(`/images/${nombre}/watermarked/${foto}`);
 
     div.appendChild(img);
@@ -197,7 +197,7 @@ async function abrirAlbum(nombre) {
   });
 }
 
-// 🖼️ MODAL
+// MODAL
 function abrirModal(src) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("modalImg").src = src;
@@ -207,7 +207,7 @@ function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
 
-// 🚀 INIT
+// INIT
 mostrarAlbums();
 
 </script>
