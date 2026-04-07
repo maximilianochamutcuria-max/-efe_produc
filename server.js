@@ -1,53 +1,35 @@
-const express = require("express");
-const sharp = require("sharp");
-const fs = require("fs");
-const path = require("path");
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
+// Servir archivos estáticos
 app.use(express.static(__dirname));
 
-app.get("/image", async (req, res) => {
-  const imgPath = req.query.src;
+// Ruta para obtener imágenes organizadas por carpetas
+app.get('/images', (req, res) => {
+  const imagesPath = path.join(__dirname, 'images');
 
-  if (!imgPath) return res.status(400).send("No image");
+  let result = {};
 
-  const fullPath = path.join(__dirname, imgPath);
+  fs.readdirSync(imagesPath).forEach(folder => {
+    const folderPath = path.join(imagesPath, folder);
 
-  if (!fs.existsSync(fullPath)) {
-    return res.status(404).send("Not found");
-  }
+    if (fs.lstatSync(folderPath).isDirectory()) {
+      result[folder] = fs.readdirSync(folderPath).map(file => {
+        return `/images/${folder}/${file}`;
+      });
+    }
+  });
 
-  try {
-    const image = sharp(fullPath);
-    const metadata = await image.metadata();
-
-    const watermark = `
-    <svg width="${metadata.width}" height="${metadata.height}">
-      <style>
-        text { fill: white; opacity: 0.12; font-size: 90px; }
-      </style>
-      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
-      transform="rotate(-30 ${metadata.width / 2} ${metadata.height / 2})">
-        @efe_produc
-      </text>
-    </svg>
-    `;
-
-    const buffer = await image
-      .composite([{ input: Buffer.from(watermark), gravity: "center" }])
-      .jpeg({ quality: 90 })
-      .toBuffer();
-
-    res.set("Content-Type", "image/jpeg");
-    res.send(buffer);
-
-  } catch (err) {
-    res.status(500).send("Error");
-  }
+  res.json(result);
 });
 
+// Servir carpeta images
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.listen(PORT, () => {
-  console.log("🔥 Servidor: http://localhost:" + PORT);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
