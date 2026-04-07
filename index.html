@@ -17,24 +17,38 @@ h1 {
   margin: 20px;
 }
 
+/* BOTONES ÁLBUMES */
 #albums button {
   padding: 10px 20px;
   margin: 10px;
   cursor: pointer;
+  border-radius: 8px;
+  border: none;
 }
 
 /* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 10px;
+  gap: 15px;
   padding: 20px;
+}
+
+/* CARD */
+.card {
+  overflow: hidden;
+  border-radius: 12px;
 }
 
 .card img {
   width: 100%;
-  border-radius: 10px;
+  display: block;
   cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.card img:hover {
+  transform: scale(1.05);
 }
 
 /* MODAL */
@@ -50,51 +64,12 @@ h1 {
   align-items: center;
 }
 
-/* CONTENEDOR FOTO */
-.modal-content {
-  position: relative;
+/* IMAGEN GRANDE */
+.modal img {
   max-width: 90%;
   max-height: 90%;
+  border-radius: 12px;
 }
-
-/* FOTO GRANDE */
-.modal img {
-  width: 100%;
-  max-height: 90vh;
-  border-radius: 10px;
-}
-
-/* 🔥 MARCA DE AGUA */
-.watermark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-
-  background-image: url('logo.png');
-  background-repeat: repeat;
-  background-size: 200px;
-  opacity: 0.15;
-}
-
-/* TEXTO REPETIDO */
-.watermark::after {
-  content: "@efe_produc";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  color: white;
-  font-size: 40px;
-  opacity: 0.2;
-
-  display: flex;
-  flex-wrap: wrap;
-  align-content: space-around;
-  justify-content: space-around;
-}
-
 </style>
 </head>
 
@@ -107,17 +82,21 @@ h1 {
 
 <!-- MODAL -->
 <div class="modal" id="modal" onclick="cerrarModal()">
-  <div class="modal-content">
-    <img id="modalImg">
-    <div class="watermark"></div>
-  </div>
+  <img id="modalImg">
 </div>
 
 <script>
+
+// 🔒 BLOQUEO CLICK DERECHO (básico)
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+// 📂 ÁLBUMES
 const albums = ["gymna_vs_cariocas"];
 
+// CARGAR BOTONES
 function cargarAlbums() {
   const cont = document.getElementById("albums");
+
   albums.forEach(album => {
     const btn = document.createElement("button");
     btn.innerText = album;
@@ -126,6 +105,7 @@ function cargarAlbums() {
   });
 }
 
+// 📸 CARGAR FOTOS (SIN MARCA)
 async function cargarFotos(album) {
   const res = await fetch(`/api/fotos/${album}`);
   const fotos = await res.json();
@@ -139,26 +119,31 @@ async function cargarFotos(album) {
 
     const img = document.createElement("img");
 
-    // 🔥 SIN MARCA DE AGUA EN GRID
+    // 🔥 MINIATURA SIN MARCA
     img.src = `/images/${album}/preview/${foto}`;
 
-    img.onclick = () => abrirModal(`/images/${album}/original/${foto}`);
+    // 🔥 FOTO GRANDE CON MARCA (desde server)
+    img.onclick = () => abrirModal(`/api/watermark/${album}/${foto}`);
 
     div.appendChild(img);
     gallery.appendChild(div);
   });
 }
 
+// 🖼️ ABRIR MODAL
 function abrirModal(src) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("modalImg").src = src;
 }
 
+// ❌ CERRAR MODAL
 function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
 
+// INIT
 cargarAlbums();
+
 </script>
 
 </body>
