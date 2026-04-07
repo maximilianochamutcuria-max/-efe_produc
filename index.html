@@ -18,12 +18,19 @@ h1 {
 }
 
 /* BOTONES ÁLBUMES */
+#albums {
+  margin-bottom: 20px;
+}
+
 #albums button {
   padding: 10px 20px;
   margin: 10px;
   cursor: pointer;
   border-radius: 8px;
   border: none;
+  background: white;
+  color: black;
+  font-weight: bold;
 }
 
 /* GRID */
@@ -62,6 +69,7 @@ h1 {
   background: rgba(0,0,0,0.95);
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 /* IMAGEN GRANDE */
@@ -90,10 +98,10 @@ h1 {
 // 🔒 BLOQUEO CLICK DERECHO (básico)
 document.addEventListener("contextmenu", e => e.preventDefault());
 
-// 📂 ÁLBUMES
+// 📂 LISTA DE ÁLBUMES
 const albums = ["gymna_vs_cariocas"];
 
-// CARGAR BOTONES
+// 🔘 CREAR BOTONES DE ÁLBUMES
 function cargarAlbums() {
   const cont = document.getElementById("albums");
 
@@ -122,8 +130,8 @@ async function cargarFotos(album) {
     // 🔥 MINIATURA SIN MARCA
     img.src = `/images/${album}/preview/${foto}`;
 
-    // 🔥 FOTO GRANDE CON MARCA (desde server)
-    img.onclick = () => abrirModal(`/api/watermark/${album}/${foto}`);
+    // 🔥 FOTO GRANDE CON WATERMARK
+    img.onclick = () => abrirModal(`/images/${album}/watermarked/${foto}`);
 
     div.appendChild(img);
     gallery.appendChild(div);
@@ -141,7 +149,7 @@ function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
 
-// INIT
+// 🚀 INICIAR
 cargarAlbums();
 
 </script>

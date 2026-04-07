@@ -1,50 +1,46 @@
 from PIL import Image, ImageDraw, ImageFont
 import os
 
-base_folder = "images"
+base = "images/gymna_vs_cariocas"
 
-watermark_text = "@efe_produc"
+input_folder = f"{base}/original"
+preview_folder = f"{base}/preview"
+watermark_folder = f"{base}/watermarked"
 
-for album in os.listdir(base_folder):
-    album_path = os.path.join(base_folder, album)
+os.makedirs(preview_folder, exist_ok=True)
+os.makedirs(watermark_folder, exist_ok=True)
 
-    if not os.path.isdir(album_path):
-        continue
+logo = Image.open("logo.png").convert("RGBA")
 
-    original_path = os.path.join(album_path, "original")
-    preview_path = os.path.join(album_path, "preview")
-
-    os.makedirs(preview_path, exist_ok=True)
-
-    for file in os.listdir(original_path):
-        if not file.lower().endswith(".jpg"):
-            continue
-
-        img_path = os.path.join(original_path, file)
+for file in os.listdir(input_folder):
+    if file.lower().endswith((".jpg", ".jpeg", ".png")):
+        img_path = os.path.join(input_folder, file)
         img = Image.open(img_path).convert("RGBA")
 
-        overlay = Image.new("RGBA", img.size, (255,255,255,0))
-        draw = ImageDraw.Draw(overlay)
+        # 🔹 PREVIEW (SIN MARCA)
+        preview = img.copy()
+        preview.thumbnail((800, 800))
+        preview.convert("RGB").save(os.path.join(preview_folder, file), quality=85)
 
-        width, height = img.size
+        # 🔥 WATERMARK
+        watermark_layer = Image.new("RGBA", img.size)
+        draw = ImageDraw.Draw(watermark_layer)
 
-        try:
-            font = ImageFont.truetype("Arial.ttf", 60)
-        except:
-            font = ImageFont.load_default()
+        for x in range(0, img.width, 300):
+            for y in range(0, img.height, 300):
 
-        # WATERMARK REPETIDO
-        for x in range(0, width, 300):
-            for y in range(0, height, 200):
-                draw.text((x, y), watermark_text, fill=(255,255,255,80), font=font)
+                # LOGO
+                logo_resized = logo.resize((150, 150))
+                watermark_layer.paste(logo_resized, (x, y), logo_resized)
 
-        final = Image.alpha_composite(img, overlay)
+                # TEXTO
+                draw.text((x, y + 160), "@efe_produc", fill=(255,255,255,80))
 
-        # REDUCIR CALIDAD (extra protección)
-        final = final.convert("RGB")
-        final.thumbnail((1600,1600))
+        combined = Image.alpha_composite(img, watermark_layer)
 
-        save_path = os.path.join(preview_path, file)
-        final.save(save_path, quality=70)
+        combined.convert("RGB").save(
+            os.path.join(watermark_folder, file),
+            quality=90
+        )
 
-print("✅ Previews generados con watermark")
+print("✅ PREVIEW + WATERMARK generados")
