@@ -1,41 +1,34 @@
-const { createCanvas, loadImage } = require("canvas");
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
-app.get("/api/watermark/:album/:foto", async (req, res) => {
-  const { album, foto } = req.params;
+const app = express();
+const PORT = process.env.PORT || 10000;
 
-  const imgPath = path.join(__dirname, "images", album, "original", foto);
-  const logoPath = path.join(__dirname, "logo.png");
+// 📁 Servir archivos estáticos
+app.use("/images", express.static(path.join(__dirname, "images")));
+app.use(express.static(__dirname));
 
-  try {
-    const img = await loadImage(imgPath);
-    const logo = await loadImage(logoPath);
+// 📸 API: listar fotos automáticamente
+app.get("/api/fotos/:album", (req, res) => {
+  const album = req.params.album;
 
-    const canvas = createCanvas(img.width, img.height);
-    const ctx = canvas.getContext("2d");
+  const dir = path.join(__dirname, "images", album, "preview");
 
-    // FOTO ORIGINAL
-    ctx.drawImage(img, 0, 0);
-
-    // 🔥 MARCA DE AGUA (repetida)
-    const size = 300;
-
-    for (let x = 0; x < img.width; x += size) {
-      for (let y = 0; y < img.height; y += size) {
-        ctx.globalAlpha = 0.15;
-        ctx.drawImage(logo, x, y, 200, 200);
-
-        ctx.globalAlpha = 0.2;
-        ctx.fillStyle = "white";
-        ctx.font = "40px Arial";
-        ctx.fillText("@efe_produc", x, y + 220);
-      }
+  fs.readdir(dir, (err, files) => {
+    if (err) {
+      return res.status(500).json({ error: "No se pudo leer la carpeta" });
     }
 
-    res.setHeader("Content-Type", "image/jpeg");
-    canvas.createJPEGStream().pipe(res);
+    const fotos = files.filter(f =>
+      f.endsWith(".jpg") || f.endsWith(".png")
+    );
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error generando watermark");
-  }
+    res.json(fotos);
+  });
+});
+
+// 🚀 iniciar servidor
+app.listen(PORT, () => {
+  console.log("Servidor corriendo en puerto " + PORT);
 });
