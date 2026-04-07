@@ -2,69 +2,42 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>@efe_produc</title>
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0a0a0a;
+  background: #000;
   color: white;
-}
-
-header {
+  font-family: Arial;
   text-align: center;
-  padding: 20px;
-  font-size: 24px;
-  font-weight: bold;
 }
 
-.albums {
+h1 {
+  margin: 20px;
+}
+
+.grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  padding: 20px;
-}
-
-.album {
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: center;
-  transition: 0.3s;
-}
-
-.album:hover {
-  background: #333;
-}
-
-.gallery {
-  display: none;
-  padding: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
+  padding: 20px;
 }
 
-.gallery img {
+.card {
+  cursor: pointer;
+}
+
+.card img {
   width: 100%;
   border-radius: 10px;
-  cursor: pointer;
 }
 
-.back {
-  margin: 20px;
-  cursor: pointer;
-  display: inline-block;
-  padding: 10px 15px;
-  background: #222;
-  border-radius: 8px;
-}
-
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
+  z-index: 999;
   top: 0;
   left: 0;
   width: 100%;
@@ -72,84 +45,111 @@ header {
   background: rgba(0,0,0,0.9);
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .modal img {
   max-width: 90%;
   max-height: 80%;
+  pointer-events: none; /* evita arrastrar */
 }
 
-.close {
+.cerrar {
   position: absolute;
   top: 20px;
   right: 30px;
   font-size: 30px;
   cursor: pointer;
 }
+
+/* WATERMARK */
+.watermark {
+  position: absolute;
+  color: rgba(255,255,255,0.2);
+  font-size: 40px;
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
 </style>
 </head>
 
 <body>
 
-<header>@efe_produc</header>
+<h1>@efe_produc</h1>
 
-<div id="albums" class="albums"></div>
+<div id="albums"></div>
 
-<div id="gallerySection" style="display:none;">
-  <div class="back" onclick="volver()">← Volver</div>
-  <div id="gallery" class="gallery"></div>
-</div>
+<div class="grid" id="gallery"></div>
 
-<div id="modal" class="modal" onclick="cerrarModal()">
-  <span class="close">&times;</span>
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="cerrarModal()">
+  <span class="cerrar">✖</span>
   <img id="modalImg">
+  <div class="watermark">@efe_produc</div>
 </div>
 
 <script>
-const albumsContainer = document.getElementById("albums");
-const gallery = document.getElementById("gallery");
-const gallerySection = document.getElementById("gallerySection");
 
-let data = {};
+const base = "images";
 
-fetch('/images')
-  .then(res => res.json())
-  .then(json => {
-    data = json;
-    cargarAlbums();
-  });
+// 🚀 CARGAR ALBUMES
+async function cargarAlbumes() {
+  const res = await fetch(base);
+  const text = await res.text();
 
-function cargarAlbums() {
-  albumsContainer.innerHTML = "";
-  Object.keys(data).forEach(album => {
-    const div = document.createElement("div");
-    div.className = "album";
-    div.innerText = album;
-    div.onclick = () => abrirAlbum(album);
-    albumsContainer.appendChild(div);
+  const parser = new DOMParser();
+  const html = parser.parseFromString(text, "text/html");
+  const links = html.querySelectorAll("a");
+
+  const albumsDiv = document.getElementById("albums");
+
+  links.forEach(link => {
+    const name = link.getAttribute("href");
+
+    if(name !== "../") {
+      const btn = document.createElement("button");
+      btn.innerText = name.replace("/", "");
+      btn.onclick = () => cargarFotos(name.replace("/", ""));
+      albumsDiv.appendChild(btn);
+    }
   });
 }
 
-function abrirAlbum(album) {
-  albumsContainer.style.display = "none";
-  gallerySection.style.display = "block";
-  gallery.style.display = "grid";
+// 🚀 CARGAR FOTOS (USA PREVIEW)
+async function cargarFotos(album) {
+  const res = await fetch(`${base}/${album}/preview`);
+  const text = await res.text();
 
+  const parser = new DOMParser();
+  const html = parser.parseFromString(text, "text/html");
+  const links = html.querySelectorAll("a");
+
+  const gallery = document.getElementById("gallery");
   gallery.innerHTML = "";
 
-  data[album].forEach(img => {
-    const image = document.createElement("img");
-    image.src = img;
-    image.onclick = () => abrirModal(img);
-    gallery.appendChild(image);
+  links.forEach(link => {
+    const file = link.getAttribute("href");
+
+    if(file.endsWith(".jpg") || file.endsWith(".png")) {
+
+      const div = document.createElement("div");
+      div.className = "card";
+
+      const img = document.createElement("img");
+      img.src = `${base}/${album}/preview/${file}`;
+
+      // ❌ bloquear click derecho
+      img.oncontextmenu = () => false;
+
+      div.onclick = () => abrirModal(img.src);
+
+      div.appendChild(img);
+      gallery.appendChild(div);
+    }
   });
 }
 
-function volver() {
-  gallerySection.style.display = "none";
-  albumsContainer.style.display = "grid";
-}
-
+// MODAL
 function abrirModal(src) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("modalImg").src = src;
@@ -158,6 +158,10 @@ function abrirModal(src) {
 function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
+
+// INIT
+cargarAlbumes();
+
 </script>
 
 </body>
