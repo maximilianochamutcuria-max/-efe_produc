@@ -7,78 +7,125 @@
   <meta name="Generator" content="Cocoa HTML Writer">
   <meta name="CocoaVersion" content="2685.4">
   <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
   </style>
 </head>
 <body>
-<p class="p1">&lt;script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">const base = "images";</p>
-<p class="p2"><br></p>
-<p class="p1">// 🔥 LISTA MANUAL DE ÁLBUMES</p>
-<p class="p1">const albums = [</p>
-<p class="p1"><span class="Apple-converted-space">  </span>"gymna_vs_cariocas"</p>
-<p class="p1">];</p>
-<p class="p2"><br></p>
-<p class="p1">// 🔥 CARGAR ALBUMES</p>
-<p class="p1">function cargarAlbumes() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const albumsDiv = document.getElementById("albums");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>albumsDiv.innerHTML = "";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>albums.forEach(album =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const btn = document.createElement("button");</p>
-<p class="p1"><span class="Apple-converted-space">    </span>btn.innerText = album;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>btn.onclick = () =&gt; cargarFotos(album);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>albumsDiv.appendChild(btn);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// 🔥 CARGAR FOTOS (desde preview)</p>
-<p class="p1">async function cargarFotos(album) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const res = await fetch(`${base}/${album}/preview`);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const text = await res.text();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const parser = new DOMParser();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const html = parser.parseFromString(text, "text/html");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const links = html.querySelectorAll("a");</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const gallery = document.getElementById("gallery");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>gallery.innerHTML = "";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>links.forEach(link =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const file = link.getAttribute("href");</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(file.endsWith(".jpg") || file.endsWith(".png")) {</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const div = document.createElement("div");</p>
-<p class="p1"><span class="Apple-converted-space">      </span>div.className = "card";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const img = document.createElement("img");</p>
-<p class="p1"><span class="Apple-converted-space">      </span>img.src = `${base}/${album}/preview/${file}`;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>img.oncontextmenu = () =&gt; false;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>div.onclick = () =&gt; abrirModal(img.src);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>div.appendChild(img);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gallery.appendChild(div);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// MODAL</p>
-<p class="p1">function abrirModal(src) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("modal").style.display = "flex";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("modalImg").src = src;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function cerrarModal() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("modal").style.display = "none";</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// INIT</p>
-<p class="p1">cargarAlbumes();</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/script&gt;</p>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="es"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;title&gt;@efe_produc&lt;/title&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;style&gt;</span></p>
+<p class="p1"><span class="s1">body {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: black;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: white;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-family: Arial;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-align: center;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">.grid {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: grid;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: 20px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">.card img {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 10px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">.modal {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>position: fixed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>top: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>left: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(0,0,0,0.9);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">.modal img {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-width: 90%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-height: 80%;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;h1&gt;@efe_produc&lt;/h1&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div id="albums"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="grid" id="gallery"&gt;&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div class="modal" id="modal" onclick="cerrarModal()"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;img id="modalImg"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const base = "images";</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const albums = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>"gymna_vs_cariocas"</span></p>
+<p class="p1"><span class="s1">];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">function cargarAlbumes() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const albumsDiv = document.getElementById("albums");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>albums.forEach(album =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const btn = document.createElement("button");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>btn.innerText = album;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>btn.onclick = () =&gt; cargarFotos(album);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>albumsDiv.appendChild(btn);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">async function cargarFotos(album) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const res = await fetch(`${base}/${album}/preview`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const text = await res.text();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const parser = new DOMParser();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const html = parser.parseFromString(text, "text/html");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const links = html.querySelectorAll("a");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const gallery = document.getElementById("gallery");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gallery.innerHTML = "";</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>links.forEach(link =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const file = link.getAttribute("href");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if(file.endsWith(".jpg")) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const img = document.createElement("img");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>img.src = `${base}/${album}/preview/${file}`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>img.onclick = () =&gt; abrirModal(img.src);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>gallery.appendChild(img);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">function abrirModal(src) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("modal").style.display = "flex";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("modalImg").src = src;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">function cerrarModal() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("modal").style.display = "none";</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">cargarAlbumes();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
 </body>
 </html>
