@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@efe_produc</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.albums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+.album {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.album:hover {
+  background: #333;
+}
+
+.gallery {
+  display: none;
+  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.gallery img {
+  width: 100%;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.back {
+  margin: 20px;
+  cursor: pointer;
+  display: inline-block;
+  padding: 10px 15px;
+  background: #222;
+  border-radius: 8px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal img {
+  max-width: 90%;
+  max-height: 80%;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 30px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>@efe_produc</header>
+
+<div id="albums" class="albums"></div>
+
+<div id="gallerySection" style="display:none;">
+  <div class="back" onclick="volver()">← Volver</div>
+  <div id="gallery" class="gallery"></div>
+</div>
+
+<div id="modal" class="modal" onclick="cerrarModal()">
+  <span class="close">&times;</span>
+  <img id="modalImg">
+</div>
+
+<script>
+const albumsContainer = document.getElementById("albums");
+const gallery = document.getElementById("gallery");
+const gallerySection = document.getElementById("gallerySection");
+
+let data = {};
+
+fetch('/images')
+  .then(res => res.json())
+  .then(json => {
+    data = json;
+    cargarAlbums();
+  });
+
+function cargarAlbums() {
+  albumsContainer.innerHTML = "";
+  Object.keys(data).forEach(album => {
+    const div = document.createElement("div");
+    div.className = "album";
+    div.innerText = album;
+    div.onclick = () => abrirAlbum(album);
+    albumsContainer.appendChild(div);
+  });
+}
+
+function abrirAlbum(album) {
+  albumsContainer.style.display = "none";
+  gallerySection.style.display = "block";
+  gallery.style.display = "grid";
+
+  gallery.innerHTML = "";
+
+  data[album].forEach(img => {
+    const image = document.createElement("img");
+    image.src = img;
+    image.onclick = () => abrirModal(img);
+    gallery.appendChild(image);
+  });
+}
+
+function volver() {
+  gallerySection.style.display = "none";
+  albumsContainer.style.display = "grid";
+}
+
+function abrirModal(src) {
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("modalImg").src = src;
+}
+
+function cerrarModal() {
+  document.getElementById("modal").style.display = "none";
+}
+</script>
+
+</body>
+</html>
