@@ -260,13 +260,13 @@ let seleccionadas = [];
 let currentAlbum = "";
 let totalGlobal = 0;
 
-/* 🔥 SOLO ESTE LINK ACTIVO */
+/* 🔥 LINKS ACTIVOS */
 const LINKS = {
   2000:"https://mpago.la/17zfiHq",
   5500:"",
   7500:"",
   9500:"",
-  12000:""
+  12000:"https://mpago.la/1fNeWh5"
 };
 
 /* MODAL */
@@ -329,11 +329,17 @@ function pagarMercadoPago(){
   const links = generarLinksPago(totalGlobal);
 
   if(links.length === 0){
-    alert("No hay nada para pagar");
+    alert("No hay links configurados para este monto");
     return;
   }
 
   window.open(links[0], "_blank");
+
+  for(let i=1; i<links.length; i++){
+    setTimeout(()=>{
+      window.open(links[i], "_blank");
+    }, 500 * i);
+  }
 }
 
 /* RENDER */
