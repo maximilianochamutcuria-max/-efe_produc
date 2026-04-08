@@ -67,11 +67,9 @@ h1 { text-align:center; margin:30px 0; }
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:16px;
   color:white;
 }
 
-/* 🔥 ACA ESTÁ LA CLAVE */
 .photo.selected .checkbox::after {
   content:"✔";
 }
@@ -84,7 +82,7 @@ h1 { text-align:center; margin:30px 0; }
   border-radius:12px;
 }
 
-/* BOTÓN VOLVER */
+/* VOLVER */
 .back-btn {
   margin:20px;
   padding:10px;
@@ -94,7 +92,7 @@ h1 { text-align:center; margin:30px 0; }
   cursor:pointer;
 }
 
-/* CARRITO */
+/* BOTÓN */
 .cart-bar {
   position:fixed;
   bottom:20px;
@@ -109,7 +107,7 @@ h1 { text-align:center; margin:30px 0; }
   z-index:9999;
 }
 
-/* MODAL */
+/* MODAL PRO */
 .modal {
   display:none;
   position:fixed;
@@ -150,87 +148,6 @@ h1 { text-align:center; margin:30px 0; }
   color:white;
   cursor:pointer;
 }
-
-/* CHECKOUT */
-.checkout {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  z-index:10000;
-}
-
-.checkout-panel {
-  position:absolute;
-  bottom:0;
-  width:100%;
-  height:90%;
-  background:#f7f7f7;
-  border-radius:20px 20px 0 0;
-  display:flex;
-}
-
-.checkout-left {
-  width:60%;
-  padding:30px;
-  overflow-y:auto;
-}
-
-.checkout-items {
-  display:flex;
-  flex-wrap:wrap;
-  gap:15px;
-}
-
-.checkout-item { position:relative; }
-
-.checkout-item img {
-  width:120px;
-  border-radius:10px;
-}
-
-.remove-item {
-  position:absolute;
-  top:-8px;
-  right:-8px;
-  background:black;
-  color:white;
-  border-radius:50%;
-  width:22px;
-  height:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-
-.checkout-right {
-  width:40%;
-  background:#eee;
-  padding:30px;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-}
-
-.buy-btn {
-  padding:15px;
-  background:black;
-  color:white;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.close-bar {
-  position:absolute;
-  bottom:0;
-  width:100%;
-  text-align:center;
-  padding:15px;
-  background:white;
-  cursor:pointer;
-}
 </style>
 </head>
 
@@ -260,6 +177,39 @@ const cartBar = document.getElementById("cartBar");
 
 let seleccionadas = new Set();
 
+/* VISOR */
+let fotosActuales = [];
+let fotoIndex = 0;
+
+function abrirModal(lista, index){
+  fotosActuales = lista;
+  fotoIndex = index;
+  modal.style.display="flex";
+  modalImg.src = fotosActuales[index];
+}
+
+function cerrarModal(){
+  modal.style.display="none";
+}
+
+function siguienteFoto(){
+  fotoIndex = (fotoIndex+1)%fotosActuales.length;
+  modalImg.src = fotosActuales[fotoIndex];
+}
+
+function anteriorFoto(){
+  fotoIndex = (fotoIndex-1+fotosActuales.length)%fotosActuales.length;
+  modalImg.src = fotosActuales[fotoIndex];
+}
+
+document.addEventListener("keydown", e=>{
+  if(modal.style.display==="flex"){
+    if(e.key==="ArrowRight") siguienteFoto();
+    if(e.key==="ArrowLeft") anteriorFoto();
+    if(e.key==="Escape") cerrarModal();
+  }
+});
+
 /* BOTÓN */
 function actualizarBoton(){
   if(seleccionadas.size>0){
@@ -283,10 +233,13 @@ async function mostrarAlbums(){
 
     const div=document.createElement("div");
     div.className="album-card";
+
     div.innerHTML=`
       <b>${album}</b>
+      <div>${fotos.length} fotos</div>
       <img src="/images/${album}/preview/${fotos[0]}">
     `;
+
     div.onclick=()=>abrirAlbum(album);
     cont.appendChild(div);
   }
@@ -295,6 +248,8 @@ async function mostrarAlbums(){
 /* GALERÍA */
 async function abrirAlbum(nombre){
   const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
+
+  const watermarked = fotos.map(f=>`/images/${nombre}/watermarked/${f}`);
 
   app.innerHTML=`
     <div class="gallery-container">
@@ -305,17 +260,15 @@ async function abrirAlbum(nombre){
 
   const gallery=document.getElementById("gallery");
 
-  fotos.forEach(foto=>{
+  fotos.forEach((foto,i)=>{
     const div=document.createElement("div");
     div.className="photo";
 
     const img=document.createElement("img");
     img.src=`/images/${nombre}/preview/${foto}`;
 
-    /* 🔥 CLICK SOLO ABRE MODAL */
-    div.onclick=()=>abrirModal(img.src);
+    div.onclick=()=>abrirModal(watermarked,i);
 
-    /* 🔥 CHECK */
     const check=document.createElement("div");
     check.className="checkbox";
 
@@ -324,7 +277,6 @@ async function abrirAlbum(nombre){
       toggle(div,foto);
     };
 
-    /* CLICK DERECHO */
     div.oncontextmenu=(e)=>{
       e.preventDefault();
       toggle(div,foto);
@@ -336,7 +288,7 @@ async function abrirAlbum(nombre){
   });
 }
 
-/* TOGGLE */
+/* TOGGLE FIX REAL */
 function toggle(div,f){
   if(seleccionadas.has(f)){
     seleccionadas.delete(f);
@@ -346,13 +298,6 @@ function toggle(div,f){
     div.classList.add("selected");
   }
   actualizarBoton();
-}
-
-/* MODAL SIMPLE */
-function abrirModal(src){
-  modal.style.display="flex";
-  modalImg.src=src;
-  modal.onclick=()=>modal.style.display="none";
 }
 
 mostrarAlbums();
