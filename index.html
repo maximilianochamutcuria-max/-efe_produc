@@ -5,239 +5,148 @@
 <title>@efe_produc</title>
 
 <style>
-body {
-  margin: 0;
-  background: #f5f5f5;
-  font-family: Arial;
-}
-
-h1 {
-  text-align: center;
-  margin: 30px 0;
-}
+body { margin:0; background:#f5f5f5; font-family:Arial; }
+h1 { text-align:center; margin:30px 0; }
 
 /* ÁLBUMES */
 .home-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 260px);
-  gap: 30px;
-  padding: 40px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,260px);
+  gap:30px;
+  padding:40px;
 }
 
 .album-card {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
-  cursor: pointer;
+  background:white;
+  border-radius:12px;
+  padding:15px;
+  box-shadow:0 5px 12px rgba(0,0,0,0.1);
+  cursor:pointer;
 }
 
 .album-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 8px;
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  border-radius:8px;
 }
 
 /* GALERÍA */
-.gallery-container {
-  max-width: 1200px;
-  margin: auto;
-}
-
-.back-btn {
-  margin: 20px;
-  padding: 10px;
-  background: black;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* PINTEREST */
-.gallery {
-  column-count: 4;
-  column-gap: 15px;
-}
-
-.photo {
-  position: relative;
-  break-inside: avoid;
-  margin-bottom: 15px;
-  cursor: pointer;
-}
-
-.photo img {
-  width: 100%;
-  border-radius: 12px;
-  transition: 0.3s;
-}
-
-.photo:hover img {
-  transform: scale(1.05);
-}
+.gallery { column-count:4; column-gap:15px; }
+.photo { position:relative; break-inside:avoid; margin-bottom:15px; cursor:pointer; }
+.photo img { width:100%; border-radius:12px; transition:.3s; }
+.photo:hover img { transform:scale(1.05); }
 
 /* CHECK */
 .checkbox {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 26px;
-  height: 26px;
-  border: 2px solid white;
-  border-radius: 6px;
-  background: rgba(0,0,0,0.5);
-  z-index: 3;
-}
-
-.photo.selected .checkbox {
-  background: black;
-}
-
-.photo.selected .checkbox::after {
-  content: "✔";
-  color: white;
-  position: absolute;
-  top: 2px;
-  left: 5px;
+  position:absolute; bottom:10px; left:10px;
+  width:26px; height:26px;
+  border:2px solid white; border-radius:6px;
+  background:rgba(0,0,0,0.5);
 }
 
 .photo.selected::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,0,0,0.4);
-  border-radius: 12px;
+  content:""; position:absolute; inset:0;
+  background:rgba(255,0,0,0.4);
+  border-radius:12px;
 }
 
 /* BOTÓN */
 .cart-bar {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: black;
-  color: white;
-  padding: 18px 30px;
-  border-radius: 20px;
-  font-size: 18px;
-  display: none;
-  cursor: pointer;
-  z-index: 9999;
+  position:fixed; bottom:20px; left:50%;
+  transform:translateX(-50%);
+  background:black; color:white;
+  padding:18px 30px; border-radius:20px;
+  display:none; cursor:pointer; z-index:9999;
 }
 
-/* TOAST */
-.toast {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: #d4edda;
-  padding: 15px;
-  border-radius: 10px;
-  display: none;
-  z-index: 9999;
-}
-
-/* MODAL (FIXED) */
+/* MODAL PRO */
 .modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.95);
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.95);
+  justify-content:center; align-items:center;
+  z-index:99999;
 }
 
 .modal img {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
-  border-radius: 10px;
+  max-width:90vw;
+  max-height:90vh;
+  object-fit:contain;
 }
 
-/* CHECKOUT PRO */
+.modal-controls {
+  position:absolute; width:100%;
+  display:flex; justify-content:space-between;
+  top:50%; transform:translateY(-50%);
+}
+
+.modal-btn {
+  font-size:40px; color:white;
+  cursor:pointer; padding:20px;
+}
+
+.modal-close {
+  position:absolute; top:20px; right:20px;
+  font-size:30px; color:white;
+  cursor:pointer;
+}
+
+/* CHECKOUT */
 .checkout {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  z-index: 10000;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none; z-index:10000;
 }
 
 .checkout-panel {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 90%;
-  background: #f7f7f7;
-  border-radius: 20px 20px 0 0;
-  display: flex;
+  position:absolute; bottom:0;
+  width:100%; height:90%;
+  background:#f7f7f7;
+  border-radius:20px 20px 0 0;
+  display:flex;
 }
 
 .checkout-left {
-  width: 60%;
-  padding: 30px;
-  overflow-y: auto;
+  width:60%; padding:30px;
+  overflow-y:auto;
 }
 
 .checkout-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
+  display:flex; flex-wrap:wrap;
+  gap:15px;
 }
 
-.checkout-item {
-  position: relative;
-}
+.checkout-item { position:relative; }
 
 .checkout-item img {
-  width: 120px;
-  border-radius: 10px;
+  width:120px; border-radius:10px;
 }
 
 .remove-item {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: black;
-  color: white;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
+  position:absolute; top:-8px; right:-8px;
+  background:black; color:white;
+  border-radius:50%; width:22px; height:22px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
 }
 
 .checkout-right {
-  width: 40%;
-  background: #eee;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  width:40%; background:#eee;
+  padding:30px;
+  display:flex; flex-direction:column; gap:15px;
 }
 
 .buy-btn {
-  padding: 15px;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
+  padding:15px;
+  background:black; color:white;
+  border:none; border-radius:10px;
+  cursor:pointer;
 }
 
 .close-bar {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  padding: 15px;
-  background: white;
-  cursor: pointer;
+  position:absolute; bottom:0; width:100%;
+  text-align:center; padding:15px;
+  background:white; cursor:pointer;
 }
 </style>
 </head>
@@ -246,13 +155,19 @@ h1 {
 
 <h1>@efe_produc</h1>
 
-<div id="toast" class="toast">✔ Fotos agregadas</div>
 <div id="app"></div>
-
 <div id="cartBar" class="cart-bar"></div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
   <img id="modalImg">
+
+  <div class="modal-controls">
+    <div class="modal-btn" onclick="anteriorFoto()">‹</div>
+    <div class="modal-btn" onclick="siguienteFoto()">›</div>
+  </div>
+
+  <div class="modal-close" onclick="cerrarModal()">✖</div>
 </div>
 
 <!-- CHECKOUT -->
@@ -262,11 +177,10 @@ h1 {
     <div class="checkout-left">
       <div style="display:flex;justify-content:space-between;">
         <h2>Carrito</h2>
-        <span onclick="cerrarCheckout()" style="cursor:pointer;font-size:22px;">✖</span>
+        <span onclick="cerrarCheckout()" style="cursor:pointer;">✖</span>
       </div>
 
       <div id="checkoutItems" class="checkout-items"></div>
-
       <div onclick="vaciarCarrito()" style="color:red;margin-top:20px;">
         🗑 Limpiar carrito
       </div>
@@ -274,7 +188,6 @@ h1 {
 
     <div class="checkout-right">
       <div id="detallePedido"></div>
-      <div id="total"></div>
 
       <input id="email" placeholder="Email">
       <input id="telefono" placeholder="Teléfono">
@@ -292,158 +205,167 @@ h1 {
 let seleccionadas = new Set();
 let enCarrito = false;
 
-/* BOTÓN */
-function actualizarBoton() {
-  const btn = document.getElementById("cartBar");
+/* VISOR */
+let fotosActuales = [];
+let fotoIndex = 0;
 
-  if (seleccionadas.size > 0) {
-    btn.style.display = "block";
-    btn.innerText = enCarrito
-      ? "Finalizar →"
-      : "🛒 Agregar (" + seleccionadas.size + ")";
-  } else {
-    btn.style.display = "none";
-    enCarrito = false;
+function abrirModal(src, index, lista){
+  fotosActuales = lista;
+  fotoIndex = index;
+  modal.style.display="flex";
+  modalImg.src=src;
+}
+
+function cerrarModal(){
+  modal.style.display="none";
+}
+
+function siguienteFoto(){
+  fotoIndex=(fotoIndex+1)%fotosActuales.length;
+  modalImg.src=fotosActuales[fotoIndex];
+}
+
+function anteriorFoto(){
+  fotoIndex=(fotoIndex-1+fotosActuales.length)%fotosActuales.length;
+  modalImg.src=fotosActuales[fotoIndex];
+}
+
+document.addEventListener("keydown",e=>{
+  if(modal.style.display==="flex"){
+    if(e.key==="ArrowRight") siguienteFoto();
+    if(e.key==="ArrowLeft") anteriorFoto();
+    if(e.key==="Escape") cerrarModal();
+  }
+});
+
+/* PRECIOS */
+function calcularPrecio(c){
+  if(c>=10) return {total:12000,base:c*2000};
+  if(c>=7) return {total:9500,base:c*2000};
+  if(c>=5) return {total:7500,base:c*2000};
+  if(c>=3) return {total:5500,base:c*2000};
+  return {total:c*2000,base:c*2000};
+}
+
+/* BOTÓN */
+function actualizarBoton(){
+  const btn=document.getElementById("cartBar");
+  if(seleccionadas.size>0){
+    btn.style.display="block";
+    btn.innerText=enCarrito?"Finalizar →":"🛒 "+seleccionadas.size;
+  }else{
+    btn.style.display="none";
+    enCarrito=false;
   }
 }
 
-document.getElementById("cartBar").onclick = () => {
-  if (!enCarrito) {
-    enCarrito = true;
-    toast.style.display = "block";
-    setTimeout(()=>toast.style.display="none",2000);
-  } else {
-    abrirCheckout();
-  }
+cartBar.onclick=()=>{
+  if(!enCarrito){
+    enCarrito=true;
+  }else abrirCheckout();
   actualizarBoton();
 };
 
 /* ÁLBUMES */
-async function mostrarAlbums() {
-  const res = await fetch("/api/albums");
-  const albums = await res.json();
+async function mostrarAlbums(){
+  const res=await fetch("/api/albums");
+  const albums=await res.json();
 
-  app.innerHTML = `<div class="home-container"></div>`;
-  const cont = app.firstChild;
+  app.innerHTML=`<div class="home-container"></div>`;
+  const cont=app.firstChild;
 
-  for (const album of albums) {
-    const fotos = await (await fetch(`/api/fotos/${album}`)).json();
+  for(const album of albums){
+    const fotos=await (await fetch(`/api/fotos/${album}`)).json();
 
-    const div = document.createElement("div");
-    div.className = "album-card";
-    div.innerHTML = `
+    const div=document.createElement("div");
+    div.className="album-card";
+    div.innerHTML=`
       <b>${album}</b>
-      <div>${fotos.length} fotos</div>
       <img src="/images/${album}/preview/${fotos[0]}">
     `;
-    div.onclick = () => abrirAlbum(album);
+    div.onclick=()=>abrirAlbum(album);
     cont.appendChild(div);
   }
 }
 
 /* GALERÍA */
-async function abrirAlbum(nombre) {
-  const fotos = await (await fetch(`/api/fotos/${nombre}`)).json();
+async function abrirAlbum(nombre){
+  const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
+  const urls=fotos.map(f=>`/images/${nombre}/watermarked/${f}`);
 
-  app.innerHTML = `
-    <div class="gallery-container">
-      <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
-      <div class="gallery" id="gallery"></div>
+  app.innerHTML=`
+    <div class="gallery">
+      ${fotos.map((f,i)=>`
+        <div class="photo" onclick="abrirModal('${urls[i]}',${i},${JSON.stringify(urls)})"
+          oncontextmenu="event.preventDefault();toggle(this,'${f}')">
+          <img src="/images/${nombre}/preview/${f}">
+          <div class="checkbox"></div>
+        </div>
+      `).join("")}
     </div>
   `;
-
-  const gallery = document.getElementById("gallery");
-
-  fotos.forEach(foto => {
-    const div = document.createElement("div");
-    div.className = "photo";
-
-    const img = document.createElement("img");
-    img.src = `/images/${nombre}/preview/${foto}`;
-
-    div.onclick = () => abrirModal(`/images/${nombre}/watermarked/${foto}`);
-    div.oncontextmenu = e => { e.preventDefault(); toggle(div,foto); };
-
-    const check = document.createElement("div");
-    check.className = "checkbox";
-    check.onclick = e => { e.stopPropagation(); toggle(div,foto); };
-
-    div.appendChild(img);
-    div.appendChild(check);
-    gallery.appendChild(div);
-  });
 }
 
 /* TOGGLE */
-function toggle(div, foto) {
+function toggle(div,f){
   div.classList.toggle("selected");
-  seleccionadas.has(foto) ? seleccionadas.delete(foto) : seleccionadas.add(foto);
+  seleccionadas.has(f)?seleccionadas.delete(f):seleccionadas.add(f);
   actualizarBoton();
 }
 
-/* MODAL */
-function abrirModal(src) {
-  modal.style.display = "flex";
-  modalImg.src = src;
-  modal.onclick = () => modal.style.display = "none";
-}
-
 /* CHECKOUT */
-function abrirCheckout() {
-  const cont = document.getElementById("checkoutItems");
-  const detalle = document.getElementById("detallePedido");
+function abrirCheckout(){
+  const cont=document.getElementById("checkoutItems");
+  const detalle=document.getElementById("detallePedido");
 
-  cont.innerHTML = "";
+  cont.innerHTML="";
 
-  seleccionadas.forEach(f => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "checkout-item";
+  seleccionadas.forEach(f=>{
+    const d=document.createElement("div");
+    d.className="checkout-item";
 
-    const img = document.createElement("img");
-    img.src = document.querySelector(`img[src*="${f}"]`)?.src;
+    const img=document.createElement("img");
+    img.src=document.querySelector(`img[src*="${f}"]`).src;
 
-    const remove = document.createElement("div");
-    remove.className = "remove-item";
-    remove.innerText = "✖";
-
-    remove.onclick = () => {
+    const r=document.createElement("div");
+    r.className="remove-item";
+    r.innerText="✖";
+    r.onclick=()=>{
       seleccionadas.delete(f);
-      document.querySelectorAll(".photo").forEach(p=>{
-        if(p.innerHTML.includes(f)) p.classList.remove("selected");
-      });
       abrirCheckout();
       actualizarBoton();
     };
 
-    wrapper.appendChild(img);
-    wrapper.appendChild(remove);
-    cont.appendChild(wrapper);
+    d.appendChild(img);
+    d.appendChild(r);
+    cont.appendChild(d);
   });
 
-  const precio = 2000;
-  const total = seleccionadas.size * precio;
+  const c=seleccionadas.size;
+  const {total,base}=calcularPrecio(c);
 
-  detalle.innerHTML = `${seleccionadas.size} fotos x $${precio}`;
-  document.getElementById("total").innerText = "Total: $" + total;
+  detalle.innerHTML=`
+    ${c} fotos<br>
+    Precio sin descuento: $${base}<br>
+    <b>Total: $${total}</b><br>
+    <span style="color:green;">Ahorrás $${base-total}</span>
+  `;
 
-  checkout.style.display = "block";
+  checkout.style.display="block";
 }
 
-function cerrarCheckout() {
-  checkout.style.display = "none";
-}
+function cerrarCheckout(){ checkout.style.display="none"; }
 
-function vaciarCarrito() {
+function vaciarCarrito(){
   seleccionadas.clear();
   document.querySelectorAll(".photo").forEach(p=>p.classList.remove("selected"));
   cerrarCheckout();
   actualizarBoton();
 }
 
-function enviarPedido() {
-  let msg = "Pedido:%0A";
-  seleccionadas.forEach(f => msg += "- " + f + "%0A");
-
+function enviarPedido(){
+  let msg="Pedido:%0A";
+  seleccionadas.forEach(f=>msg+="- "+f+"%0A");
   window.open(`https://wa.me/5493810000000?text=${msg}`);
 }
 
