@@ -13,9 +13,10 @@ body {
 
 h1 {
   text-align: center;
-  margin: 30px;
+  margin: 30px 0;
 }
 
+/* ÁLBUMES */
 .home-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 260px);
@@ -25,8 +26,9 @@ h1 {
 
 .album-card {
   background: white;
-  padding: 15px;
   border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
   cursor: pointer;
 }
 
@@ -37,14 +39,30 @@ h1 {
   border-radius: 8px;
 }
 
+/* GALERÍA */
+.gallery-container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.back-btn {
+  margin: 20px;
+  padding: 10px;
+  background: black;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* PINTEREST */
 .gallery {
   column-count: 4;
   column-gap: 15px;
-  padding: 20px;
 }
 
 .photo {
   position: relative;
+  break-inside: avoid;
   margin-bottom: 15px;
   cursor: pointer;
 }
@@ -52,6 +70,36 @@ h1 {
 .photo img {
   width: 100%;
   border-radius: 12px;
+  transition: 0.3s;
+}
+
+.photo:hover img {
+  transform: scale(1.05);
+}
+
+/* CHECK */
+.checkbox {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 26px;
+  height: 26px;
+  border: 2px solid white;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.5);
+  z-index: 3;
+}
+
+.photo.selected .checkbox {
+  background: black;
+}
+
+.photo.selected .checkbox::after {
+  content: "✔";
+  color: white;
+  position: absolute;
+  top: 2px;
+  left: 5px;
 }
 
 .photo.selected::after {
@@ -60,8 +108,10 @@ h1 {
   inset: 0;
   background: rgba(255,0,0,0.4);
   border-radius: 12px;
+  pointer-events: none;
 }
 
+/* BOTÓN CARRITO */
 .cart-bar {
   position: fixed;
   bottom: 20px;
@@ -71,50 +121,42 @@ h1 {
   color: white;
   padding: 18px 30px;
   border-radius: 20px;
-  display: none;
   font-size: 18px;
+  font-weight: bold;
+  display: none;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
+  z-index: 9999;
 }
 
-.checkout {
+/* TOAST */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #d4edda;
+  color: #155724;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  display: none;
+  z-index: 9999;
+}
+
+/* MODAL */
+.modal {
+  display: none;
   position: fixed;
   inset: 0;
-  background: white;
-  z-index: 9999;
-  padding: 30px;
-  overflow: auto;
-  display: none;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
 }
 
-.grid-mini {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.grid-mini img {
-  width: 100px;
-  border-radius: 10px;
-}
-
-.total {
-  font-size: 20px;
-  margin: 20px 0;
-}
-
-.btn {
-  background: black;
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-input {
-  padding: 10px;
-  width: 250px;
+.modal img {
+  max-width: 90%;
+  max-height: 90%;
 }
 </style>
 </head>
@@ -123,47 +165,62 @@ input {
 
 <h1>@efe_produc</h1>
 
+<div id="toast" class="toast">✔ Fotos agregadas!</div>
+
 <div id="app"></div>
 
-<div id="cartBar" class="cart-bar"></div>
+<div id="cartBar" class="cart-bar">
+  🛒 <span id="cartText"></span>
+</div>
 
-<div id="checkout" class="checkout">
-  <h2>Carrito</h2>
-
-  <div id="miniaturas" class="grid-mini"></div>
-
-  <button class="btn" onclick="limpiar()">🗑 Limpiar carrito</button>
-
-  <div class="total" id="total"></div>
-
-  <h3>Enviar fotos</h3>
-  <input placeholder="Email"><br><br>
-  <input placeholder="Teléfono"><br><br>
-
-  <button class="btn">Finalizar compra</button>
-  <br><br>
-  <button onclick="cerrarCheckout()">Cerrar</button>
+<div class="modal" id="modal">
+  <img id="modalImg">
 </div>
 
 <script>
 
 let seleccionadas = new Set();
-let albumActual = "";
+let enCarrito = false;
 
-function actualizarBoton(){
+/* TOAST */
+function mostrarToast() {
+  const t = document.getElementById("toast");
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 2000);
+}
+
+/* BOTÓN */
+function actualizarBoton() {
   const btn = document.getElementById("cartBar");
+  const txt = document.getElementById("cartText");
 
-  if(seleccionadas.size > 0){
-    btn.style.display = "block";
-    btn.innerText = "🛒 Finalizar (" + seleccionadas.size + ")";
+  if (seleccionadas.size > 0) {
+    btn.style.display = "flex";
+
+    if (!enCarrito) {
+      txt.innerText = "Agregar al carrito +" + seleccionadas.size;
+    } else {
+      txt.innerText = "Finalizar →";
+    }
   } else {
     btn.style.display = "none";
+    enCarrito = false;
   }
 }
 
-document.getElementById("cartBar").onclick = abrirCheckout;
+/* CLICK BOTÓN */
+document.getElementById("cartBar").onclick = function() {
+  if (!enCarrito) {
+    enCarrito = true;
+    mostrarToast();
+  } else {
+    alert("Acá conectamos WhatsApp 💰");
+  }
+  actualizarBoton();
+};
 
-async function mostrarAlbums(){
+/* ÁLBUMES */
+async function mostrarAlbums() {
   const app = document.getElementById("app");
 
   const res = await fetch("/api/albums");
@@ -172,7 +229,7 @@ async function mostrarAlbums(){
   app.innerHTML = `<div class="home-container"></div>`;
   const cont = app.firstChild;
 
-  for(const album of albums){
+  for (const album of albums) {
     const fotos = await (await fetch(`/api/fotos/${album}`)).json();
 
     const div = document.createElement("div");
@@ -180,6 +237,7 @@ async function mostrarAlbums(){
 
     div.innerHTML = `
       <b>${album.replaceAll("_"," ")}</b>
+      <div>${fotos.length} Fotos</div>
       <img src="/images/${album}/preview/${fotos[0]}">
     `;
 
@@ -188,65 +246,77 @@ async function mostrarAlbums(){
   }
 }
 
-async function abrirAlbum(nombre){
-  albumActual = nombre;
-
+/* ABRIR ÁLBUM */
+async function abrirAlbum(nombre) {
   const app = document.getElementById("app");
+
   const fotos = await (await fetch(`/api/fotos/${nombre}`)).json();
 
-  app.innerHTML = `<div class="gallery" id="gallery"></div>`;
-  const g = document.getElementById("gallery");
+  app.innerHTML = `
+    <div class="gallery-container">
+      <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  `;
 
-  fotos.forEach(f => {
-    const d = document.createElement("div");
-    d.className = "photo";
+  const gallery = document.getElementById("gallery");
 
-    d.innerHTML = `<img src="/images/${nombre}/preview/${f}">`;
+  fotos.forEach(foto => {
+    const div = document.createElement("div");
+    div.className = "photo";
 
-    d.onclick = () => toggle(d, f);
+    const img = document.createElement("img");
+    img.src = `/images/${nombre}/preview/${foto}`;
 
-    g.appendChild(d);
+    div.onclick = function(e) {
+      if (e.target.classList.contains("checkbox")) return;
+      abrirModal(`/images/${nombre}/watermarked/${foto}`);
+    };
+
+    div.oncontextmenu = function(e) {
+      e.preventDefault();
+      toggle(div, foto);
+    };
+
+    const check = document.createElement("div");
+    check.className = "checkbox";
+
+    check.onclick = function(e) {
+      e.stopPropagation();
+      toggle(div, foto);
+    };
+
+    div.appendChild(img);
+    div.appendChild(check);
+    gallery.appendChild(div);
   });
 }
 
-function toggle(div, foto){
-  if(div.classList.contains("selected")){
+/* TOGGLE */
+function toggle(div, foto) {
+  if (div.classList.contains("selected")) {
     div.classList.remove("selected");
     seleccionadas.delete(foto);
   } else {
     div.classList.add("selected");
     seleccionadas.add(foto);
   }
+
   actualizarBoton();
 }
 
-function abrirCheckout(){
-  const panel = document.getElementById("checkout");
-  const mini = document.getElementById("miniaturas");
+/* MODAL */
+function abrirModal(src) {
+  const modal = document.getElementById("modal");
+  const img = document.getElementById("modalImg");
 
-  mini.innerHTML = "";
-
-  seleccionadas.forEach(f => {
-    const img = document.createElement("img");
-    img.src = `/images/${albumActual}/preview/${f}`;
-    mini.appendChild(img);
-  });
-
-  document.getElementById("total").innerText =
-    "Total: $" + (seleccionadas.size * 2000);
-
-  panel.style.display = "block";
+  img.src = src;
+  modal.style.display = "flex";
+  modal.onclick = () => modal.style.display = "none";
 }
 
-function cerrarCheckout(){
-  document.getElementById("checkout").style.display = "none";
-}
-
-function limpiar(){
-  seleccionadas.clear();
-  actualizarBoton();
-  cerrarCheckout();
-}
+/* BLOQUEAR CLICK DERECHO */
+document.addEventListener("contextmenu", e => e.preventDefault());
 
 mostrarAlbums();
 
