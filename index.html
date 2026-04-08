@@ -49,11 +49,8 @@ h1 { text-align:center; margin:30px 0; }
 .photo img {
   width:100%;
   border-radius:12px;
-  transition:.3s;
   cursor:pointer;
 }
-
-.photo:hover img { transform:scale(1.05); }
 
 /* CHECK */
 .checkbox {
@@ -73,9 +70,7 @@ h1 { text-align:center; margin:30px 0; }
   z-index:2;
 }
 
-.photo.selected .checkbox::after {
-  content:"✔";
-}
+.photo.selected .checkbox::after { content:"✔"; }
 
 .photo.selected::after {
   content:"";
@@ -86,7 +81,7 @@ h1 { text-align:center; margin:30px 0; }
   pointer-events:none;
 }
 
-/* VOLVER */
+/* BOTONES */
 .back-btn {
   margin:20px;
   padding:10px;
@@ -104,7 +99,7 @@ h1 { text-align:center; margin:30px 0; }
   transform:translateX(-50%);
   background:black;
   color:white;
-  padding:18px 30px;
+  padding:15px 25px;
   border-radius:20px;
   display:none;
   cursor:pointer;
@@ -136,7 +131,7 @@ h1 { text-align:center; margin:30px 0; }
   cursor:pointer;
 }
 
-/* CHECKOUT */
+/* CHECKOUT FULLFOTO */
 #checkout {
   position:fixed;
   bottom:0;
@@ -146,24 +141,56 @@ h1 { text-align:center; margin:30px 0; }
   background:white;
   border-radius:20px 20px 0 0;
   display:none;
-  flex-direction:column;
   z-index:99999;
+}
+
+.checkout-body {
+  display:flex;
+  height:100%;
+}
+
+/* IZQUIERDA */
+.checkout-left {
+  flex:2;
+  padding:20px;
   overflow:auto;
 }
 
-.step { display:none; }
-.step.active { display:block; }
+.grid-fotos {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,100px);
+  gap:10px;
+}
+
+.grid-fotos img {
+  width:100%;
+  border-radius:10px;
+}
+
+/* DERECHA */
+.checkout-right {
+  flex:1;
+  background:#f7f7f7;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  border-radius:12px;
+}
 
 .btn {
-  width:90%;
-  margin:10px auto;
   padding:12px;
   border:none;
   border-radius:10px;
   cursor:pointer;
+  width:100%;
 }
 
-.btn-black { background:black; color:white; }
 .btn-blue { background:#009ee3; color:white; }
 </style>
 </head>
@@ -183,23 +210,45 @@ h1 { text-align:center; margin:30px 0; }
 
 <!-- CHECKOUT -->
 <div id="checkout">
+  <div class="checkout-body">
 
-  <!-- PASO 1 -->
-  <div id="step1" class="step active">
-    <div id="resumen" style="padding:15px;"></div>
-    <div id="total" style="padding:15px;"></div>
+    <!-- IZQUIERDA -->
+    <div class="checkout-left">
+      <div id="gridFotos" class="grid-fotos"></div>
 
-    <button class="btn btn-black" onclick="irAPago()">Siguiente</button>
+      <div style="margin-top:15px;color:red;cursor:pointer;" onclick="vaciarCarrito()">
+        🗑 Limpiar carrito
+      </div>
+    </div>
+
+    <!-- DERECHA -->
+    <div class="checkout-right">
+
+      <div class="card">
+        <b>Info</b>
+        <div id="infoUpsell"></div>
+      </div>
+
+      <div class="card">
+        <b>Pedido</b>
+        <div id="detallePedido"></div>
+        <div id="total"></div>
+      </div>
+
+      <div class="card">
+        <input placeholder="Email">
+        <input placeholder="Teléfono">
+      </div>
+
+      <button class="btn btn-blue" onclick="pagarMercadoPago()">
+        Mercado Pago
+      </button>
+
+      <button class="btn" onclick="cerrarCheckout()">Cerrar</button>
+
+    </div>
+
   </div>
-
-  <!-- PASO 2 -->
-  <div id="step2" class="step">
-    <button class="btn btn-blue" onclick="pagarMercadoPago()">Mercado Pago</button>
-    <button class="btn btn-black">Transferencia</button>
-  </div>
-
-  <button class="btn" onclick="cerrarCheckout()">Cerrar</button>
-
 </div>
 
 <script>
@@ -211,7 +260,7 @@ let seleccionadas = [];
 let currentAlbum = "";
 let totalGlobal = 0;
 
-/* LINKS */
+/* LINKS MP */
 const LINKS = {
   2000:"PEGAR_LINK_2000",
   5500:"PEGAR_LINK_5500",
@@ -223,7 +272,7 @@ const LINKS = {
 /* MODAL */
 function abrirModal(src){
   modal.style.display="flex";
-  modalImg.src = src;
+  modalImg.src=src;
 }
 
 function cerrarModal(){
@@ -240,22 +289,12 @@ function actualizarBoton(){
 cartBar.onclick = abrirCheckout;
 
 function abrirCheckout(){
-  checkout.style.display="flex";
-  mostrarPaso(1);
+  checkout.style.display="block";
   renderCheckout();
 }
 
 function cerrarCheckout(){
   checkout.style.display="none";
-}
-
-function mostrarPaso(n){
-  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-  document.getElementById("step"+n).classList.add("active");
-}
-
-function irAPago(){
-  mostrarPaso(2);
 }
 
 /* PRECIO */
@@ -290,25 +329,51 @@ function pagarMercadoPago(){
 
 /* RENDER */
 function renderCheckout(){
-  let agrupado={}, total=0, html="";
+
+  const grid=document.getElementById("gridFotos");
+  const detalle=document.getElementById("detallePedido");
+  const totalDiv=document.getElementById("total");
+  const info=document.getElementById("infoUpsell");
+
+  grid.innerHTML="";
+  detalle.innerHTML="";
+  info.innerHTML="";
+
+  let agrupado={}, total=0;
 
   seleccionadas.forEach(i=>{
     if(!agrupado[i.album]) agrupado[i.album]=[];
     agrupado[i.album].push(i.foto);
   });
 
-  for(let a in agrupado){
-    let c=agrupado[a].length;
+  for(let album in agrupado){
+
+    agrupado[album].forEach(f=>{
+      const img=document.createElement("img");
+      img.src=`/images/${album}/preview/${f}`;
+      grid.appendChild(img);
+    });
+
+    let c=agrupado[album].length;
     let p=calcularPrecio(c);
     total+=p;
 
-    html+=`<b>${a}</b><br>${c} fotos → $${p}<br><br>`;
+    detalle.innerHTML+=`<b>${album}</b><br>${c} fotos → $${p}<br><br>`;
+
+    if(c<3){
+      info.innerHTML=`Agregá ${3-c} fotos y pagás pack de 3`;
+    }
   }
 
   totalGlobal=total;
+  totalDiv.innerHTML="<b>Total: $"+total+"</b>";
+}
 
-  resumen.innerHTML=html;
-  total.innerHTML="<b>Total: $"+total+"</b>";
+/* VACIAR */
+function vaciarCarrito(){
+  seleccionadas=[];
+  actualizarBoton();
+  renderCheckout();
 }
 
 /* ÁLBUMES */
