@@ -16,7 +16,7 @@ h1 {
   margin: 30px 0;
 }
 
-/* 🔥 GRID ÁLBUMES (ARREGLADO) */
+/* ÁLBUMES */
 .home-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 260px);
@@ -46,7 +46,7 @@ h1 {
   border-radius: 8px;
 }
 
-/* 📸 GALERÍA */
+/* GALERÍA */
 .gallery-container {
   max-width: 1200px;
   margin: auto;
@@ -61,7 +61,7 @@ h1 {
   cursor: pointer;
 }
 
-/* 🔥 PINTEREST */
+/* PINTEREST */
 .gallery {
   column-count: 4;
   column-gap: 15px;
@@ -80,12 +80,12 @@ h1 {
   transition: 0.3s;
 }
 
-/* 🔥 HOVER RESTAURADO */
+/* HOVER */
 .photo:hover img {
   transform: scale(1.05);
 }
 
-/* 🔲 CHECKBOX */
+/* CHECKBOX */
 .checkbox {
   position: absolute;
   bottom: 10px;
@@ -99,7 +99,7 @@ h1 {
   z-index: 3;
 }
 
-/* ✔ SELECCION */
+/* SELECCIÓN */
 .photo.selected .checkbox {
   background: black;
 }
@@ -112,17 +112,16 @@ h1 {
   left: 5px;
 }
 
-/* 🔥 OVERLAY SIN BLOQUEAR CLICK */
 .photo.selected::after {
   content: "";
   position: absolute;
   inset: 0;
   background: rgba(255,0,0,0.4);
   border-radius: 12px;
-  pointer-events: none; /* 🔥 CLAVE */
+  pointer-events: none;
 }
 
-/* 🛒 CARRITO */
+/* CARRITO */
 .cart {
   position: fixed;
   top: 20px;
@@ -135,7 +134,7 @@ h1 {
   z-index: 9999;
 }
 
-/* 🔥 MODAL */
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -172,12 +171,11 @@ h1 {
 
 let seleccionadas = new Set();
 
-// 🛒 actualizar carrito
 function actualizarCarrito() {
   document.getElementById("cart").innerText = "🛒 " + seleccionadas.size;
 }
 
-// 🏠 ÁLBUMES
+/* ÁLBUMES */
 async function mostrarAlbums() {
   const app = document.getElementById("app");
 
@@ -204,7 +202,7 @@ async function mostrarAlbums() {
   }
 }
 
-// 📸 ABRIR ÁLBUM
+/* ABRIR ÁLBUM */
 async function abrirAlbum(nombre) {
   const app = document.getElementById("app");
 
@@ -226,9 +224,25 @@ async function abrirAlbum(nombre) {
     const img = document.createElement("img");
     img.src = `/images/${nombre}/preview/${foto}`;
 
-    // 🔥 CLICK FUNCIONA SIEMPRE
-    div.addEventListener("click", () => {
+    /* CLICK IZQUIERDO */
+    div.addEventListener("click", (e) => {
+      if (e.target.classList.contains("checkbox")) return;
       abrirModal(`/images/${nombre}/watermarked/${foto}`);
+    });
+
+    /* CLICK DERECHO */
+    div.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+
+      if (div.classList.contains("selected")) {
+        div.classList.remove("selected");
+        seleccionadas.delete(foto);
+      } else {
+        div.classList.add("selected");
+        seleccionadas.add(foto);
+      }
+
+      actualizarCarrito();
     });
 
     const checkbox = document.createElement("div");
@@ -254,7 +268,7 @@ async function abrirAlbum(nombre) {
   });
 }
 
-// 🖼 MODAL
+/* MODAL */
 function abrirModal(src) {
   const modal = document.getElementById("modal");
   const img = document.getElementById("modalImg");
@@ -262,14 +276,12 @@ function abrirModal(src) {
   img.src = src;
   modal.style.display = "flex";
 
-  modal.onclick = cerrarModal;
+  modal.onclick = () => modal.style.display = "none";
 }
 
-function cerrarModal() {
-  document.getElementById("modal").style.display = "none";
-}
+/* BLOQUEAR CLICK DERECHO GLOBAL */
+document.addEventListener("contextmenu", e => e.preventDefault());
 
-// INIT
 mostrarAlbums();
 
 </script>
