@@ -50,7 +50,10 @@ h1 { text-align:center; margin:30px 0; }
   width:100%;
   border-radius:12px;
   cursor:pointer;
+  transition:.3s;
 }
+
+.photo:hover img { transform:scale(1.05); }
 
 /* CHECK */
 .checkbox {
@@ -131,7 +134,7 @@ h1 { text-align:center; margin:30px 0; }
   cursor:pointer;
 }
 
-/* CHECKOUT FULLFOTO */
+/* CHECKOUT */
 #checkout {
   position:fixed;
   bottom:0;
@@ -260,7 +263,7 @@ let seleccionadas = [];
 let currentAlbum = "";
 let totalGlobal = 0;
 
-/* LINKS MP */
+/* 🔗 PEGÁ TUS LINKS REALES */
 const LINKS = {
   2000:"PEGAR_LINK_2000",
   5500:"PEGAR_LINK_5500",
@@ -310,7 +313,7 @@ function calcularPrecio(n){
   return total;
 }
 
-/* MP */
+/* GENERAR LINKS */
 function generarLinksPago(total){
   let links=[];
   while(total>0){
@@ -323,8 +326,23 @@ function generarLinksPago(total){
   return links;
 }
 
+/* 💰 PAGAR (FIX PRO) */
 function pagarMercadoPago(){
-  generarLinksPago(totalGlobal).forEach(l=>window.open(l));
+
+  const links = generarLinksPago(totalGlobal);
+
+  if(links.length === 0){
+    alert("No hay nada para pagar");
+    return;
+  }
+
+  window.open(links[0], "_blank");
+
+  for(let i=1; i<links.length; i++){
+    setTimeout(()=>{
+      window.open(links[i], "_blank");
+    }, 500 * i);
+  }
 }
 
 /* RENDER */
