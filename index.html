@@ -17,20 +17,20 @@ h1 {
   margin: 30px 0;
 }
 
-/* ===== HOME (ÁLBUMES) ===== */
+/* ===== GRID DE ÁLBUMES ===== */
 .home-container {
-  width: 900px;
-  margin-left: 40px; /* izquierda */
+  display: grid;
+  grid-template-columns: repeat(4, 260px); /* 👈 tamaño */
+  gap: 30px;
+  padding-left: 40px; /* izquierda */
 }
 
-/* CARD CUADRADA */
+/* CARD */
 .album-card {
-  width: 420px;
   background: white;
-  border-radius: 15px;
+  border-radius: 12px;
   padding: 15px;
-  margin-bottom: 25px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -40,30 +40,30 @@ h1 {
 }
 
 .album-title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
 }
 
 .album-count {
   color: gray;
   margin: 5px 0 10px;
+  font-size: 14px;
 }
 
-/* IMAGEN CUADRADA */
+/* PREVIEW */
 .album-card img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 160px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
-/* ===== GALERÍA (CENTRADA) ===== */
+/* ===== GALERÍA ===== */
 .gallery-container {
   max-width: 1200px;
-  margin: auto; /* 👈 centrado */
+  margin: auto;
 }
 
-/* BOTON VOLVER */
 .back-btn {
   display: inline-block;
   margin: 20px 0;
@@ -130,7 +130,6 @@ h1 {
 
 <div id="app"></div>
 
-<!-- MODAL -->
 <div class="modal" id="modal" onclick="cerrarModal()">
   <img id="modalImg">
 </div>
@@ -142,10 +141,22 @@ const albums = [
   {
     nombre: "gymna_vs_cariocas",
     titulo: "FUTSAL TUCUMAN Fecha 3: Malvinas Argentinas vs Alianza"
+  },
+  {
+    nombre: "balcor_vs_lomas",
+    titulo: "FUTSAL TUCUMAN Fecha 3: Balcor vs Lomas"
+  },
+  {
+    nombre: "vinotinto_vs_sportivo",
+    titulo: "FUTSAL TUCUMAN Fecha 4: Vinotinto vs Sportivo"
+  },
+  {
+    nombre: "templo_vs_leones",
+    titulo: "FUTSAL TUCUMAN Fecha 4: Templo Negro vs Los Leones"
   }
 ];
 
-// 🏠 HOME (izquierda + cuadrado)
+// 🏠 HOME GRID
 function mostrarAlbums() {
   const app = document.getElementById("app");
 
@@ -176,7 +187,7 @@ function mostrarAlbums() {
   });
 }
 
-// 📸 ÁLBUM (centrado + pinterest)
+// 📸 ABRIR ÁLBUM
 async function abrirAlbum(nombre) {
   const app = document.getElementById("app");
 
@@ -198,10 +209,7 @@ async function abrirAlbum(nombre) {
 
     const img = document.createElement("img");
 
-    // SIN marca
     img.src = `/images/${nombre}/preview/${foto}`;
-
-    // CON marca
     img.onclick = () => abrirModal(`/images/${nombre}/watermarked/${foto}`);
 
     div.appendChild(img);
