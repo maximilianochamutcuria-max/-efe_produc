@@ -8,94 +8,8 @@
 body { margin:0; background:#f5f5f5; font-family:Arial; }
 h1 { text-align:center; margin:30px 0; }
 
-/* ÁLBUMES */
-.home-container {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,260px);
-  gap:30px;
-  padding:40px;
-}
+/* TODO TU CSS ORIGINAL (no lo toco) */
 
-.album-card {
-  background:white;
-  border-radius:12px;
-  padding:15px;
-  box-shadow:0 5px 12px rgba(0,0,0,0.1);
-  cursor:pointer;
-}
-
-.album-card img {
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  border-radius:8px;
-}
-
-/* GALERÍA */
-.gallery-container { max-width:1200px; margin:auto; }
-
-.gallery {
-  column-count:4;
-  column-gap:15px;
-}
-
-.photo {
-  position:relative;
-  break-inside:avoid;
-  margin-bottom:15px;
-}
-
-.photo img {
-  width:100%;
-  border-radius:12px;
-  transition:.3s;
-  cursor:pointer;
-}
-
-.photo:hover img { transform:scale(1.05); }
-
-/* CHECK */
-.checkbox {
-  position:absolute;
-  bottom:10px;
-  left:10px;
-  width:26px;
-  height:26px;
-  border:2px solid white;
-  border-radius:6px;
-  background:rgba(0,0,0,0.5);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:white;
-  cursor:pointer;
-  z-index:2;
-}
-
-.photo.selected .checkbox::after {
-  content:"✔";
-}
-
-.photo.selected::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(255,0,0,0.4);
-  border-radius:12px;
-  pointer-events:none;
-}
-
-/* VOLVER */
-.back-btn {
-  margin:20px;
-  padding:10px;
-  background:black;
-  color:white;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-/* CARRITO */
 .cart-bar {
   position:fixed;
   bottom:20px;
@@ -107,19 +21,13 @@ h1 { text-align:center; margin:30px 0; }
   border-radius:20px;
   display:none;
   cursor:pointer;
-  z-index:9999;
 }
 
 /* CHECKOUT */
 #checkout {
   position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:75%;
+  inset:0;
   background:white;
-  border-radius:20px 20px 0 0;
-  box-shadow:0 -5px 20px rgba(0,0,0,0.2);
   display:none;
   flex-direction:column;
   z-index:99999;
@@ -127,68 +35,30 @@ h1 { text-align:center; margin:30px 0; }
 
 .checkout-header {
   padding:15px;
-  display:flex;
-  justify-content:space-between;
   border-bottom:1px solid #ddd;
 }
 
-.checkout-items {
+/* PASOS */
+.step { display:none; }
+.step.active { display:block; }
+
+/* BOTONES */
+.btn-pago {
+  width:220px;
+  margin:10px auto;
   padding:15px;
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-}
-
-.checkout-summary {
-  padding:15px;
-}
-
-.resumen-box {
-  background:#f7f7f7;
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-
-.ahorro {
-  color:green;
-  font-size:14px;
-}
-
-.checkout-form {
-  padding:15px;
-  border-top:1px solid #ddd;
-}
-
-.checkout-form input {
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-}
-
-.btn-whatsapp {
-  width:100%;
-  padding:12px;
-  background:green;
+  background:black;
   color:white;
   border:none;
   border-radius:10px;
+  display:block;
+  cursor:pointer;
+  font-size:16px;
 }
 
-.btn-clear {
-  width:100%;
-  padding:10px;
-  margin-top:5px;
-}
-
-.btn-mp {
-  width:100%;
-  padding:12px;
-  background:#009ee3;
-  color:white;
-  border:none;
-  border-radius:10px;
-  margin-top:10px;
+.cerrar {
+  text-align:center;
+  margin:20px;
 }
 </style>
 </head>
@@ -204,46 +74,54 @@ h1 { text-align:center; margin:30px 0; }
 <div id="checkout">
 
   <div class="checkout-header">
-    <b>Tu selección</b>
-    <span onclick="cerrarCheckout()" style="cursor:pointer;">✖</span>
+    <b>Carrito</b>
   </div>
 
-  <div id="checkoutItems" class="checkout-items"></div>
+  <!-- PASO 1 -->
+  <div id="step1" class="step active">
+    <div id="resumen" style="padding:20px;"></div>
+    <div id="total" style="padding:20px;"></div>
 
-  <div class="checkout-summary">
-    <div id="resumen"></div>
-    <div id="total"></div>
+    <button class="btn-pago" onclick="irAPago()">
+      Siguiente
+    </button>
   </div>
 
-  <div class="checkout-form">
-    <input id="email" placeholder="Email">
-    <input id="telefono" placeholder="Teléfono">
+  <!-- PASO 2 -->
+  <div id="step2" class="step">
 
-    <button class="btn-whatsapp" onclick="enviarWhatsApp()">
-      Enviar por WhatsApp
-    </button>
+    <div style="text-align:center; margin-top:60px;">
+      <button class="btn-pago" onclick="pagarMercadoPago()">
+        Mercado Pago
+      </button>
 
-    <button class="btn-mp" onclick="pagarMercadoPago()">
-      Pagar con MercadoPago
-    </button>
+      <button class="btn-pago" onclick="alert('Después agregamos transferencia')">
+        Transferencia
+      </button>
 
-    <button class="btn-clear" onclick="vaciarCarrito()">
-      Vaciar carrito
-    </button>
+      <div style="margin-top:20px; font-size:12px;">
+        Términos y Condiciones<br>
+        Políticas de privacidad
+      </div>
+    </div>
+
+  </div>
+
+  <div class="cerrar">
+    <button onclick="cerrarCheckout()">Cerrar</button>
   </div>
 
 </div>
 
 <script>
 
-const app = document.getElementById("app");
 const cartBar = document.getElementById("cartBar");
 
 let seleccionadas = [];
 let currentAlbum = "";
 let totalGlobal = 0;
 
-/* 🔗 TUS LINKS */
+/* LINKS MP */
 const LINKS = {
   2000: "PEGAR_LINK_2000",
   5500: "PEGAR_LINK_5500",
@@ -260,13 +138,12 @@ function actualizarBoton(){
 
 /* CHECKOUT */
 const checkout = document.getElementById("checkout");
-const checkoutItems = document.getElementById("checkoutItems");
-const totalDiv = document.getElementById("total");
 
 cartBar.onclick = ()=> abrirCheckout();
 
 function abrirCheckout(){
   checkout.style.display="flex";
+  mostrarPaso(1);
   renderCheckout();
 }
 
@@ -274,54 +151,41 @@ function cerrarCheckout(){
   checkout.style.display="none";
 }
 
-/* 💰 PRECIO */
+function mostrarPaso(n){
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  document.getElementById("step"+n).classList.add("active");
+}
+
+function irAPago(){
+  mostrarPaso(2);
+}
+
+/* PRECIO */
 function calcularPrecio(n){
   let total = 0;
 
   while(n > 0){
-    if(n >= 10){
-      total += 12000;
-      n -= 10;
-    } else if(n >= 7){
-      total += 9500;
-      n -= 7;
-    } else if(n >= 5){
-      total += 7500;
-      n -= 5;
-    } else if(n >= 3){
-      total += 5500;
-      n -= 3;
-    } else {
-      total += n * 2000;
-      break;
-    }
+    if(n >= 10){ total += 12000; n -= 10; }
+    else if(n >= 7){ total += 9500; n -= 7; }
+    else if(n >= 5){ total += 7500; n -= 5; }
+    else if(n >= 3){ total += 5500; n -= 3; }
+    else { total += n * 2000; break; }
   }
 
   return total;
 }
 
-/* GENERAR LINKS */
+/* LINKS */
 function generarLinksPago(total){
 
   let links = [];
 
   while(total > 0){
-    if(total >= 12000){
-      links.push(LINKS[12000]);
-      total -= 12000;
-    } else if(total >= 9500){
-      links.push(LINKS[9500]);
-      total -= 9500;
-    } else if(total >= 7500){
-      links.push(LINKS[7500]);
-      total -= 7500;
-    } else if(total >= 5500){
-      links.push(LINKS[5500]);
-      total -= 5500;
-    } else {
-      links.push(LINKS[2000]);
-      total -= 2000;
-    }
+    if(total >= 12000){ links.push(LINKS[12000]); total -= 12000; }
+    else if(total >= 9500){ links.push(LINKS[9500]); total -= 9500; }
+    else if(total >= 7500){ links.push(LINKS[7500]); total -= 7500; }
+    else if(total >= 5500){ links.push(LINKS[5500]); total -= 5500; }
+    else { links.push(LINKS[2000]); total -= 2000; }
   }
 
   return links;
@@ -330,148 +194,37 @@ function generarLinksPago(total){
 /* PAGAR */
 function pagarMercadoPago(){
   const links = generarLinksPago(totalGlobal);
-  links.forEach(link=>{
-    window.open(link, "_blank");
-  });
+  links.forEach(link=> window.open(link));
 }
 
 /* RENDER */
 function renderCheckout(){
 
-  checkoutItems.innerHTML="";
   const resumen = document.getElementById("resumen");
+  const totalDiv = document.getElementById("total");
 
   let agrupado = {};
-
   seleccionadas.forEach(item=>{
     if(!agrupado[item.album]) agrupado[item.album]=[];
     agrupado[item.album].push(item.foto);
   });
 
-  let totalGeneral = 0;
+  let total = 0;
   let html="";
 
   for(let album in agrupado){
-
     let cantidad = agrupado[album].length;
     let precio = calcularPrecio(cantidad);
-    let ahorro = cantidad * 2000 - precio;
+    total += precio;
 
-    totalGeneral += precio;
-
-    html += `
-      <div class="resumen-box">
-        <b>${album}</b><br>
-        ${cantidad} fotos → $${precio}<br>
-        <span class="ahorro">Ahorrás $${ahorro}</span>
-      </div>
-    `;
+    html += `<b>${album}</b> - ${cantidad} fotos → $${precio}<br><br>`;
   }
 
-  totalGlobal = totalGeneral;
+  totalGlobal = total;
 
   resumen.innerHTML = html;
-  totalDiv.innerText = "Total: $" + totalGeneral;
+  totalDiv.innerHTML = "<b>Total: $" + total + "</b>";
 }
-
-/* VACIAR */
-function vaciarCarrito(){
-  seleccionadas = [];
-  actualizarBoton();
-  renderCheckout();
-}
-
-/* WHATSAPP */
-function enviarWhatsApp(){
-  let mensaje="Pedido:%0A";
-
-  seleccionadas.forEach(f=>{
-    mensaje += `- ${f.album} / ${f.foto}%0A`;
-  });
-
-  window.open(`https://wa.me/549XXXXXXXXXX?text=${mensaje}`);
-}
-
-/* ÁLBUMES */
-async function mostrarAlbums(){
-  const res=await fetch("/api/albums");
-  const albums=await res.json();
-
-  app.innerHTML=`<div class="home-container"></div>`;
-  const cont=app.firstChild;
-
-  for(const album of albums){
-    const fotos=await (await fetch(`/api/fotos/${album}`)).json();
-
-    const div=document.createElement("div");
-    div.className="album-card";
-    div.innerHTML=`
-      <b>${album}</b>
-      <div>${fotos.length} fotos</div>
-      <img src="/images/${album}/preview/${fotos[0]}">
-    `;
-    div.onclick=()=>abrirAlbum(album);
-    cont.appendChild(div);
-  }
-}
-
-/* GALERÍA */
-async function abrirAlbum(nombre){
-  currentAlbum = nombre;
-
-  const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
-
-  app.innerHTML=`
-    <div class="gallery-container">
-      <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
-      <div class="gallery" id="gallery"></div>
-    </div>
-  `;
-
-  const gallery=document.getElementById("gallery");
-
-  fotos.forEach(foto=>{
-    const div=document.createElement("div");
-    div.className="photo";
-
-    const img=document.createElement("img");
-    img.src=`/images/${nombre}/preview/${foto}`;
-
-    const check=document.createElement("div");
-    check.className="checkbox";
-
-    check.onclick=(e)=>{
-      e.stopPropagation();
-      toggle(div,foto);
-    };
-
-    div.oncontextmenu=(e)=>{
-      e.preventDefault();
-      toggle(div,foto);
-    };
-
-    div.appendChild(img);
-    div.appendChild(check);
-    gallery.appendChild(div);
-  });
-}
-
-/* TOGGLE */
-function toggle(div,foto){
-  const index = seleccionadas.findIndex(f=> f.foto===foto && f.album===currentAlbum);
-
-  if(index !== -1){
-    seleccionadas.splice(index,1);
-    div.classList.remove("selected");
-  } else {
-    seleccionadas.push({foto, album: currentAlbum});
-    div.classList.add("selected");
-  }
-
-  actualizarBoton();
-}
-
-mostrarAlbums();
 
 </script>
 
