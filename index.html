@@ -126,98 +126,82 @@ h1 { text-align:center; margin:30px 0; }
   max-height:90vh;
 }
 
-/* CHECKOUT FULLFOTO STYLE */
+/* CHECKOUT MEJORADO */
 #checkout {
   position:fixed;
-  inset:0;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:75%;
   background:white;
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -5px 20px rgba(0,0,0,0.2);
   display:none;
-  z-index:99999;
   flex-direction:column;
+  z-index:99999;
 }
 
 .checkout-header {
-  padding:15px 20px;
-  font-weight:bold;
-  border-bottom:1px solid #ddd;
+  padding:15px;
   display:flex;
   justify-content:space-between;
+  border-bottom:1px solid #ddd;
 }
 
-.checkout-body {
+.checkout-items {
+  padding:15px;
   display:flex;
-  height:100%;
-}
-
-/* IZQUIERDA */
-.checkout-left {
-  flex:2;
-  padding:20px;
-  overflow:auto;
-}
-
-.checkout-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,120px);
-  gap:15px;
-}
-
-.checkout-item {
-  text-align:center;
+  gap:10px;
+  overflow-x:auto;
 }
 
 .checkout-item img {
-  width:100%;
+  width:80px;
   border-radius:10px;
 }
 
 .remove-btn {
   color:red;
   cursor:pointer;
+  text-align:center;
+}
+
+/* INFO + RESUMEN */
+.checkout-info {
+  padding:15px;
+  background:#f7f7f7;
   font-size:14px;
 }
 
-/* DERECHA */
-.checkout-right {
-  flex:1;
-  background:#f7f7f7;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-}
-
-.card {
-  background:white;
+.checkout-summary {
   padding:15px;
-  border-radius:12px;
 }
 
-.total {
-  font-weight:bold;
-  margin-top:10px;
+/* FORM */
+.checkout-form {
+  padding:15px;
+  border-top:1px solid #ddd;
 }
 
-input {
+.checkout-form input {
   width:100%;
   padding:10px;
-  margin-top:5px;
-}
-
-button {
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
+  margin-bottom:10px;
 }
 
 .btn-whatsapp {
+  width:100%;
+  padding:12px;
   background:green;
   color:white;
+  border:none;
+  border-radius:10px;
 }
 
 .btn-clear {
-  background:#eee;
+  width:100%;
+  padding:10px;
+  margin-top:5px;
 }
 </style>
 </head>
@@ -229,59 +213,37 @@ button {
 <div id="app"></div>
 <div id="cartBar" class="cart-bar"></div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <img id="modalImg">
-</div>
-
 <!-- CHECKOUT -->
 <div id="checkout">
+
   <div class="checkout-header">
-    Carrito
-    <span style="cursor:pointer;" onclick="cerrarCheckout()">✖</span>
+    <b>Tu selección</b>
+    <span onclick="cerrarCheckout()" style="cursor:pointer;">✖</span>
   </div>
 
-  <div class="checkout-body">
+  <div id="checkoutItems" class="checkout-items"></div>
 
-    <!-- IZQUIERDA -->
-    <div class="checkout-left">
-      <div id="checkoutGrid" class="checkout-grid"></div>
-      <div style="margin-top:20px;color:red;cursor:pointer;" onclick="vaciarCarrito()">
-        🗑 Limpiar carrito
-      </div>
-    </div>
-
-    <!-- DERECHA -->
-    <div class="checkout-right">
-
-      <div class="card">
-        <b>Info</b>
-        <div style="font-size:14px;margin-top:5px;">
-          Agregá más fotos para obtener descuento 🔥
-        </div>
-      </div>
-
-      <div class="card">
-        <b>Pedido</b>
-        <div id="resumen"></div>
-        <div class="total" id="total"></div>
-      </div>
-
-      <div class="card">
-        <label>Email</label>
-        <input id="email">
-
-        <label>Teléfono</label>
-        <input id="telefono">
-      </div>
-
-      <button class="btn-whatsapp" onclick="enviarWhatsApp()">
-        Enviar por WhatsApp
-      </button>
-
-    </div>
-
+  <div class="checkout-info">
+    💡 Agregá más fotos para obtener mejor precio (próximamente packs 🔥)
   </div>
+
+  <div class="checkout-summary">
+    <div id="total"></div>
+  </div>
+
+  <div class="checkout-form">
+    <input id="email" placeholder="Email">
+    <input id="telefono" placeholder="Teléfono">
+
+    <button class="btn-whatsapp" onclick="enviarWhatsApp()">
+      Enviar por WhatsApp
+    </button>
+
+    <button class="btn-clear" onclick="vaciarCarrito()">
+      Vaciar carrito
+    </button>
+  </div>
+
 </div>
 
 <script>
@@ -300,6 +262,8 @@ function actualizarBoton(){
 
 /* CHECKOUT */
 const checkout = document.getElementById("checkout");
+const checkoutItems = document.getElementById("checkoutItems");
+const totalDiv = document.getElementById("total");
 
 cartBar.onclick = ()=> abrirCheckout();
 
@@ -314,12 +278,7 @@ function cerrarCheckout(){
 
 function renderCheckout(){
 
-  const grid = document.getElementById("checkoutGrid");
-  const resumen = document.getElementById("resumen");
-  const totalDiv = document.getElementById("total");
-
-  grid.innerHTML="";
-  resumen.innerHTML="";
+  checkoutItems.innerHTML="";
 
   seleccionadas.forEach(foto=>{
     const div=document.createElement("div");
@@ -336,10 +295,9 @@ function renderCheckout(){
       actualizarBoton();
     };
 
-    grid.appendChild(div);
+    checkoutItems.appendChild(div);
   });
 
-  resumen.innerHTML = `${seleccionadas.size} fotos seleccionadas`;
   totalDiv.innerText = "Total: $" + (seleccionadas.size * 2000);
 }
 
