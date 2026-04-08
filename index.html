@@ -135,20 +135,25 @@ h1 {
   padding: 15px;
   border-radius: 10px;
   display: none;
+  z-index: 9999;
 }
 
-/* MODAL */
+/* MODAL (FIXED) */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   justify-content: center;
   align-items: center;
+  z-index: 99999;
 }
 
 .modal img {
-  max-width: 90%;
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 10px;
 }
 
 /* CHECKOUT PRO */
@@ -182,9 +187,29 @@ h1 {
   gap: 15px;
 }
 
-.checkout-items img {
+.checkout-item {
+  position: relative;
+}
+
+.checkout-item img {
   width: 120px;
   border-radius: 10px;
+}
+
+.remove-item {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: black;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .checkout-right {
@@ -235,9 +260,16 @@ h1 {
   <div class="checkout-panel">
 
     <div class="checkout-left">
-      <h2>Carrito</h2>
+      <div style="display:flex;justify-content:space-between;">
+        <h2>Carrito</h2>
+        <span onclick="cerrarCheckout()" style="cursor:pointer;font-size:22px;">✖</span>
+      </div>
+
       <div id="checkoutItems" class="checkout-items"></div>
-      <div onclick="vaciarCarrito()" style="color:red;margin-top:20px;">🗑 Limpiar carrito</div>
+
+      <div onclick="vaciarCarrito()" style="color:red;margin-top:20px;">
+        🗑 Limpiar carrito
+      </div>
     </div>
 
     <div class="checkout-right">
@@ -278,8 +310,8 @@ function actualizarBoton() {
 document.getElementById("cartBar").onclick = () => {
   if (!enCarrito) {
     enCarrito = true;
-    document.getElementById("toast").style.display = "block";
-    setTimeout(()=>document.getElementById("toast").style.display="none",2000);
+    toast.style.display = "block";
+    setTimeout(()=>toast.style.display="none",2000);
   } else {
     abrirCheckout();
   }
@@ -364,9 +396,28 @@ function abrirCheckout() {
   cont.innerHTML = "";
 
   seleccionadas.forEach(f => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "checkout-item";
+
     const img = document.createElement("img");
     img.src = document.querySelector(`img[src*="${f}"]`)?.src;
-    cont.appendChild(img);
+
+    const remove = document.createElement("div");
+    remove.className = "remove-item";
+    remove.innerText = "✖";
+
+    remove.onclick = () => {
+      seleccionadas.delete(f);
+      document.querySelectorAll(".photo").forEach(p=>{
+        if(p.innerHTML.includes(f)) p.classList.remove("selected");
+      });
+      abrirCheckout();
+      actualizarBoton();
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(remove);
+    cont.appendChild(wrapper);
   });
 
   const precio = 2000;
