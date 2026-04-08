@@ -215,16 +215,13 @@ h1 { text-align:center; margin:30px 0; }
 <div id="checkout">
   <div class="checkout-body">
 
-    <!-- IZQUIERDA -->
     <div class="checkout-left">
       <div id="gridFotos" class="grid-fotos"></div>
-
       <div style="margin-top:15px;color:red;cursor:pointer;" onclick="vaciarCarrito()">
         🗑 Limpiar carrito
       </div>
     </div>
 
-    <!-- DERECHA -->
     <div class="checkout-right">
 
       <div class="card">
@@ -263,13 +260,13 @@ let seleccionadas = [];
 let currentAlbum = "";
 let totalGlobal = 0;
 
-/* 🔗 PEGÁ TUS LINKS REALES */
+/* 🔥 SOLO ESTE LINK ACTIVO */
 const LINKS = {
-  2000:"PEGAR_LINK_2000",
-  5500:"PEGAR_LINK_5500",
-  7500:"PEGAR_LINK_7500",
-  9500:"PEGAR_LINK_9500",
-  12000:"PEGAR_LINK_12000"
+  2000:"https://mpago.la/17zfiHq",
+  5500:"",
+  7500:"",
+  9500:"",
+  12000:""
 };
 
 /* MODAL */
@@ -313,7 +310,7 @@ function calcularPrecio(n){
   return total;
 }
 
-/* GENERAR LINKS */
+/* LINKS */
 function generarLinksPago(total){
   let links=[];
   while(total>0){
@@ -326,7 +323,7 @@ function generarLinksPago(total){
   return links;
 }
 
-/* 💰 PAGAR (FIX PRO) */
+/* PAGAR */
 function pagarMercadoPago(){
 
   const links = generarLinksPago(totalGlobal);
@@ -337,12 +334,6 @@ function pagarMercadoPago(){
   }
 
   window.open(links[0], "_blank");
-
-  for(let i=1; i<links.length; i++){
-    setTimeout(()=>{
-      window.open(links[i], "_blank");
-    }, 500 * i);
-  }
 }
 
 /* RENDER */
