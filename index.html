@@ -30,22 +30,6 @@ h1 {
   padding: 15px;
   box-shadow: 0 5px 12px rgba(0,0,0,0.1);
   cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.album-card:hover {
-  transform: scale(1.03);
-}
-
-.album-title {
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.album-count {
-  color: gray;
-  margin: 5px 0 10px;
-  font-size: 14px;
 }
 
 .album-card img {
@@ -78,6 +62,7 @@ h1 {
 }
 
 .photo {
+  position: relative;
   break-inside: avoid;
   margin-bottom: 15px;
 }
@@ -90,15 +75,51 @@ h1 {
 }
 
 .photo img:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
-/* 🔥 MODAL FIX */
+/* 🔲 CHECKBOX */
+.checkbox {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 26px;
+  height: 26px;
+  border: 2px solid white;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.5);
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* ✔ ACTIVO */
+.photo.selected .checkbox {
+  background: black;
+}
+
+/* ✔ ICONO */
+.photo.selected .checkbox::after {
+  content: "✔";
+  color: white;
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 16px;
+}
+
+/* 🔴 OVERLAY ROJO */
+.photo.selected::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,0,0,0.4);
+  border-radius: 12px;
+}
+
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.95);
@@ -110,7 +131,6 @@ h1 {
 .modal img {
   max-width: 90%;
   max-height: 90%;
-  border-radius: 12px;
 }
 </style>
 </head>
@@ -120,14 +140,16 @@ h1 {
 <h1>@efe_produc</h1>
 <div id="app"></div>
 
-<!-- MODAL -->
 <div class="modal" id="modal" onclick="cerrarModal()">
   <img id="modalImg">
 </div>
 
 <script>
 
-// 🔥 CARGAR ÁLBUMES
+// 🧠 fotos seleccionadas
+let seleccionadas = new Set();
+
+// 🔥 ÁLBUMES
 async function mostrarAlbums() {
   const app = document.getElementById("app");
 
@@ -148,13 +170,12 @@ async function mostrarAlbums() {
     div.className = "album-card";
 
     div.innerHTML = `
-      <div class="album-title">${album.replaceAll("_", " ")}</div>
-      <div class="album-count">${fotos.length} Fotos</div>
+      <b>${album.replaceAll("_"," ")}</b>
+      <div>${fotos.length} Fotos</div>
       <img src="/images/${album}/preview/${preview}">
     `;
 
     div.onclick = () => abrirAlbum(album);
-
     cont.appendChild(div);
   }
 }
@@ -180,24 +201,34 @@ async function abrirAlbum(nombre) {
     div.className = "photo";
 
     const img = document.createElement("img");
-
     img.src = `/images/${nombre}/preview/${foto}`;
-
     img.onclick = () => abrirModal(`/images/${nombre}/watermarked/${foto}`);
 
+    const checkbox = document.createElement("div");
+    checkbox.className = "checkbox";
+
+    checkbox.onclick = (e) => {
+      e.stopPropagation();
+
+      if (div.classList.contains("selected")) {
+        div.classList.remove("selected");
+        seleccionadas.delete(foto);
+      } else {
+        div.classList.add("selected");
+        seleccionadas.add(foto);
+      }
+    };
+
     div.appendChild(img);
+    div.appendChild(checkbox);
     gallery.appendChild(div);
   });
 }
 
-// 🔥 MODAL FIX
+// 🔥 MODAL
 function abrirModal(src) {
-  const modal = document.getElementById("modal");
-  const img = document.getElementById("modalImg");
-
-  img.src = src;
-  modal.style.display = "flex";
-
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("modalImg").src = src;
   document.body.style.overflow = "hidden";
 }
 
