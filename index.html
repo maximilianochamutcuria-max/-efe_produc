@@ -158,6 +158,65 @@ h1 {
   max-width: 90%;
   max-height: 90%;
 }
+
+/* CHECKOUT */
+.checkout {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.checkout-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.checkout-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkout-items img {
+  width: 70px;
+  border-radius: 8px;
+}
+
+.checkout-footer {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkout-footer input {
+  padding: 10px;
+}
+
+.checkout-footer button {
+  padding: 12px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
 </style>
 </head>
 
@@ -175,6 +234,28 @@ h1 {
 
 <div class="modal" id="modal">
   <img id="modalImg">
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkout" class="checkout">
+  <div class="checkout-content">
+    <div class="checkout-header">
+      <span>Tu selección</span>
+      <span onclick="cerrarCheckout()" style="cursor:pointer;">✖</span>
+    </div>
+
+    <div id="checkoutItems" class="checkout-items"></div>
+
+    <div class="checkout-footer">
+      <div id="total"></div>
+
+      <input type="email" id="email" placeholder="Tu email">
+      <input type="text" id="telefono" placeholder="Tu teléfono">
+
+      <button onclick="enviarPedido()">Comprar por WhatsApp</button>
+      <button onclick="vaciarCarrito()">🗑 Vaciar carrito</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -214,7 +295,7 @@ document.getElementById("cartBar").onclick = function() {
     enCarrito = true;
     mostrarToast();
   } else {
-    alert("Acá conectamos WhatsApp 💰");
+    abrirCheckout();
   }
   actualizarBoton();
 };
@@ -313,6 +394,53 @@ function abrirModal(src) {
   img.src = src;
   modal.style.display = "flex";
   modal.onclick = () => modal.style.display = "none";
+}
+
+/* CHECKOUT */
+function abrirCheckout() {
+  const cont = document.getElementById("checkoutItems");
+  cont.innerHTML = "";
+
+  seleccionadas.forEach(foto => {
+    const img = document.createElement("img");
+    img.src = document.querySelector(`img[src*="${foto}"]`)?.src;
+    cont.appendChild(img);
+  });
+
+  actualizarTotal();
+  document.getElementById("checkout").style.display = "flex";
+}
+
+function cerrarCheckout() {
+  document.getElementById("checkout").style.display = "none";
+}
+
+function actualizarTotal() {
+  const precio = 1000;
+  const total = seleccionadas.size * precio;
+  document.getElementById("total").innerText = "Total: $" + total;
+}
+
+function vaciarCarrito() {
+  seleccionadas.clear();
+  document.querySelectorAll(".photo").forEach(p => p.classList.remove("selected"));
+  cerrarCheckout();
+  actualizarBoton();
+}
+
+function enviarPedido() {
+  const email = document.getElementById("email").value;
+  const tel = document.getElementById("telefono").value;
+
+  let mensaje = "Hola! Quiero comprar estas fotos:%0A";
+
+  seleccionadas.forEach(f => {
+    mensaje += "- " + f + "%0A";
+  });
+
+  mensaje += `%0AEmail: ${email}%0ATel: ${tel}`;
+
+  window.open(`https://wa.me/5493810000000?text=${mensaje}`, "_blank");
 }
 
 /* BLOQUEAR CLICK DERECHO */
