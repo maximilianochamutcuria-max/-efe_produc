@@ -8,13 +8,16 @@
 body { margin:0; background:#f5f5f5; font-family:Arial; }
 h1 { text-align:center; margin:30px 0; }
 
-/* (todo tu CSS igual, no lo toco salvo esto nuevo) */
-
 .resumen-box {
   background:#f7f7f7;
-  padding:10px;
+  padding:12px;
   margin-top:10px;
   border-radius:10px;
+}
+
+.ahorro {
+  color:green;
+  font-size:14px;
 }
 </style>
 </head>
@@ -24,28 +27,24 @@ h1 { text-align:center; margin:30px 0; }
 <h1>@efe_produc</h1>
 
 <div id="app"></div>
-<div id="cartBar" class="cart-bar"></div>
+<div id="cartBar"></div>
 
 <!-- CHECKOUT -->
-<div id="checkout">
+<div id="checkout" style="position:fixed;bottom:0;width:100%;background:white;padding:15px;display:none;z-index:9999;">
 
-  <div class="checkout-header">
+  <div style="display:flex;justify-content:space-between;">
     <b>Tu selección</b>
-    <span onclick="cerrarCheckout()">✖</span>
+    <span onclick="cerrarCheckout()" style="cursor:pointer;">✖</span>
   </div>
 
-  <div id="checkoutItems" class="checkout-items"></div>
-
-  <div class="checkout-summary">
-    <div id="resumen"></div>
-    <div id="total"></div>
-  </div>
+  <div id="resumen"></div>
+  <div id="total" style="margin-top:10px;"></div>
 
 </div>
 
 <script>
 
-let seleccionadas = []; // 🔥 CAMBIO IMPORTANTE
+let seleccionadas = [];
 let currentAlbum = "";
 
 /* TOGGLE */
@@ -71,49 +70,85 @@ function actualizarBoton(){
 }
 
 /* CHECKOUT */
+function abrirCheckout(){
+  checkout.style.display="block";
+  renderCheckout();
+}
+
+function cerrarCheckout(){
+  checkout.style.display="none";
+}
+
+cartBar.onclick = abrirCheckout;
+
+/* 💰 CALCULAR PRECIO REAL */
+function calcularPrecio(n){
+
+  let total = 0;
+
+  while(n > 0){
+    if(n >= 10){
+      total += 12000;
+      n -= 10;
+    } else if(n >= 7){
+      total += 9500;
+      n -= 7;
+    } else if(n >= 5){
+      total += 7500;
+      n -= 5;
+    } else if(n >= 3){
+      total += 5500;
+      n -= 3;
+    } else {
+      total += n * 2000;
+      break;
+    }
+  }
+
+  return total;
+}
+
+/* 💸 CALCULAR AHORRO */
+function calcularAhorro(cantidad, total){
+
+  const precioNormal = cantidad * 2000;
+  return precioNormal - total;
+}
+
+/* RENDER */
 function renderCheckout(){
 
   const resumen = document.getElementById("resumen");
   const totalDiv = document.getElementById("total");
 
   let agrupado = {};
-
   seleccionadas.forEach(item=>{
     if(!agrupado[item.album]) agrupado[item.album]=[];
     agrupado[item.album].push(item.foto);
   });
 
   let html="";
-  let total=0;
+  let totalGeneral=0;
 
   for(let album in agrupado){
 
     let cantidad = agrupado[album].length;
     let precio = calcularPrecio(cantidad);
+    let ahorro = calcularAhorro(cantidad, precio);
 
-    total += precio;
+    totalGeneral += precio;
 
     html += `
       <div class="resumen-box">
         <b>${album}</b><br>
-        ${cantidad} fotos → $${precio}
+        ${cantidad} fotos → $${precio}<br>
+        <span class="ahorro">Ahorrás $${ahorro}</span>
       </div>
     `;
   }
 
   resumen.innerHTML = html;
-  totalDiv.innerHTML = "<b>Total: $" + total + "</b>";
-}
-
-/* 💰 PACKS */
-function calcularPrecio(n){
-
-  if(n>=10) return Math.floor(n/10)*12000 + calcularPrecio(n%10);
-  if(n>=7) return 9500 + calcularPrecio(n-7);
-  if(n>=5) return 7500 + calcularPrecio(n-5);
-  if(n>=3) return 5500 + calcularPrecio(n-3);
-
-  return n * 2000;
+  totalDiv.innerHTML = "<b>Total: $" + totalGeneral + "</b>";
 }
 
 </script>
