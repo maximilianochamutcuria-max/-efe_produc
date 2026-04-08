@@ -110,22 +110,6 @@ h1 { text-align:center; margin:30px 0; }
   z-index:9999;
 }
 
-/* MODAL */
-.modal {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.95);
-  justify-content:center;
-  align-items:center;
-  z-index:99999;
-}
-
-.modal img {
-  max-width:90vw;
-  max-height:90vh;
-}
-
 /* CHECKOUT */
 #checkout {
   position:fixed;
@@ -153,11 +137,6 @@ h1 { text-align:center; margin:30px 0; }
   display:flex;
   gap:10px;
   overflow-x:auto;
-}
-
-.checkout-item img {
-  width:80px;
-  border-radius:10px;
 }
 
 .checkout-summary {
@@ -201,6 +180,16 @@ h1 { text-align:center; margin:30px 0; }
   padding:10px;
   margin-top:5px;
 }
+
+.btn-mp {
+  width:100%;
+  padding:12px;
+  background:#009ee3;
+  color:white;
+  border:none;
+  border-radius:10px;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -234,6 +223,10 @@ h1 { text-align:center; margin:30px 0; }
       Enviar por WhatsApp
     </button>
 
+    <button class="btn-mp" onclick="pagarMercadoPago()">
+      Pagar con MercadoPago
+    </button>
+
     <button class="btn-clear" onclick="vaciarCarrito()">
       Vaciar carrito
     </button>
@@ -248,6 +241,16 @@ const cartBar = document.getElementById("cartBar");
 
 let seleccionadas = [];
 let currentAlbum = "";
+let totalGlobal = 0;
+
+/* 🔗 TUS LINKS */
+const LINKS = {
+  2000: "PEGAR_LINK_2000",
+  5500: "PEGAR_LINK_5500",
+  7500: "PEGAR_LINK_7500",
+  9500: "PEGAR_LINK_9500",
+  12000: "PEGAR_LINK_12000"
+};
 
 /* BOTÓN */
 function actualizarBoton(){
@@ -297,6 +300,41 @@ function calcularPrecio(n){
   return total;
 }
 
+/* GENERAR LINKS */
+function generarLinksPago(total){
+
+  let links = [];
+
+  while(total > 0){
+    if(total >= 12000){
+      links.push(LINKS[12000]);
+      total -= 12000;
+    } else if(total >= 9500){
+      links.push(LINKS[9500]);
+      total -= 9500;
+    } else if(total >= 7500){
+      links.push(LINKS[7500]);
+      total -= 7500;
+    } else if(total >= 5500){
+      links.push(LINKS[5500]);
+      total -= 5500;
+    } else {
+      links.push(LINKS[2000]);
+      total -= 2000;
+    }
+  }
+
+  return links;
+}
+
+/* PAGAR */
+function pagarMercadoPago(){
+  const links = generarLinksPago(totalGlobal);
+  links.forEach(link=>{
+    window.open(link, "_blank");
+  });
+}
+
 /* RENDER */
 function renderCheckout(){
 
@@ -329,6 +367,8 @@ function renderCheckout(){
       </div>
     `;
   }
+
+  totalGlobal = totalGeneral;
 
   resumen.innerHTML = html;
   totalDiv.innerText = "Total: $" + totalGeneral;
