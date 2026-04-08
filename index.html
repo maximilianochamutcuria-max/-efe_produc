@@ -14,6 +14,7 @@ h1 { text-align:center; margin:30px 0; }
   grid-template-columns:repeat(auto-fill,260px);
   gap:30px;
   padding:40px;
+  justify-content:center;
 }
 
 .album-card {
@@ -32,22 +33,27 @@ h1 { text-align:center; margin:30px 0; }
 }
 
 /* GALERÍA */
+.gallery-container { max-width:1200px; margin:auto; }
+
 .gallery {
   column-count:4;
   column-gap:15px;
-  padding:20px;
 }
 
 .photo {
   position:relative;
+  break-inside:avoid;
   margin-bottom:15px;
 }
 
 .photo img {
   width:100%;
   border-radius:12px;
+  transition:.3s;
   cursor:pointer;
 }
+
+.photo:hover img { transform:scale(1.05); }
 
 /* CHECK */
 .checkbox {
@@ -56,14 +62,19 @@ h1 { text-align:center; margin:30px 0; }
   left:10px;
   width:26px;
   height:26px;
-  background:rgba(0,0,0,0.5);
+  border:2px solid white;
   border-radius:6px;
+  background:rgba(0,0,0,0.5);
   display:flex;
   align-items:center;
   justify-content:center;
   color:white;
   cursor:pointer;
   z-index:2;
+}
+
+.photo.selected .checkbox::after {
+  content:"✔";
 }
 
 .photo.selected::after {
@@ -75,6 +86,16 @@ h1 { text-align:center; margin:30px 0; }
   pointer-events:none;
 }
 
+/* VOLVER */
+.back-btn {
+  margin:20px;
+  padding:10px;
+  background:black;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
+
 /* CARRITO */
 .cart-bar {
   position:fixed;
@@ -83,36 +104,67 @@ h1 { text-align:center; margin:30px 0; }
   transform:translateX(-50%);
   background:black;
   color:white;
-  padding:15px 25px;
+  padding:18px 30px;
   border-radius:20px;
   display:none;
+  cursor:pointer;
+  z-index:9999;
+}
+
+/* MODAL */
+.modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.95);
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+}
+
+.modal img {
+  max-width:90vw;
+  max-height:90vh;
+}
+
+.modal-close {
+  position:absolute;
+  top:20px;
+  right:20px;
+  color:white;
+  font-size:30px;
   cursor:pointer;
 }
 
 /* CHECKOUT */
 #checkout {
   position:fixed;
-  inset:0;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:85%;
   background:white;
+  border-radius:20px 20px 0 0;
   display:none;
   flex-direction:column;
-  z-index:9999;
+  z-index:99999;
+  overflow:auto;
 }
 
 .step { display:none; }
 .step.active { display:block; }
 
 .btn {
-  padding:12px;
+  width:90%;
   margin:10px auto;
-  width:200px;
-  display:block;
-  background:black;
-  color:white;
+  padding:12px;
   border:none;
   border-radius:10px;
   cursor:pointer;
 }
+
+.btn-black { background:black; color:white; }
+.btn-blue { background:#009ee3; color:white; }
 </style>
 </head>
 
@@ -123,21 +175,27 @@ h1 { text-align:center; margin:30px 0; }
 <div id="app"></div>
 <div id="cartBar" class="cart-bar"></div>
 
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <img id="modalImg">
+  <div class="modal-close" onclick="cerrarModal()">✖</div>
+</div>
+
 <!-- CHECKOUT -->
 <div id="checkout">
 
   <!-- PASO 1 -->
   <div id="step1" class="step active">
-    <div id="resumen" style="padding:20px;"></div>
-    <div id="total" style="padding:20px;"></div>
+    <div id="resumen" style="padding:15px;"></div>
+    <div id="total" style="padding:15px;"></div>
 
-    <button class="btn" onclick="irAPago()">Siguiente</button>
+    <button class="btn btn-black" onclick="irAPago()">Siguiente</button>
   </div>
 
   <!-- PASO 2 -->
   <div id="step2" class="step">
-    <button class="btn" onclick="pagarMercadoPago()">Mercado Pago</button>
-    <button class="btn">Transferencia</button>
+    <button class="btn btn-blue" onclick="pagarMercadoPago()">Mercado Pago</button>
+    <button class="btn btn-black">Transferencia</button>
   </div>
 
   <button class="btn" onclick="cerrarCheckout()">Cerrar</button>
@@ -155,12 +213,22 @@ let totalGlobal = 0;
 
 /* LINKS */
 const LINKS = {
-  2000:"LINK_2000",
-  5500:"LINK_5500",
-  7500:"LINK_7500",
-  9500:"LINK_9500",
-  12000:"LINK_12000"
+  2000:"PEGAR_LINK_2000",
+  5500:"PEGAR_LINK_5500",
+  7500:"PEGAR_LINK_7500",
+  9500:"PEGAR_LINK_9500",
+  12000:"PEGAR_LINK_12000"
 };
+
+/* MODAL */
+function abrirModal(src){
+  modal.style.display="flex";
+  modalImg.src = src;
+}
+
+function cerrarModal(){
+  modal.style.display="none";
+}
 
 /* BOTÓN */
 function actualizarBoton(){
@@ -169,6 +237,8 @@ function actualizarBoton(){
 }
 
 /* CHECKOUT */
+cartBar.onclick = abrirCheckout;
+
 function abrirCheckout(){
   checkout.style.display="flex";
   mostrarPaso(1);
@@ -201,7 +271,7 @@ function calcularPrecio(n){
   return total;
 }
 
-/* LINKS */
+/* MP */
 function generarLinksPago(total){
   let links=[];
   while(total>0){
@@ -220,21 +290,19 @@ function pagarMercadoPago(){
 
 /* RENDER */
 function renderCheckout(){
-  let agrupado={};
+  let agrupado={}, total=0, html="";
 
   seleccionadas.forEach(i=>{
     if(!agrupado[i.album]) agrupado[i.album]=[];
     agrupado[i.album].push(i.foto);
   });
 
-  let total=0, html="";
-
   for(let a in agrupado){
     let c=agrupado[a].length;
     let p=calcularPrecio(c);
     total+=p;
 
-    html+=`<b>${a}</b> - ${c} fotos → $${p}<br>`;
+    html+=`<b>${a}</b><br>${c} fotos → $${p}<br><br>`;
   }
 
   totalGlobal=total;
@@ -248,14 +316,22 @@ async function mostrarAlbums(){
   const res=await fetch("/api/albums");
   const albums=await res.json();
 
-  app.innerHTML="";
-  albums.forEach(album=>{
+  app.innerHTML=`<div class="home-container"></div>`;
+  const cont=app.firstChild;
+
+  for(const album of albums){
+    const fotos=await (await fetch(`/api/fotos/${album}`)).json();
+
     const div=document.createElement("div");
     div.className="album-card";
-    div.innerHTML=album;
+    div.innerHTML=`
+      <b>${album}</b>
+      <div>${fotos.length} fotos</div>
+      <img src="/images/${album}/preview/${fotos[0]}">
+    `;
     div.onclick=()=>abrirAlbum(album);
-    app.appendChild(div);
-  });
+    cont.appendChild(div);
+  }
 }
 
 /* GALERÍA */
@@ -264,7 +340,13 @@ async function abrirAlbum(nombre){
 
   const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
 
-  app.innerHTML='<div class="gallery" id="gallery"></div>';
+  app.innerHTML=`
+    <div class="gallery-container">
+      <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  `;
+
   const gallery=document.getElementById("gallery");
 
   fotos.forEach(foto=>{
@@ -273,12 +355,18 @@ async function abrirAlbum(nombre){
 
     const img=document.createElement("img");
     img.src=`/images/${nombre}/preview/${foto}`;
+    img.onclick=()=>abrirModal(`/images/${nombre}/watermarked/${foto}`);
 
     const check=document.createElement("div");
     check.className="checkbox";
 
     check.onclick=(e)=>{
       e.stopPropagation();
+      toggle(div,foto);
+    };
+
+    div.oncontextmenu=(e)=>{
+      e.preventDefault();
       toggle(div,foto);
     };
 
@@ -302,8 +390,6 @@ function toggle(div,foto){
 
   actualizarBoton();
 }
-
-cartBar.onclick=abrirCheckout;
 
 mostrarAlbums();
 
