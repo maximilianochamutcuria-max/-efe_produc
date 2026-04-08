@@ -69,7 +69,7 @@ h1 { text-align:center; margin:30px 0; }
   justify-content:center;
   color:white;
   cursor:pointer;
-  z-index:2; /* 🔥 asegura que esté arriba */
+  z-index:2;
 }
 
 .photo.selected .checkbox::after {
@@ -82,7 +82,7 @@ h1 { text-align:center; margin:30px 0; }
   inset:0;
   background:rgba(255,0,0,0.4);
   border-radius:12px;
-  pointer-events:none; /* 🔥 FIX CLAVE */
+  pointer-events:none;
 }
 
 /* VOLVER */
@@ -124,48 +124,100 @@ h1 { text-align:center; margin:30px 0; }
 .modal img {
   max-width:90vw;
   max-height:90vh;
-  object-fit:contain;
 }
 
-.modal-controls {
-  position:absolute;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  top:50%;
-  transform:translateY(-50%);
-}
-
-.modal-btn {
-  font-size:40px;
-  color:white;
-  cursor:pointer;
-  padding:20px;
-}
-
-.modal-close {
-  position:absolute;
-  top:20px;
-  right:20px;
-  font-size:30px;
-  color:white;
-  cursor:pointer;
-}
-
-/* CHECKOUT */
+/* CHECKOUT FULLFOTO STYLE */
 #checkout {
   position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:80%;
+  inset:0;
   background:white;
-  border-radius:20px 20px 0 0;
-  box-shadow:0 -5px 20px rgba(0,0,0,0.2);
   display:none;
-  flex-direction:column;
   z-index:99999;
-  overflow:hidden;
+  flex-direction:column;
+}
+
+.checkout-header {
+  padding:15px 20px;
+  font-weight:bold;
+  border-bottom:1px solid #ddd;
+  display:flex;
+  justify-content:space-between;
+}
+
+.checkout-body {
+  display:flex;
+  height:100%;
+}
+
+/* IZQUIERDA */
+.checkout-left {
+  flex:2;
+  padding:20px;
+  overflow:auto;
+}
+
+.checkout-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,120px);
+  gap:15px;
+}
+
+.checkout-item {
+  text-align:center;
+}
+
+.checkout-item img {
+  width:100%;
+  border-radius:10px;
+}
+
+.remove-btn {
+  color:red;
+  cursor:pointer;
+  font-size:14px;
+}
+
+/* DERECHA */
+.checkout-right {
+  flex:1;
+  background:#f7f7f7;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  border-radius:12px;
+}
+
+.total {
+  font-weight:bold;
+  margin-top:10px;
+}
+
+input {
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+}
+
+button {
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.btn-whatsapp {
+  background:green;
+  color:white;
+}
+
+.btn-clear {
+  background:#eee;
 }
 </style>
 </head>
@@ -180,37 +232,55 @@ h1 { text-align:center; margin:30px 0; }
 <!-- MODAL -->
 <div class="modal" id="modal">
   <img id="modalImg">
-
-  <div class="modal-controls">
-    <div class="modal-btn" onclick="anteriorFoto()">‹</div>
-    <div class="modal-btn" onclick="siguienteFoto()">›</div>
-  </div>
-
-  <div class="modal-close" onclick="cerrarModal()">✖</div>
 </div>
 
 <!-- CHECKOUT -->
 <div id="checkout">
-  <div style="padding:15px; display:flex; justify-content:space-between;">
-    <b>Tu selección</b>
+  <div class="checkout-header">
+    Carrito
     <span style="cursor:pointer;" onclick="cerrarCheckout()">✖</span>
   </div>
 
-  <div id="checkoutItems" style="flex:1; overflow:auto; padding:10px;"></div>
+  <div class="checkout-body">
 
-  <div style="padding:15px; border-top:1px solid #ddd;">
-    <div id="total"></div>
+    <!-- IZQUIERDA -->
+    <div class="checkout-left">
+      <div id="checkoutGrid" class="checkout-grid"></div>
+      <div style="margin-top:20px;color:red;cursor:pointer;" onclick="vaciarCarrito()">
+        🗑 Limpiar carrito
+      </div>
+    </div>
 
-    <input id="email" placeholder="Email" style="width:100%;margin-top:10px;padding:8px;">
-    <input id="telefono" placeholder="Teléfono" style="width:100%;margin-top:10px;padding:8px;">
+    <!-- DERECHA -->
+    <div class="checkout-right">
 
-    <button onclick="enviarWhatsApp()" style="width:100%;margin-top:10px;padding:12px;background:green;color:white;border:none;border-radius:10px;">
-      Enviar por WhatsApp
-    </button>
+      <div class="card">
+        <b>Info</b>
+        <div style="font-size:14px;margin-top:5px;">
+          Agregá más fotos para obtener descuento 🔥
+        </div>
+      </div>
 
-    <button onclick="vaciarCarrito()" style="width:100%;margin-top:10px;padding:10px;">
-      Vaciar carrito
-    </button>
+      <div class="card">
+        <b>Pedido</b>
+        <div id="resumen"></div>
+        <div class="total" id="total"></div>
+      </div>
+
+      <div class="card">
+        <label>Email</label>
+        <input id="email">
+
+        <label>Teléfono</label>
+        <input id="telefono">
+      </div>
+
+      <button class="btn-whatsapp" onclick="enviarWhatsApp()">
+        Enviar por WhatsApp
+      </button>
+
+    </div>
+
   </div>
 </div>
 
@@ -222,43 +292,14 @@ const cartBar = document.getElementById("cartBar");
 let seleccionadas = new Set();
 let currentAlbum = "";
 
-/* MODAL */
-let fotosActuales = [];
-let fotoIndex = 0;
-
-function abrirModal(lista,index){
-  fotosActuales = lista;
-  fotoIndex = index;
-  modal.style.display="flex";
-  modalImg.src = fotosActuales[index];
-}
-
-function cerrarModal(){ modal.style.display="none"; }
-
-function siguienteFoto(){
-  fotoIndex=(fotoIndex+1)%fotosActuales.length;
-  modalImg.src=fotosActuales[fotoIndex];
-}
-
-function anteriorFoto(){
-  fotoIndex=(fotoIndex-1+fotosActuales.length)%fotosActuales.length;
-  modalImg.src=fotosActuales[fotoIndex];
-}
-
 /* BOTÓN */
 function actualizarBoton(){
-  if(seleccionadas.size>0){
-    cartBar.style.display="block";
-    cartBar.innerText="🛒 "+seleccionadas.size+" fotos";
-  } else {
-    cartBar.style.display="none";
-  }
+  cartBar.style.display = seleccionadas.size ? "block" : "none";
+  cartBar.innerText = "🛒 " + seleccionadas.size + " fotos";
 }
 
 /* CHECKOUT */
 const checkout = document.getElementById("checkout");
-const checkoutItems = document.getElementById("checkoutItems");
-const totalDiv = document.getElementById("total");
 
 cartBar.onclick = ()=> abrirCheckout();
 
@@ -272,54 +313,46 @@ function cerrarCheckout(){
 }
 
 function renderCheckout(){
-  checkoutItems.innerHTML="";
+
+  const grid = document.getElementById("checkoutGrid");
+  const resumen = document.getElementById("resumen");
+  const totalDiv = document.getElementById("total");
+
+  grid.innerHTML="";
+  resumen.innerHTML="";
 
   seleccionadas.forEach(foto=>{
     const div=document.createElement("div");
-    div.style.display="flex";
-    div.style.marginBottom="10px";
+    div.className="checkout-item";
 
     div.innerHTML=`
-      <img src="/images/${currentAlbum}/preview/${foto}" style="width:60px;height:60px;object-fit:cover;margin-right:10px;border-radius:8px;">
-      <span style="flex:1;">${foto}</span>
-      <span style="cursor:pointer;color:red;">✖</span>
+      <img src="/images/${currentAlbum}/preview/${foto}">
+      <div class="remove-btn">✖</div>
     `;
 
-    div.querySelector("span:last-child").onclick=()=>{
-      eliminarFoto(foto);
+    div.querySelector(".remove-btn").onclick=()=>{
+      seleccionadas.delete(foto);
+      renderCheckout();
+      actualizarBoton();
     };
 
-    checkoutItems.appendChild(div);
+    grid.appendChild(div);
   });
 
-  totalDiv.innerText="Total: $" + (seleccionadas.size * 2000);
-}
-
-function eliminarFoto(foto){
-  seleccionadas.delete(foto);
-  actualizarBoton();
-  renderCheckout();
+  resumen.innerHTML = `${seleccionadas.size} fotos seleccionadas`;
+  totalDiv.innerText = "Total: $" + (seleccionadas.size * 2000);
 }
 
 function vaciarCarrito(){
   seleccionadas.clear();
-  actualizarBoton();
   renderCheckout();
+  actualizarBoton();
 }
 
 /* WHATSAPP */
 function enviarWhatsApp(){
-  const tel=document.getElementById("telefono").value;
-  const email=document.getElementById("email").value;
-
   let mensaje="Pedido:%0A";
-
-  seleccionadas.forEach(f=>{
-    mensaje+="- "+f+"%0A";
-  });
-
-  mensaje+=`%0AEmail: ${email}%0ATeléfono: ${tel}`;
-
+  seleccionadas.forEach(f=> mensaje+= "- "+f+"%0A");
   window.open(`https://wa.me/549XXXXXXXXXX?text=${mensaje}`);
 }
 
@@ -351,7 +384,6 @@ async function abrirAlbum(nombre){
   currentAlbum = nombre;
 
   const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
-  const watermarked=fotos.map(f=>`/images/${nombre}/watermarked/${f}`);
 
   app.innerHTML=`
     <div class="gallery-container">
@@ -362,13 +394,12 @@ async function abrirAlbum(nombre){
 
   const gallery=document.getElementById("gallery");
 
-  fotos.forEach((foto,i)=>{
+  fotos.forEach(foto=>{
     const div=document.createElement("div");
     div.className="photo";
 
     const img=document.createElement("img");
     img.src=`/images/${nombre}/preview/${foto}`;
-    img.onclick=()=>abrirModal(watermarked,i);
 
     const check=document.createElement("div");
     check.className="checkbox";
@@ -389,7 +420,6 @@ async function abrirAlbum(nombre){
   });
 }
 
-/* TOGGLE */
 function toggle(div,foto){
   if(seleccionadas.has(foto)){
     seleccionadas.delete(foto);
