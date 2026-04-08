@@ -43,13 +43,13 @@ h1 { text-align:center; margin:30px 0; }
   position:relative;
   break-inside:avoid;
   margin-bottom:15px;
-  cursor:pointer;
 }
 
 .photo img {
   width:100%;
   border-radius:12px;
   transition:.3s;
+  cursor:pointer;
 }
 
 .photo:hover img { transform:scale(1.05); }
@@ -68,6 +68,7 @@ h1 { text-align:center; margin:30px 0; }
   align-items:center;
   justify-content:center;
   color:white;
+  cursor:pointer;
 }
 
 .photo.selected .checkbox::after {
@@ -92,7 +93,7 @@ h1 { text-align:center; margin:30px 0; }
   cursor:pointer;
 }
 
-/* BOTÓN */
+/* CARRITO */
 .cart-bar {
   position:fixed;
   bottom:20px;
@@ -107,7 +108,7 @@ h1 { text-align:center; margin:30px 0; }
   z-index:9999;
 }
 
-/* MODAL PRO */
+/* MODAL */
 .modal {
   display:none;
   position:fixed;
@@ -177,50 +178,45 @@ const cartBar = document.getElementById("cartBar");
 
 let seleccionadas = new Set();
 
-/* VISOR */
+/* ===== MODAL ===== */
 let fotosActuales = [];
 let fotoIndex = 0;
 
-function abrirModal(lista, index){
+function abrirModal(lista,index){
   fotosActuales = lista;
   fotoIndex = index;
   modal.style.display="flex";
   modalImg.src = fotosActuales[index];
 }
 
-function cerrarModal(){
-  modal.style.display="none";
-}
+function cerrarModal(){ modal.style.display="none"; }
 
 function siguienteFoto(){
-  fotoIndex = (fotoIndex+1)%fotosActuales.length;
-  modalImg.src = fotosActuales[fotoIndex];
+  fotoIndex=(fotoIndex+1)%fotosActuales.length;
+  modalImg.src=fotosActuales[fotoIndex];
 }
 
 function anteriorFoto(){
-  fotoIndex = (fotoIndex-1+fotosActuales.length)%fotosActuales.length;
-  modalImg.src = fotosActuales[fotoIndex];
+  fotoIndex=(fotoIndex-1+fotosActuales.length)%fotosActuales.length;
+  modalImg.src=fotosActuales[fotoIndex];
 }
 
-document.addEventListener("keydown", e=>{
-  if(modal.style.display==="flex"){
-    if(e.key==="ArrowRight") siguienteFoto();
-    if(e.key==="ArrowLeft") anteriorFoto();
-    if(e.key==="Escape") cerrarModal();
-  }
-});
-
-/* BOTÓN */
+/* ===== BOTÓN ===== */
 function actualizarBoton(){
   if(seleccionadas.size>0){
     cartBar.style.display="block";
-    cartBar.innerText="🛒 "+seleccionadas.size;
+    cartBar.innerText="🛒 "+seleccionadas.size+" fotos";
   } else {
     cartBar.style.display="none";
   }
 }
 
-/* ÁLBUMES */
+/* 🔥 CLICK CARRITO */
+cartBar.onclick = ()=>{
+  alert("Acá después conectamos el checkout 💰");
+};
+
+/* ===== ÁLBUMES ===== */
 async function mostrarAlbums(){
   const res=await fetch("/api/albums");
   const albums=await res.json();
@@ -233,23 +229,20 @@ async function mostrarAlbums(){
 
     const div=document.createElement("div");
     div.className="album-card";
-
     div.innerHTML=`
       <b>${album}</b>
       <div>${fotos.length} fotos</div>
       <img src="/images/${album}/preview/${fotos[0]}">
     `;
-
     div.onclick=()=>abrirAlbum(album);
     cont.appendChild(div);
   }
 }
 
-/* GALERÍA */
+/* ===== GALERÍA ===== */
 async function abrirAlbum(nombre){
   const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
-
-  const watermarked = fotos.map(f=>`/images/${nombre}/watermarked/${f}`);
+  const watermarked=fotos.map(f=>`/images/${nombre}/watermarked/${f}`);
 
   app.innerHTML=`
     <div class="gallery-container">
@@ -267,8 +260,10 @@ async function abrirAlbum(nombre){
     const img=document.createElement("img");
     img.src=`/images/${nombre}/preview/${foto}`;
 
-    div.onclick=()=>abrirModal(watermarked,i);
+    /* SOLO IMAGEN ABRE MODAL */
+    img.onclick=()=>abrirModal(watermarked,i);
 
+    /* CHECK */
     const check=document.createElement("div");
     check.className="checkbox";
 
@@ -277,6 +272,7 @@ async function abrirAlbum(nombre){
       toggle(div,foto);
     };
 
+    /* CLICK DERECHO */
     div.oncontextmenu=(e)=>{
       e.preventDefault();
       toggle(div,foto);
@@ -288,15 +284,17 @@ async function abrirAlbum(nombre){
   });
 }
 
-/* TOGGLE FIX REAL */
-function toggle(div,f){
-  if(seleccionadas.has(f)){
-    seleccionadas.delete(f);
+/* ===== TOGGLE FIX ===== */
+function toggle(div,foto){
+
+  if(seleccionadas.has(foto)){
+    seleccionadas.delete(foto);
     div.classList.remove("selected");
   } else {
-    seleccionadas.add(f);
+    seleccionadas.add(foto);
     div.classList.add("selected");
   }
+
   actualizarBoton();
 }
 
