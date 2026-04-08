@@ -11,21 +11,19 @@ body {
   font-family: Arial;
 }
 
-/* HEADER */
 h1 {
   text-align: center;
   margin: 30px 0;
 }
 
-/* ===== GRID DE ÁLBUMES ===== */
+/* GRID */
 .home-container {
   display: grid;
-  grid-template-columns: repeat(4, 260px); /* 👈 tamaño */
+  grid-template-columns: repeat(4, 260px);
   gap: 30px;
-  padding-left: 40px; /* izquierda */
+  padding-left: 40px;
 }
 
-/* CARD */
 .album-card {
   background: white;
   border-radius: 12px;
@@ -50,7 +48,6 @@ h1 {
   font-size: 14px;
 }
 
-/* PREVIEW */
 .album-card img {
   width: 100%;
   height: 160px;
@@ -58,33 +55,25 @@ h1 {
   border-radius: 8px;
 }
 
-/* ===== GALERÍA ===== */
+/* GALERIA */
 .gallery-container {
   max-width: 1200px;
   margin: auto;
 }
 
 .back-btn {
-  display: inline-block;
   margin: 20px 0;
   padding: 10px 15px;
   background: black;
   color: white;
   border-radius: 8px;
   cursor: pointer;
+  display: inline-block;
 }
 
-/* PINTEREST */
 .gallery {
   column-count: 4;
   column-gap: 15px;
-}
-
-@media (max-width: 1000px) {
-  .gallery { column-count: 3; }
-}
-@media (max-width: 600px) {
-  .gallery { column-count: 2; }
 }
 
 .photo {
@@ -95,8 +84,8 @@ h1 {
 .photo img {
   width: 100%;
   border-radius: 12px;
-  transition: transform 0.3s;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 .photo img:hover {
@@ -107,8 +96,6 @@ h1 {
 .modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.95);
@@ -119,7 +106,6 @@ h1 {
 .modal img {
   max-width: 90%;
   max-height: 90%;
-  border-radius: 12px;
 }
 </style>
 </head>
@@ -127,7 +113,6 @@ h1 {
 <body>
 
 <h1>@efe_produc</h1>
-
 <div id="app"></div>
 
 <div class="modal" id="modal" onclick="cerrarModal()">
@@ -136,55 +121,36 @@ h1 {
 
 <script>
 
-// 📂 ÁLBUMES
-const albums = [
-  {
-    nombre: "gymna_vs_cariocas",
-    titulo: "FUTSAL TUCUMAN Fecha 3: Malvinas Argentinas vs Alianza"
-  },
-  {
-    nombre: "balcor_vs_lomas",
-    titulo: "FUTSAL TUCUMAN Fecha 3: Balcor vs Lomas"
-  },
-  {
-    nombre: "vinotinto_vs_sportivo",
-    titulo: "FUTSAL TUCUMAN Fecha 4: Vinotinto vs Sportivo"
-  },
-  {
-    nombre: "templo_vs_leones",
-    titulo: "FUTSAL TUCUMAN Fecha 4: Templo Negro vs Los Leones"
-  }
-];
-
-// 🏠 HOME GRID
-function mostrarAlbums() {
+// 🔥 TRAE ÁLBUMES DESDE EL SERVER
+async function mostrarAlbums() {
   const app = document.getElementById("app");
 
-  app.innerHTML = `<div class="home-container" id="albums"></div>`;
+  const res = await fetch("/api/albums");
+  const albums = await res.json();
 
+  app.innerHTML = `<div class="home-container" id="albums"></div>`;
   const cont = document.getElementById("albums");
 
-  albums.forEach(album => {
+  for (const album of albums) {
+
+    const fotosRes = await fetch(`/api/fotos/${album}`);
+    const fotos = await fotosRes.json();
+
+    const preview = fotos[0]; // 👈 primera foto como preview
 
     const div = document.createElement("div");
     div.className = "album-card";
 
     div.innerHTML = `
-      <div class="album-title">${album.titulo}</div>
-      <div class="album-count">Cargando...</div>
-      <img src="/images/${album.nombre}/preview/1.jpg">
+      <div class="album-title">${album.replaceAll("_", " ")}</div>
+      <div class="album-count">${fotos.length} Fotos</div>
+      <img src="/images/${album}/preview/${preview}">
     `;
 
-    fetch(`/api/fotos/${album.nombre}`)
-      .then(r => r.json())
-      .then(fotos => {
-        div.querySelector(".album-count").innerText = fotos.length + " Fotos";
-      });
-
-    div.onclick = () => abrirAlbum(album.nombre);
+    div.onclick = () => abrirAlbum(album);
 
     cont.appendChild(div);
-  });
+  }
 }
 
 // 📸 ABRIR ÁLBUM
@@ -227,7 +193,6 @@ function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
 
-// INIT
 mostrarAlbums();
 
 </script>
