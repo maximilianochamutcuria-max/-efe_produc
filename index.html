@@ -32,39 +32,86 @@ h1 { text-align:center; margin:30px 0; }
 }
 
 /* GALERÍA */
-.gallery { column-count:4; column-gap:15px; }
-.photo { position:relative; break-inside:avoid; margin-bottom:15px; cursor:pointer; }
-.photo img { width:100%; border-radius:12px; transition:.3s; }
-.photo:hover img { transform:scale(1.05); }
+.gallery-container {
+  max-width:1200px;
+  margin:auto;
+}
+
+.gallery {
+  column-count:4;
+  column-gap:15px;
+}
+
+.photo {
+  position:relative;
+  break-inside:avoid;
+  margin-bottom:15px;
+  cursor:pointer;
+}
+
+.photo img {
+  width:100%;
+  border-radius:12px;
+  transition:.3s;
+}
+
+.photo:hover img {
+  transform:scale(1.05);
+}
 
 /* CHECK */
 .checkbox {
-  position:absolute; bottom:10px; left:10px;
-  width:26px; height:26px;
-  border:2px solid white; border-radius:6px;
+  position:absolute;
+  bottom:10px;
+  left:10px;
+  width:26px;
+  height:26px;
+  border:2px solid white;
+  border-radius:6px;
   background:rgba(0,0,0,0.5);
 }
 
 .photo.selected::after {
-  content:""; position:absolute; inset:0;
+  content:"";
+  position:absolute;
+  inset:0;
   background:rgba(255,0,0,0.4);
   border-radius:12px;
 }
 
-/* BOTÓN */
+/* BOTÓN VOLVER */
+.back-btn {
+  margin:20px;
+  padding:10px;
+  background:black;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* BOTÓN CARRITO */
 .cart-bar {
-  position:fixed; bottom:20px; left:50%;
+  position:fixed;
+  bottom:20px;
+  left:50%;
   transform:translateX(-50%);
-  background:black; color:white;
-  padding:18px 30px; border-radius:20px;
-  display:none; cursor:pointer; z-index:9999;
+  background:black;
+  color:white;
+  padding:18px 30px;
+  border-radius:20px;
+  display:none;
+  cursor:pointer;
+  z-index:9999;
 }
 
 /* MODAL PRO */
 .modal {
-  display:none; position:fixed; inset:0;
+  display:none;
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,0.95);
-  justify-content:center; align-items:center;
+  justify-content:center;
+  align-items:center;
   z-index:99999;
 }
 
@@ -75,78 +122,109 @@ h1 { text-align:center; margin:30px 0; }
 }
 
 .modal-controls {
-  position:absolute; width:100%;
-  display:flex; justify-content:space-between;
-  top:50%; transform:translateY(-50%);
+  position:absolute;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  top:50%;
+  transform:translateY(-50%);
 }
 
 .modal-btn {
-  font-size:40px; color:white;
-  cursor:pointer; padding:20px;
+  font-size:40px;
+  color:white;
+  cursor:pointer;
+  padding:20px;
 }
 
 .modal-close {
-  position:absolute; top:20px; right:20px;
-  font-size:30px; color:white;
+  position:absolute;
+  top:20px;
+  right:20px;
+  font-size:30px;
+  color:white;
   cursor:pointer;
 }
 
 /* CHECKOUT */
 .checkout {
-  position:fixed; inset:0;
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,0.6);
-  display:none; z-index:10000;
+  display:none;
+  z-index:10000;
 }
 
 .checkout-panel {
-  position:absolute; bottom:0;
-  width:100%; height:90%;
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:90%;
   background:#f7f7f7;
   border-radius:20px 20px 0 0;
   display:flex;
 }
 
 .checkout-left {
-  width:60%; padding:30px;
+  width:60%;
+  padding:30px;
   overflow-y:auto;
 }
 
 .checkout-items {
-  display:flex; flex-wrap:wrap;
+  display:flex;
+  flex-wrap:wrap;
   gap:15px;
 }
 
 .checkout-item { position:relative; }
 
 .checkout-item img {
-  width:120px; border-radius:10px;
+  width:120px;
+  border-radius:10px;
 }
 
 .remove-item {
-  position:absolute; top:-8px; right:-8px;
-  background:black; color:white;
-  border-radius:50%; width:22px; height:22px;
-  display:flex; align-items:center; justify-content:center;
+  position:absolute;
+  top:-8px;
+  right:-8px;
+  background:black;
+  color:white;
+  border-radius:50%;
+  width:22px;
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
 }
 
 .checkout-right {
-  width:40%; background:#eee;
+  width:40%;
+  background:#eee;
   padding:30px;
-  display:flex; flex-direction:column; gap:15px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }
 
 .buy-btn {
   padding:15px;
-  background:black; color:white;
-  border:none; border-radius:10px;
+  background:black;
+  color:white;
+  border:none;
+  border-radius:10px;
   cursor:pointer;
 }
 
 .close-bar {
-  position:absolute; bottom:0; width:100%;
-  text-align:center; padding:15px;
-  background:white; cursor:pointer;
+  position:absolute;
+  bottom:0;
+  width:100%;
+  text-align:center;
+  padding:15px;
+  background:white;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -177,10 +255,11 @@ h1 { text-align:center; margin:30px 0; }
     <div class="checkout-left">
       <div style="display:flex;justify-content:space-between;">
         <h2>Carrito</h2>
-        <span onclick="cerrarCheckout()" style="cursor:pointer;">✖</span>
+        <span onclick="cerrarCheckout()">✖</span>
       </div>
 
       <div id="checkoutItems" class="checkout-items"></div>
+
       <div onclick="vaciarCarrito()" style="color:red;margin-top:20px;">
         🗑 Limpiar carrito
       </div>
@@ -205,15 +284,15 @@ h1 { text-align:center; margin:30px 0; }
 let seleccionadas = new Set();
 let enCarrito = false;
 
-/* VISOR */
 let fotosActuales = [];
 let fotoIndex = 0;
 
-function abrirModal(src, index, lista){
+/* MODAL */
+function abrirModal(lista, index){
   fotosActuales = lista;
   fotoIndex = index;
   modal.style.display="flex";
-  modalImg.src=src;
+  modalImg.src = fotosActuales[index];
 }
 
 function cerrarModal(){
@@ -221,16 +300,16 @@ function cerrarModal(){
 }
 
 function siguienteFoto(){
-  fotoIndex=(fotoIndex+1)%fotosActuales.length;
-  modalImg.src=fotosActuales[fotoIndex];
+  fotoIndex = (fotoIndex+1)%fotosActuales.length;
+  modalImg.src = fotosActuales[fotoIndex];
 }
 
 function anteriorFoto(){
-  fotoIndex=(fotoIndex-1+fotosActuales.length)%fotosActuales.length;
-  modalImg.src=fotosActuales[fotoIndex];
+  fotoIndex = (fotoIndex-1+fotosActuales.length)%fotosActuales.length;
+  modalImg.src = fotosActuales[fotoIndex];
 }
 
-document.addEventListener("keydown",e=>{
+document.addEventListener("keydown", e=>{
   if(modal.style.display==="flex"){
     if(e.key==="ArrowRight") siguienteFoto();
     if(e.key==="ArrowLeft") anteriorFoto();
@@ -249,12 +328,11 @@ function calcularPrecio(c){
 
 /* BOTÓN */
 function actualizarBoton(){
-  const btn=document.getElementById("cartBar");
   if(seleccionadas.size>0){
-    btn.style.display="block";
-    btn.innerText=enCarrito?"Finalizar →":"🛒 "+seleccionadas.size;
+    cartBar.style.display="block";
+    cartBar.innerText=enCarrito?"Finalizar →":"🛒 "+seleccionadas.size;
   }else{
-    btn.style.display="none";
+    cartBar.style.display="none";
     enCarrito=false;
   }
 }
@@ -262,7 +340,7 @@ function actualizarBoton(){
 cartBar.onclick=()=>{
   if(!enCarrito){
     enCarrito=true;
-  }else abrirCheckout();
+  } else abrirCheckout();
   actualizarBoton();
 };
 
@@ -291,19 +369,43 @@ async function mostrarAlbums(){
 /* GALERÍA */
 async function abrirAlbum(nombre){
   const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
+
   const urls=fotos.map(f=>`/images/${nombre}/watermarked/${f}`);
 
   app.innerHTML=`
-    <div class="gallery">
-      ${fotos.map((f,i)=>`
-        <div class="photo" onclick="abrirModal('${urls[i]}',${i},${JSON.stringify(urls)})"
-          oncontextmenu="event.preventDefault();toggle(this,'${f}')">
-          <img src="/images/${nombre}/preview/${f}">
-          <div class="checkbox"></div>
-        </div>
-      `).join("")}
+    <div class="gallery-container">
+      <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
+      <div class="gallery" id="gallery"></div>
     </div>
   `;
+
+  const gallery=document.getElementById("gallery");
+
+  fotos.forEach((foto,i)=>{
+    const div=document.createElement("div");
+    div.className="photo";
+
+    const img=document.createElement("img");
+    img.src=`/images/${nombre}/preview/${foto}`;
+
+    div.onclick=()=>abrirModal(urls,i);
+
+    div.oncontextmenu=e=>{
+      e.preventDefault();
+      toggle(div,foto);
+    };
+
+    const check=document.createElement("div");
+    check.className="checkbox";
+    check.onclick=e=>{
+      e.stopPropagation();
+      toggle(div,foto);
+    };
+
+    div.appendChild(img);
+    div.appendChild(check);
+    gallery.appendChild(div);
+  });
 }
 
 /* TOGGLE */
