@@ -4,11 +4,12 @@ const path = require("path");
 
 const app = express();
 
-// 📂 carpeta base
+// 📂 Carpeta base de imágenes
 const BASE_PATH = path.join(__dirname, "images");
 
-// 👉 servir imágenes
+// 🔥 Servir archivos estáticos
 app.use("/images", express.static(BASE_PATH));
+app.use(express.static(__dirname)); // 👈 para index.html
 
 // 🔥 ENDPOINT: LISTAR ÁLBUMES
 app.get("/api/albums", (req, res) => {
@@ -27,7 +28,7 @@ app.get("/api/albums", (req, res) => {
   }
 });
 
-// 🔥 ENDPOINT: LISTAR FOTOS DE UN ÁLBUM
+// 🔥 ENDPOINT: LISTAR FOTOS
 app.get("/api/fotos/:album", (req, res) => {
   const album = req.params.album;
 
@@ -53,9 +54,9 @@ app.get("/api/fotos/:album", (req, res) => {
   }
 });
 
-// 🏠 ROOT (opcional)
+// 🏠 MOSTRAR INDEX.HTML
 app.get("/", (req, res) => {
-  res.send("Servidor funcionando correctamente 🚀");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // 🚀 PUERTO (IMPORTANTE PARA RENDER)
