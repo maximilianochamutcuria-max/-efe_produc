@@ -16,23 +16,37 @@ h1 {
   margin: 30px 0;
 }
 
-/* GRID ÁLBUMES */
+/* 🔥 GRID ÁLBUMES (ARREGLADO) */
 .home-container {
   display: grid;
-  grid-template-columns: repeat(4, 260px);
+  grid-template-columns: repeat(auto-fill, 260px);
   gap: 30px;
-  padding-left: 40px;
+  padding: 40px;
+  justify-content: flex-start;
 }
 
 .album-card {
+  width: 260px;
   background: white;
   border-radius: 12px;
   padding: 15px;
   box-shadow: 0 5px 12px rgba(0,0,0,0.1);
   cursor: pointer;
+  transition: 0.3s;
 }
 
-/* GALERÍA */
+.album-card:hover {
+  transform: scale(1.05);
+}
+
+.album-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* 📸 GALERÍA */
 .gallery-container {
   max-width: 1200px;
   margin: auto;
@@ -47,7 +61,7 @@ h1 {
   cursor: pointer;
 }
 
-/* PINTEREST */
+/* 🔥 PINTEREST */
 .gallery {
   column-count: 4;
   column-gap: 15px;
@@ -57,15 +71,21 @@ h1 {
   position: relative;
   break-inside: avoid;
   margin-bottom: 15px;
+  cursor: pointer;
 }
 
 .photo img {
   width: 100%;
   border-radius: 12px;
-  cursor: pointer;
+  transition: 0.3s;
 }
 
-/* CHECKBOX */
+/* 🔥 HOVER RESTAURADO */
+.photo:hover img {
+  transform: scale(1.05);
+}
+
+/* 🔲 CHECKBOX */
 .checkbox {
   position: absolute;
   bottom: 10px;
@@ -79,7 +99,7 @@ h1 {
   z-index: 3;
 }
 
-/* SELECCION */
+/* ✔ SELECCION */
 .photo.selected .checkbox {
   background: black;
 }
@@ -92,13 +112,14 @@ h1 {
   left: 5px;
 }
 
-/* OVERLAY */
+/* 🔥 OVERLAY SIN BLOQUEAR CLICK */
 .photo.selected::after {
   content: "";
   position: absolute;
   inset: 0;
   background: rgba(255,0,0,0.4);
   border-radius: 12px;
+  pointer-events: none; /* 🔥 CLAVE */
 }
 
 /* 🛒 CARRITO */
@@ -114,10 +135,12 @@ h1 {
   z-index: 9999;
 }
 
-/* MODAL */
+/* 🔥 MODAL */
 .modal {
   display: none;
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.95);
@@ -149,12 +172,12 @@ h1 {
 
 let seleccionadas = new Set();
 
-// 🔥 ACTUALIZAR CARRITO
+// 🛒 actualizar carrito
 function actualizarCarrito() {
   document.getElementById("cart").innerText = "🛒 " + seleccionadas.size;
 }
 
-// 🔥 ÁLBUMES
+// 🏠 ÁLBUMES
 async function mostrarAlbums() {
   const app = document.getElementById("app");
 
@@ -203,8 +226,8 @@ async function abrirAlbum(nombre) {
     const img = document.createElement("img");
     img.src = `/images/${nombre}/preview/${foto}`;
 
-    // 🔥 CLICK FOTO (FIX)
-    img.addEventListener("click", () => {
+    // 🔥 CLICK FUNCIONA SIEMPRE
+    div.addEventListener("click", () => {
       abrirModal(`/images/${nombre}/watermarked/${foto}`);
     });
 
@@ -212,7 +235,7 @@ async function abrirAlbum(nombre) {
     checkbox.className = "checkbox";
 
     checkbox.addEventListener("click", (e) => {
-      e.stopPropagation(); // 🔥 CLAVE
+      e.stopPropagation();
 
       if (div.classList.contains("selected")) {
         div.classList.remove("selected");
@@ -231,7 +254,7 @@ async function abrirAlbum(nombre) {
   });
 }
 
-// MODAL
+// 🖼 MODAL
 function abrirModal(src) {
   const modal = document.getElementById("modal");
   const img = document.getElementById("modalImg");
@@ -239,7 +262,7 @@ function abrirModal(src) {
   img.src = src;
   modal.style.display = "flex";
 
-  modal.onclick = () => cerrarModal();
+  modal.onclick = cerrarModal;
 }
 
 function cerrarModal() {
