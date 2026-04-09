@@ -152,7 +152,6 @@ h1 { text-align:center; margin:30px 0; }
   height:100%;
 }
 
-/* IZQUIERDA */
 .checkout-left {
   flex:2;
   padding:20px;
@@ -170,7 +169,6 @@ h1 { text-align:center; margin:30px 0; }
   border-radius:10px;
 }
 
-/* DERECHA */
 .checkout-right {
   flex:1;
   background:#f7f7f7;
@@ -260,7 +258,7 @@ let seleccionadas = [];
 let currentAlbum = "";
 let totalGlobal = 0;
 
-/* 🔥 LINKS ACTIVOS */
+/* LINKS */
 const LINKS = {
   2000:"https://mpago.la/17zfiHq",
   5500:"",
@@ -315,31 +313,27 @@ function generarLinksPago(total){
   let links=[];
   while(total>0){
     if(total>=12000){links.push(LINKS[12000]);total-=12000;}
-    else if(total>=9500){links.push(LINKS[9500]);total-=9500;}
-    else if(total>=7500){links.push(LINKS[7500]);total-=7500;}
-    else if(total>=5500){links.push(LINKS[5500]);total-=5500;}
     else {links.push(LINKS[2000]);total-=2000;}
   }
   return links;
 }
 
-/* PAGAR */
+/* 💰 FIX FINAL */
 function pagarMercadoPago(){
 
   const links = generarLinksPago(totalGlobal);
 
   if(links.length === 0){
-    alert("No hay links configurados para este monto");
+    alert("No hay links configurados");
     return;
   }
 
-  window.open(links[0], "_blank");
-
-  for(let i=1; i<links.length; i++){
+  links.forEach((link, i)=>{
     setTimeout(()=>{
-      window.open(links[i], "_blank");
-    }, 500 * i);
-  }
+      window.open(link, "_blank");
+    }, i * 500);
+  });
+
 }
 
 /* RENDER */
