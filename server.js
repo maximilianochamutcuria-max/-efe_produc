@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -9,29 +7,37 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 👇 SERVIR ARCHIVOS ESTÁTICOS (CLAVE)
+// 🔥 SERVIR ARCHIVOS (ESTO ES LO QUE TE FALTABA)
 app.use(express.static(__dirname));
 
-// 🔑 CLIENTE MP
+// 🔥 TU TOKEN
 const client = new MercadoPagoConfig({
-  accessToken: process.env.ACCESS_TOKEN,
+  accessToken: "APP_USR-6334214303353461-040900-cc61c12b09cebb5053374f72bf65ee4e-548374682",
 });
 
-// 🔥 CREAR PAGO
-app.post("/create_preference", async (req, res) => {
+const preference = new Preference(client);
+
+// 🔥 CREAR LINK DE PAGO
+app.post("/crear-preferencia", async (req, res) => {
   try {
-    const { items } = req.body;
+    const { total, email, telefono, fotos } = req.body;
 
-    const preference = new Preference(client);
-
-    const response = await preference.create({
+    const result = await preference.create({
       body: {
-        items: items.map((item) => ({
-          title: "Foto deportiva",
-          quantity: 1,
-          unit_price: Number(item.price),
-          currency_id: "ARS",
-        })),
+        items: [
+          {
+            title: "Compra de fotos",
+            quantity: 1,
+            unit_price: Number(total),
+          },
+        ],
+        payer: {
+          email: email,
+        },
+        metadata: {
+          fotos: fotos,
+          telefono: telefono,
+        },
         back_urls: {
           success: "http://localhost:3000/success.html",
           failure: "http://localhost:3000/failure.html",
@@ -42,22 +48,16 @@ app.post("/create_preference", async (req, res) => {
     });
 
     res.json({
-      id: response.id,
-      init_point: response.init_point,
+      init_point: result.init_point,
     });
+
   } catch (error) {
-    console.log("❌ ERROR REAL:");
-    console.log(error);
-    res.status(500).json({ error: "Error en pago" });
+    console.log("❌ ERROR MERCADOPAGO:", error);
+    res.status(500).json({ error: "Error al crear pago" });
   }
 });
 
-// 👇 RUTA PRINCIPAL (CLAVE)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-// 🚀 SERVER
+// 🔥 ARRANCAR SERVIDOR
 app.listen(3000, () => {
   console.log("🔥 http://localhost:3000");
 });
