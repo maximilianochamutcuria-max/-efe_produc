@@ -39,11 +39,10 @@ app.post("/crear-preferencia", async (req, res) => {
           telefono: telefono,
         },
         back_urls: {
-          success: "http://localhost:3000/success.html",
-          failure: "http://localhost:3000/failure.html",
-          pending: "http://localhost:3000/pending.html",
-        },
-        auto_return: "approved",
+  success: "https://www.google.com",
+  failure: "https://www.google.com",
+  pending: "https://www.google.com",
+}
       },
     });
 
