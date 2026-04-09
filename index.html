@@ -16,6 +16,7 @@ h1 {
   margin: 20px;
 }
 
+/* ÁLBUMES */
 .albums {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -44,6 +45,63 @@ h1 {
 .album-info {
   padding: 10px;
 }
+
+/* GALERÍA */
+.galeria {
+  column-count: 4;
+  column-gap: 10px;
+  padding: 20px;
+}
+
+.foto {
+  position: relative;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.foto img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* TILDE */
+.check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: white;
+  border-radius: 50%;
+  padding: 5px;
+  display: none;
+}
+
+.foto.selected .check {
+  display: block;
+}
+
+/* BOTÓN VOLVER */
+.volver {
+  margin: 20px;
+  padding: 10px 20px;
+  border: none;
+  background: black;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* CARRITO */
+#carrito {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-weight: bold;
+}
 </style>
 </head>
 
@@ -52,81 +110,96 @@ h1 {
 <h1>@efe_produc</h1>
 
 <div id="contenido"></div>
+<div id="carrito" style="display:none;">0 fotos | $0</div>
 
 <script>
 const contenido = document.getElementById("contenido");
+const carrito = document.getElementById("carrito");
 
-// 🔥 CONFIG MANUAL (por ahora)
-const albums = [
-  {
-    nombre: "gymna_vs_cariocas",
-    path: "images/gymna_vs_cariocas/preview/",
-    portada: "DSC_6014.jpg",
-    total: 32
-  }
+let seleccionadas = [];
+
+// 🔥 CONFIG
+const album = {
+  nombre: "gymna_vs_cariocas",
+  path: "images/gymna_vs_cariocas/preview/",
+  portada: "DSC_6014.jpg",
+  total: 32
+};
+
+const imagenes = [
+  "DSC_6014.jpg","DSC_6016.jpg","DSC_6019.jpg","DSC_6022.jpg",
+  "DSC_6024.jpg","DSC_6030.jpg","DSC_6031.jpg","DSC_6033.jpg",
+  "DSC_6034.jpg","DSC_6035.jpg","DSC_6036.jpg","DSC_6040.jpg",
+  "DSC_6041.jpg","DSC_6043.jpg","DSC_6044.jpg","DSC_6045.jpg",
+  "DSC_6049.jpg","DSC_6050.jpg","DSC_6051.jpg","DSC_6052.jpg",
+  "DSC_6055.jpg","DSC_6056.jpg","DSC_6057.jpg","DSC_6059.jpg",
+  "DSC_6060.jpg","DSC_6062.jpg","DSC_6063.jpg","DSC_6064.jpg",
+  "DSC_6065.jpg","DSC_6067.jpg","DSC_6072.jpg","DSC_6076.jpg"
 ];
 
-// 🟢 MOSTRAR ÁLBUMES
+// 🟢 ÁLBUMES
 function mostrarAlbums() {
-  contenido.innerHTML = '<div class="albums"></div>';
-  const cont = document.querySelector(".albums");
+  carrito.style.display = "none";
 
-  albums.forEach(album => {
-    const div = document.createElement("div");
-    div.className = "album";
-
-    div.innerHTML = `
-      <img src="${album.path + album.portada}">
-      <div class="album-info">
-        <h3>${album.nombre}</h3>
-        <p>${album.total} fotos</p>
+  contenido.innerHTML = `
+    <div class="albums">
+      <div class="album" onclick="abrirAlbum()">
+        <img src="${album.path + album.portada}">
+        <div class="album-info">
+          <h3>${album.nombre}</h3>
+          <p>${album.total} fotos</p>
+        </div>
       </div>
-    `;
-
-    div.onclick = () => abrirAlbum(album);
-
-    cont.appendChild(div);
-  });
+    </div>
+  `;
 }
 
 // 🟢 ABRIR ÁLBUM
-function abrirAlbum(album) {
-  const imagenes = [
-    "DSC_6014.jpg","DSC_6016.jpg","DSC_6019.jpg","DSC_6022.jpg",
-    "DSC_6024.jpg","DSC_6030.jpg","DSC_6031.jpg","DSC_6033.jpg",
-    "DSC_6034.jpg","DSC_6035.jpg","DSC_6036.jpg","DSC_6040.jpg",
-    "DSC_6041.jpg","DSC_6043.jpg","DSC_6044.jpg","DSC_6045.jpg",
-    "DSC_6049.jpg","DSC_6050.jpg","DSC_6051.jpg","DSC_6052.jpg",
-    "DSC_6055.jpg","DSC_6056.jpg","DSC_6057.jpg","DSC_6059.jpg",
-    "DSC_6060.jpg","DSC_6062.jpg","DSC_6063.jpg","DSC_6064.jpg",
-    "DSC_6065.jpg","DSC_6067.jpg","DSC_6072.jpg","DSC_6076.jpg"
-  ];
+function abrirAlbum() {
+  seleccionadas = [];
+  actualizarCarrito();
 
   contenido.innerHTML = `
-    <button onclick="volver()">⬅ Volver</button>
+    <button class="volver" onclick="mostrarAlbums()">⬅ Volver</button>
     <div class="galeria"></div>
   `;
 
+  carrito.style.display = "block";
+
   const galeria = document.querySelector(".galeria");
 
-  galeria.style.display = "grid";
-  galeria.style.gridTemplateColumns = "repeat(auto-fill, minmax(250px, 1fr))";
-  galeria.style.gap = "10px";
-  galeria.style.padding = "20px";
-
   imagenes.forEach(nombre => {
-    const img = document.createElement("img");
-    img.src = album.path + nombre;
-    img.style.width = "100%";
-    img.style.borderRadius = "10px";
+    const div = document.createElement("div");
+    div.className = "foto";
 
-    galeria.appendChild(img);
+    div.innerHTML = `
+      <img src="${album.path + nombre}">
+      <div class="check">✔</div>
+    `;
+
+    div.onclick = () => toggleSeleccion(div, nombre);
+
+    galeria.appendChild(div);
   });
 }
 
-// 🔙 VOLVER
-function volver() {
-  mostrarAlbums();
+// 🟢 SELECCIONAR
+function toggleSeleccion(div, nombre) {
+  div.classList.toggle("selected");
+
+  if (seleccionadas.includes(nombre)) {
+    seleccionadas = seleccionadas.filter(f => f !== nombre);
+  } else {
+    seleccionadas.push(nombre);
+  }
+
+  actualizarCarrito();
+}
+
+// 🟢 CARRITO
+function actualizarCarrito() {
+  const precio = 1000;
+  carrito.innerText = `${seleccionadas.length} fotos | $${seleccionadas.length * precio}`;
 }
 
 // INIT
