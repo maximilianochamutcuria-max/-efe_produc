@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>@efe_produc</title>
 
 <style>
@@ -245,7 +246,89 @@ h1 { margin: 20px; }
 .izquierda { left:30px; }
 .derecha { right:30px; }
 
-</style>
+/* 📱 MOBILE */
+@media (max-width: 768px) {
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .galeria {
+    column-count: 2;
+    padding: 10px;
+    column-gap: 8px;
+  }
+
+  .foto {
+    margin-bottom: 8px;
+  }
+
+  .check {
+    width: 32px;
+    height: 32px;
+    bottom: 8px;
+    left: 8px;
+  }
+
+  .volver {
+    width: 90%;
+    margin: 10px auto;
+    display: block;
+  }
+
+  #carrito {
+    width: 90%;
+    text-align: center;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .modal {
+    flex-direction: column;
+    height: 95%;
+  }
+
+  .izq {
+    height: 50%;
+    padding: 10px;
+  }
+
+  .der {
+    height: 50%;
+    padding: 15px;
+  }
+
+  .grid {
+    justify-content: center;
+  }
+
+  .item img {
+    width: 70px;
+  }
+
+  .input {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .btn-pagar {
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  #visor img {
+    max-width: 95%;
+    max-height: 80%;
+  }
+
+  .flecha {
+    font-size: 30px;
+  }
+
+  .cerrar {
+    font-size: 26px;
+  }
+}</style>
 </head>
 
 <body>
