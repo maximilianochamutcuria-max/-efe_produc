@@ -2,13 +2,17 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔑 CLIENTE NUEVO
+// 👇 SERVIR ARCHIVOS ESTÁTICOS (CLAVE)
+app.use(express.static(__dirname));
+
+// 🔑 CLIENTE MP
 const client = new MercadoPagoConfig({
   accessToken: process.env.ACCESS_TOKEN,
 });
@@ -46,6 +50,11 @@ app.post("/create_preference", async (req, res) => {
     console.log(error);
     res.status(500).json({ error: "Error en pago" });
   }
+});
+
+// 👇 RUTA PRINCIPAL (CLAVE)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // 🚀 SERVER

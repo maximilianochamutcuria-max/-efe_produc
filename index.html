@@ -1,251 +1,141 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>@efe_produc</title>
+  <meta charset="UTF-8">
+  <title>@efe_produc</title>
 
-<style>
-body { margin:0; font-family:Arial; background:#f5f5f5; }
-h1 { text-align:center; }
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #f5f5f5;
+      text-align: center;
+    }
 
-/* ALBUMES */
-.albums {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-  gap:20px;
-  padding:20px;
-}
+    h1 {
+      margin: 20px;
+    }
 
-.album {
-  background:white;
-  border-radius:12px;
-  overflow:hidden;
-  cursor:pointer;
-}
+    .galeria {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 10px;
+      padding: 20px;
+    }
 
-.album img {
-  width:100%;
-  height:200px;
-  object-fit:cover;
-}
+    .foto {
+      position: relative;
+      cursor: pointer;
+    }
 
-/* GALERIA */
-.gallery {
-  column-count:4;
-  column-gap:15px;
-  padding:20px;
-}
+    .foto img {
+      width: 100%;
+      border-radius: 10px;
+    }
 
-.photo {
-  margin-bottom:15px;
-  break-inside:avoid;
-  position:relative;
-}
+    .check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border-radius: 50%;
+      padding: 5px;
+      display: none;
+    }
 
-.photo img {
-  width:100%;
-  border-radius:10px;
-  cursor:pointer;
-  transition:0.3s;
-}
+    .foto.selected .check {
+      display: block;
+    }
 
-.photo:hover img {
-  transform:scale(1.03);
-  filter:brightness(0.85);
-}
-
-/* SELECCION */
-.photo.selected::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(255,0,0,0.4);
-  border-radius:10px;
-}
-
-.check {
-  position:absolute;
-  bottom:8px;
-  left:8px;
-  background:black;
-  color:white;
-  padding:4px 6px;
-  border-radius:6px;
-}
-
-/* VISOR */
-#viewer {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.9);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-
-#viewer img {
-  max-width:80%;
-}
-
-.close {
-  position:absolute;
-  top:20px;
-  right:20px;
-  color:white;
-  font-size:30px;
-  cursor:pointer;
-}
-
-/* CART */
-.cart {
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:black;
-  color:white;
-  padding:10px 20px;
-  border-radius:20px;
-  cursor:pointer;
-}
-
-/* CHECKOUT */
-#checkout {
-  position:fixed;
-  bottom:0;
-  width:100%;
-  height:70%;
-  background:white;
-  display:none;
-  padding:20px;
-}
-</style>
+    #carrito {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: black;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+    }
+  </style>
 </head>
 
 <body>
 
 <h1>@efe_produc</h1>
 
-<div id="albums" class="albums"></div>
-<div id="gallery" class="gallery" style="display:none;"></div>
-<div id="cart" class="cart"></div>
+<div class="galeria" id="galeria"></div>
 
-<!-- VISOR -->
-<div id="viewer">
-  <div class="close" onclick="viewer.style.display='none'">✖</div>
-  <img id="viewerImg">
-</div>
-
-<!-- CHECKOUT -->
-<div id="checkout">
-  <h3 id="total"></h3>
-  <input id="email" placeholder="Email">
-  <button onclick="pagar()">Continuar</button>
-</div>
+<div id="carrito">Total: $0</div>
 
 <script>
-let fotos = [];
-let seleccion = [];
-let albumActual = "";
+  const galeria = document.getElementById("galeria");
+  let total = 0;
 
-/* PRECIO */
-function precio(n){
-  let t=0;
-  if(n>=10){ t+=12000; n-=10; }
-  if(n>=3){ t+=5500; n-=3; }
-  t+=n*2000;
-  return t;
-}
+  // 🔥 RUTA REAL DE TU CARPETA
+  const basePath = "images/gymna_vs_cariocas/preview/";
 
-/* ALBUMES */
-async function cargarAlbums(){
-  const res = await fetch("/api/albums");
-  const data = await res.json();
+  // 👇 LISTA REAL DE TUS FOTOS
+  const imagenes = [
+    "DSC_6014.jpg",
+    "DSC_6016.jpg",
+    "DSC_6019.jpg",
+    "DSC_6022.jpg",
+    "DSC_6024.jpg",
+    "DSC_6030.jpg",
+    "DSC_6031.jpg",
+    "DSC_6033.jpg",
+    "DSC_6034.jpg",
+    "DSC_6035.jpg",
+    "DSC_6036.jpg",
+    "DSC_6040.jpg",
+    "DSC_6041.jpg",
+    "DSC_6043.jpg",
+    "DSC_6044.jpg",
+    "DSC_6045.jpg",
+    "DSC_6049.jpg",
+    "DSC_6050.jpg",
+    "DSC_6051.jpg",
+    "DSC_6052.jpg",
+    "DSC_6055.jpg",
+    "DSC_6056.jpg",
+    "DSC_6057.jpg",
+    "DSC_6059.jpg",
+    "DSC_6060.jpg",
+    "DSC_6062.jpg",
+    "DSC_6063.jpg",
+    "DSC_6064.jpg",
+    "DSC_6065.jpg",
+    "DSC_6067.jpg",
+    "DSC_6072.jpg",
+    "DSC_6076.jpg"
+  ];
 
-  data.forEach(a=>{
-    const div=document.createElement("div");
-    div.className="album";
-    div.innerHTML=`<img src="/images/${a}/preview/${a}_1.jpg"><h3>${a}</h3>`;
-    div.onclick=()=>abrirAlbum(a);
-    albums.appendChild(div);
-  });
-}
+  imagenes.forEach(nombre => {
+    const div = document.createElement("div");
+    div.classList.add("foto");
 
-/* ABRIR ALBUM */
-async function abrirAlbum(a){
-  albumActual=a;
-  albums.style.display="none";
-  gallery.style.display="block";
+    const src = basePath + nombre;
 
-  const res = await fetch(`/api/fotos/${a}`);
-  fotos = await res.json();
-
-  gallery.innerHTML="";
-
-  fotos.forEach((f,i)=>{
-    const d=document.createElement("div");
-    d.className="photo";
-
-    d.innerHTML=`
-      <img src="/images/${a}/preview/${f}">
-      <div class="check">+</div>
+    div.innerHTML = `
+      <img src="${src}">
+      <div class="check">✔</div>
     `;
 
-    // CLICK CONTENEDOR → SELECCIONA
-    d.onclick=()=>{
-      if(seleccion.includes(f)){
-        seleccion = seleccion.filter(x=>x!==f);
-        d.classList.remove("selected");
+    div.onclick = () => {
+      div.classList.toggle("selected");
+
+      if (div.classList.contains("selected")) {
+        total += 1000;
       } else {
-        seleccion.push(f);
-        d.classList.add("selected");
+        total -= 1000;
       }
-      actualizar();
+
+      document.getElementById("carrito").innerText = "Total: $" + total;
     };
 
-    // CLICK IMAGEN → VISOR
-    d.querySelector("img").onclick=(e)=>{
-      e.stopPropagation();
-      viewer.style.display="flex";
-      viewerImg.src=`/images/${a}/preview/${f}`;
-    };
-
-    gallery.appendChild(d);
+    galeria.appendChild(div);
   });
-}
-
-/* CARRITO */
-function actualizar(){
-  cart.style.display = seleccion.length?"block":"none";
-  cart.innerText = seleccion.length+" fotos";
-}
-
-cart.onclick=()=>{
-  checkout.style.display="block";
-  total.innerText="Total: $"+precio(seleccion.length);
-};
-
-/* PAGO */
-function pagar(){
-  const total = precio(seleccion.length);
-
-  fetch("/crear-pago",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ total })
-  })
-  .then(r=>r.json())
-  .then(d=>{
-    if(d.init_point){
-      window.location.href=d.init_point;
-    } else {
-      alert("Error en pago");
-    }
-  });
-}
-
-cargarAlbums();
 </script>
 
 </body>
