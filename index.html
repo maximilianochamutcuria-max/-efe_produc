@@ -6,7 +6,6 @@
 
 <style>
 body { margin:0; font-family:Arial; background:#f5f5f5; }
-
 h1 { text-align:center; }
 
 /* ALBUMES */
@@ -47,14 +46,31 @@ h1 { text-align:center; }
   width:100%;
   border-radius:10px;
   cursor:pointer;
+  transition:0.3s;
 }
 
+.photo:hover img {
+  transform:scale(1.03);
+  filter:brightness(0.85);
+}
+
+/* SELECCION */
 .photo.selected::after {
   content:"";
   position:absolute;
   inset:0;
   background:rgba(255,0,0,0.4);
   border-radius:10px;
+}
+
+.check {
+  position:absolute;
+  bottom:8px;
+  left:8px;
+  background:black;
+  color:white;
+  padding:4px 6px;
+  border-radius:6px;
 }
 
 /* VISOR */
@@ -65,6 +81,7 @@ h1 { text-align:center; }
   display:none;
   justify-content:center;
   align-items:center;
+  z-index:999;
 }
 
 #viewer img {
@@ -102,12 +119,6 @@ h1 { text-align:center; }
   background:white;
   display:none;
   padding:20px;
-}
-
-button {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
 }
 </style>
 </head>
@@ -161,7 +172,7 @@ async function cargarAlbums(){
   });
 }
 
-/* ABRIR */
+/* ABRIR ALBUM */
 async function abrirAlbum(a){
   albumActual=a;
   albums.style.display="none";
@@ -176,8 +187,12 @@ async function abrirAlbum(a){
     const d=document.createElement("div");
     d.className="photo";
 
-    d.innerHTML=`<img src="/images/${a}/preview/${f}">`;
+    d.innerHTML=`
+      <img src="/images/${a}/preview/${f}">
+      <div class="check">+</div>
+    `;
 
+    // CLICK CONTENEDOR → SELECCIONA
     d.onclick=()=>{
       if(seleccion.includes(f)){
         seleccion = seleccion.filter(x=>x!==f);
@@ -189,6 +204,7 @@ async function abrirAlbum(a){
       actualizar();
     };
 
+    // CLICK IMAGEN → VISOR
     d.querySelector("img").onclick=(e)=>{
       e.stopPropagation();
       viewer.style.display="flex";
@@ -199,7 +215,7 @@ async function abrirAlbum(a){
   });
 }
 
-/* CART */
+/* CARRITO */
 function actualizar(){
   cart.style.display = seleccion.length?"block":"none";
   cart.innerText = seleccion.length+" fotos";

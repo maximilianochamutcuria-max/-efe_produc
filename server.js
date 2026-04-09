@@ -1,8 +1,10 @@
+require("dotenv").config();
+console.log("TOKEN:", process.env.MP_ACCESS_TOKEN);
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
 
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 
@@ -15,6 +17,7 @@ const PORT = process.env.PORT || 3000;
 /* =========================
    MERCADO PAGO
 ========================= */
+
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
 });
@@ -22,12 +25,14 @@ const client = new MercadoPagoConfig({
 /* =========================
    ARCHIVOS ESTÁTICOS
 ========================= */
+
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(express.static(__dirname));
 
 /* =========================
    API ALBUMES
 ========================= */
+
 app.get("/api/albums", (req, res) => {
   const basePath = path.join(__dirname, "images");
 
@@ -46,6 +51,7 @@ app.get("/api/albums", (req, res) => {
 /* =========================
    API FOTOS
 ========================= */
+
 app.get("/api/fotos/:album", (req, res) => {
   const folder = path.join(__dirname, "images", req.params.album, "preview");
 
@@ -64,8 +70,11 @@ app.get("/api/fotos/:album", (req, res) => {
 /* =========================
    CREAR PAGO
 ========================= */
+
 app.post("/crear-pago", async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+
     const { total } = req.body;
 
     if (!total) {
@@ -87,6 +96,8 @@ app.post("/crear-pago", async (req, res) => {
       }
     });
 
+    console.log("MP RESPONSE:", result);
+
     res.json({ init_point: result.init_point });
 
   } catch (err) {
@@ -96,6 +107,7 @@ app.post("/crear-pago", async (req, res) => {
 });
 
 /* ========================= */
+
 app.listen(PORT, () => {
   console.log("Servidor en puerto " + PORT);
 });
