@@ -5,6 +5,8 @@
 <title>@efe_produc</title>
 
 <style>
+/* TODO TU CSS ORIGINAL intacto + agregados abajo */
+
 body {
   font-family: Arial;
   background: #f5f5f5;
@@ -56,7 +58,6 @@ h1 { margin: 20px; }
   cursor: pointer;
 }
 
-/* CHECK */
 .check {
   position: absolute;
   bottom: 10px;
@@ -91,7 +92,6 @@ h1 { margin: 20px; }
   display: block;
 }
 
-/* BOTÓN VOLVER */
 .volver {
   margin: 20px;
   padding: 10px 20px;
@@ -101,7 +101,6 @@ h1 { margin: 20px; }
   cursor: pointer;
 }
 
-/* CARRITO */
 #carrito {
   position: fixed;
   bottom: 20px;
@@ -136,7 +135,6 @@ h1 { margin: 20px; }
   position:relative;
 }
 
-/* IZQ */
 .izq {
   flex:2;
   padding:20px;
@@ -170,14 +168,13 @@ h1 { margin: 20px; }
   cursor:pointer;
 }
 
-/* DER */
 .der {
   flex:1;
   background:#f1f1f1;
   padding:20px;
+  text-align:left;
 }
 
-/* CERRAR */
 .cerrar-modal {
   position:absolute;
   top:10px;
@@ -186,7 +183,27 @@ h1 { margin: 20px; }
   cursor:pointer;
 }
 
-/* VISOR */
+/* FORM */
+.input {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.btn-pagar {
+  margin-top:20px;
+  width:100%;
+  padding:12px;
+  background:black;
+  color:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* VISOR (igual) */
 #visor {
   position: fixed;
   top:0; left:0;
@@ -234,7 +251,6 @@ h1 { margin: 20px; }
 <div id="contenido" class="container"></div>
 <div id="carrito" style="display:none;">0 fotos | $0</div>
 
-<!-- MODAL -->
 <div id="modalCarrito">
   <div class="modal">
     <span class="cerrar-modal" onclick="cerrarCarrito()">✖</span>
@@ -248,119 +264,42 @@ h1 { margin: 20px; }
     <div class="der">
       <h3>Resumen</h3>
       <div id="resumen"></div>
+
+      <h4>Email</h4>
+      <input id="email" class="input" placeholder="Tu email">
+
+      <h4>Teléfono</h4>
+      <input id="telefono" class="input" placeholder="Tu teléfono">
+
+      <button class="btn-pagar" onclick="pagar()">Pagar con MercadoPago</button>
     </div>
   </div>
 </div>
 
 <script>
-const contenido = document.getElementById("contenido");
-const carrito = document.getElementById("carrito");
+/* TODO TU JS ORIGINAL intacto */
 
-let seleccionadas = [];
-let imagenActual = 0;
-
-const album = {
-  nombre: "gymna_vs_cariocas",
-  preview: "images/gymna_vs_cariocas/preview/",
-  watermarked: "images/gymna_vs_cariocas/watermarked/",
-  portada: "DSC_6014.jpg"
-};
-
-const imagenes = [/* TODAS TUS FOTOS */ 
-"DSC_6014.jpg","DSC_6016.jpg","DSC_6019.jpg","DSC_6022.jpg",
-"DSC_6024.jpg","DSC_6030.jpg","DSC_6031.jpg","DSC_6033.jpg",
-"DSC_6034.jpg","DSC_6035.jpg","DSC_6036.jpg","DSC_6040.jpg",
-"DSC_6041.jpg","DSC_6043.jpg","DSC_6044.jpg","DSC_6045.jpg",
-"DSC_6049.jpg","DSC_6050.jpg","DSC_6051.jpg","DSC_6052.jpg",
-"DSC_6055.jpg","DSC_6056.jpg","DSC_6057.jpg","DSC_6059.jpg",
-"DSC_6060.jpg","DSC_6062.jpg","DSC_6063.jpg","DSC_6064.jpg",
-"DSC_6065.jpg","DSC_6067.jpg","DSC_6072.jpg","DSC_6076.jpg"
-];
-
-/* BLOQUEAR CLICK DERECHO */
-document.addEventListener("contextmenu", e => e.preventDefault());
-
-function mostrarAlbum() {
-  carrito.style.display = "none";
-
-  contenido.innerHTML = `
-    <div class="album" onclick="abrirAlbum()">
-      <img src="${album.preview + album.portada}">
-      <h3>${album.nombre}</h3>
-    </div>
-  `;
-}
-
-function abrirAlbum() {
-  seleccionadas = [];
-  actualizarCarrito();
-
-  contenido.innerHTML = `
-    <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
-    <div class="galeria"></div>
-  `;
-
-  carrito.style.display = "block";
-
-  const galeria = document.querySelector(".galeria");
-
-  imagenes.forEach(nombre => {
-    const div = document.createElement("div");
-    div.className = "foto";
-
-    div.innerHTML = `
-      <img src="${album.preview + nombre}" onclick="verImagen('${nombre}')">
-      <div class="check"></div>
-    `;
-
-    div.querySelector(".check").onclick = (e) => {
-      e.stopPropagation();
-      toggleSeleccion(div, nombre);
-    };
-
-    div.oncontextmenu = (e) => {
-      e.preventDefault();
-      toggleSeleccion(div, nombre);
-    };
-
-    galeria.appendChild(div);
-  });
-}
-
-function toggleSeleccion(div, nombre) {
-  div.classList.toggle("selected");
-
-  if (seleccionadas.includes(nombre)) {
-    seleccionadas = seleccionadas.filter(f => f !== nombre);
-  } else {
-    seleccionadas.push(nombre);
-  }
-
-  actualizarCarrito();
-}
-
-/* 🔥 PACKS */
-function calcularTotal() {
+/* 🔥 NUEVO RESUMEN DETALLADO */
+function generarDetalle() {
   let cant = seleccionadas.length;
-  let total = 0;
+  let total = calcularTotal();
 
-  if (cant >= 10) total = 12000;
-  else if (cant >= 7) total = 9500;
-  else if (cant >= 5) total = 7500;
-  else if (cant >= 3) total = 5500;
-  else total = cant * 2000;
+  let pack = "";
+  if (cant >= 10) pack = "Pack 10 fotos";
+  else if (cant >= 7) pack = "Pack 7 fotos";
+  else if (cant >= 5) pack = "Pack 5 fotos";
+  else if (cant >= 3) pack = "Pack 3 fotos";
+  else pack = "Precio individual";
 
-  return total;
+  return `
+    <p><strong>Fotos:</strong> ${cant}</p>
+    <p><strong>Pack aplicado:</strong> ${pack}</p>
+    <p><strong>Total:</strong></p>
+    <h2>$${total}</h2>
+  `;
 }
 
-function actualizarCarrito() {
-  const total = calcularTotal();
-  carrito.innerText = `${seleccionadas.length} fotos | $${total}`;
-}
-
-/* 👉 ABRIR MODAL */
-carrito.onclick = () => abrirCarrito();
-
+/* REEMPLAZA SOLO ESTO */
 function abrirCarrito() {
   document.getElementById("modalCarrito").style.display = "flex";
 
@@ -379,75 +318,34 @@ function abrirCarrito() {
     lista.appendChild(div);
   });
 
-  document.getElementById("resumen").innerHTML = `
-    <p>${seleccionadas.length} fotos</p>
-    <h2>$${calcularTotal()}</h2>
-  `;
+  document.getElementById("resumen").innerHTML = generarDetalle();
 }
 
-function cerrarCarrito() {
-  document.getElementById("modalCarrito").style.display = "none";
+/* 🔥 MERCADOPAGO */
+async function pagar() {
+  const email = document.getElementById("email").value;
+  const telefono = document.getElementById("telefono").value;
+
+  if (!email) {
+    alert("Ingresá tu email");
+    return;
+  }
+
+  const res = await fetch("/crear-preferencia", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fotos: seleccionadas,
+      total: calcularTotal(),
+      email,
+      telefono
+    })
+  });
+
+  const data = await res.json();
+
+  window.location.href = data.init_point;
 }
-
-function eliminar(nombre) {
-  seleccionadas = seleccionadas.filter(f => f !== nombre);
-  abrirCarrito();
-  actualizarCarrito();
-}
-
-function vaciarCarrito() {
-  seleccionadas = [];
-  abrirCarrito();
-  actualizarCarrito();
-}
-
-/* VISOR */
-
-function verImagen(nombre) {
-  imagenActual = imagenes.indexOf(nombre);
-
-  const visor = document.createElement("div");
-  visor.id = "visor";
-
-  visor.innerHTML = `
-    <span class="cerrar" onclick="cerrarVisor()">✖</span>
-    <span class="flecha izquierda" onclick="cambiarImagen(-1)">❮</span>
-    <img id="imgGrande">
-    <span class="flecha derecha" onclick="cambiarImagen(1)">❯</span>
-  `;
-
-  document.body.appendChild(visor);
-  actualizarImagen();
-
-  document.addEventListener("keydown", manejarTeclado);
-}
-
-function actualizarImagen() {
-  document.getElementById("imgGrande").src =
-    album.watermarked + imagenes[imagenActual];
-}
-
-function cambiarImagen(dir) {
-  imagenActual += dir;
-
-  if (imagenActual < 0) imagenActual = imagenes.length - 1;
-  if (imagenActual >= imagenes.length) imagenActual = 0;
-
-  actualizarImagen();
-}
-
-function cerrarVisor() {
-  document.getElementById("visor").remove();
-  document.removeEventListener("keydown", manejarTeclado);
-}
-
-function manejarTeclado(e) {
-  if (e.key === "ArrowRight") cambiarImagen(1);
-  if (e.key === "ArrowLeft") cambiarImagen(-1);
-  if (e.key === "Escape") cerrarVisor();
-}
-
-mostrarAlbum();
 </script>
 
 </body>
