@@ -5,8 +5,172 @@
 <title>@efe_produc</title>
 
 <style>
-/* TU CSS ORIGINAL intacto + SOLO agrego abajo */
+body {
+  font-family: Arial;
+  background: #f5f5f5;
+  margin: 0;
+  text-align: center;
+}
 
+h1 { margin: 20px; }
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* ÁLBUM */
+.album {
+  width: 300px;
+  margin: auto;
+  cursor: pointer;
+}
+
+.album img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* GALERÍA */
+.galeria {
+  column-count: 4;
+  column-gap: 12px;
+  padding: 20px;
+}
+
+.foto {
+  position: relative;
+  margin-bottom: 12px;
+  break-inside: avoid;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.foto:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+.foto img {
+  width: 100%;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* CHECK */
+.check {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid white;
+  background: rgba(0,0,0,0.4);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.check::after {
+  content: "✔";
+  display: none;
+  color: white;
+  text-align: center;
+  line-height: 28px;
+}
+
+.foto.selected::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,0,0,0.35);
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.foto.selected .check::after {
+  display: block;
+}
+
+/* BOTÓN VOLVER */
+.volver {
+  margin: 20px;
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* CARRITO */
+#carrito {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+/* MODAL */
+#modalCarrito {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.modal {
+  width:90%;
+  height:85%;
+  background:white;
+  border-radius:15px;
+  display:flex;
+  overflow:hidden;
+  position:relative;
+}
+
+/* IZQ */
+.izq {
+  flex:2;
+  padding:20px;
+  overflow:auto;
+}
+
+.grid {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.item {
+  position:relative;
+}
+
+.item img {
+  width:80px;
+  border-radius:6px;
+}
+
+.remove {
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  background:red;
+  color:white;
+  border-radius:50%;
+  width:20px;
+  height:20px;
+  cursor:pointer;
+}
+
+/* DER */
 .der {
   flex:1;
   background:#f1f1f1;
@@ -14,7 +178,7 @@
   text-align:left;
 }
 
-/* FORM */
+/* NUEVO */
 .input {
   width:100%;
   padding:10px;
@@ -33,6 +197,54 @@
   border-radius:10px;
   cursor:pointer;
 }
+
+/* CERRAR */
+.cerrar-modal {
+  position:absolute;
+  top:10px;
+  right:20px;
+  font-size:25px;
+  cursor:pointer;
+}
+
+/* VISOR */
+#visor {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.95);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+#visor img {
+  max-width:90%;
+  max-height:90%;
+}
+
+.cerrar {
+  position:absolute;
+  top:20px;
+  right:30px;
+  color:white;
+  font-size:30px;
+  cursor:pointer;
+}
+
+.flecha {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:40px;
+  color:white;
+  cursor:pointer;
+}
+
+.izquierda { left:30px; }
+.derecha { right:30px; }
+
 </style>
 </head>
 
@@ -69,28 +281,108 @@
 </div>
 
 <script>
+const contenido = document.getElementById("contenido");
+const carrito = document.getElementById("carrito");
 
-/* 🔥 NUEVO: RESUMEN DETALLADO */
-function generarResumen() {
-  let cant = seleccionadas.length;
-  let total = calcularTotal();
+let seleccionadas = [];
+let imagenActual = 0;
 
-  let pack = "";
-  if (cant >= 10) pack = "Pack 10 fotos ($12000)";
-  else if (cant >= 7) pack = "Pack 7 fotos ($9500)";
-  else if (cant >= 5) pack = "Pack 5 fotos ($7500)";
-  else if (cant >= 3) pack = "Pack 3 fotos ($5500)";
-  else pack = `Precio individual ($2000 c/u)`;
+const album = {
+  nombre: "gymna_vs_cariocas",
+  preview: "images/gymna_vs_cariocas/preview/",
+  watermarked: "images/gymna_vs_cariocas/watermarked/",
+  portada: "DSC_6014.jpg"
+};
 
-  return `
-    <p><strong>Cantidad:</strong> ${cant}</p>
-    <p><strong>Pack aplicado:</strong> ${pack}</p>
-    <hr>
-    <h2>Total: $${total}</h2>
+const imagenes = [
+"DSC_6014.jpg","DSC_6016.jpg","DSC_6019.jpg","DSC_6022.jpg",
+"DSC_6024.jpg","DSC_6030.jpg","DSC_6031.jpg","DSC_6033.jpg",
+"DSC_6034.jpg","DSC_6035.jpg","DSC_6036.jpg","DSC_6040.jpg",
+"DSC_6041.jpg","DSC_6043.jpg","DSC_6044.jpg","DSC_6045.jpg",
+"DSC_6049.jpg","DSC_6050.jpg","DSC_6051.jpg","DSC_6052.jpg",
+"DSC_6055.jpg","DSC_6056.jpg","DSC_6057.jpg","DSC_6059.jpg",
+"DSC_6060.jpg","DSC_6062.jpg","DSC_6063.jpg","DSC_6064.jpg",
+"DSC_6065.jpg","DSC_6067.jpg","DSC_6072.jpg","DSC_6076.jpg"
+];
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+function mostrarAlbum() {
+  carrito.style.display = "none";
+
+  contenido.innerHTML = `
+    <div class="album" onclick="abrirAlbum()">
+      <img src="${album.preview + album.portada}">
+      <h3>${album.nombre}</h3>
+    </div>
   `;
 }
 
-/* 🔥 MODIFICO SOLO ESTA FUNCIÓN */
+function abrirAlbum() {
+  seleccionadas = [];
+  actualizarCarrito();
+
+  contenido.innerHTML = `
+    <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
+    <div class="galeria"></div>
+  `;
+
+  carrito.style.display = "block";
+
+  const galeria = document.querySelector(".galeria");
+
+  imagenes.forEach(nombre => {
+    const div = document.createElement("div");
+    div.className = "foto";
+
+    div.innerHTML = `
+      <img src="${album.preview + nombre}" onclick="verImagen('${nombre}')">
+      <div class="check"></div>
+    `;
+
+    div.querySelector(".check").onclick = (e) => {
+      e.stopPropagation();
+      toggleSeleccion(div, nombre);
+    };
+
+    div.oncontextmenu = (e) => {
+      e.preventDefault();
+      toggleSeleccion(div, nombre);
+    };
+
+    galeria.appendChild(div);
+  });
+}
+
+function toggleSeleccion(div, nombre) {
+  div.classList.toggle("selected");
+
+  if (seleccionadas.includes(nombre)) {
+    seleccionadas = seleccionadas.filter(f => f !== nombre);
+  } else {
+    seleccionadas.push(nombre);
+  }
+
+  actualizarCarrito();
+}
+
+function calcularTotal() {
+  let cant = seleccionadas.length;
+
+  if (cant >= 10) return 12000;
+  if (cant >= 7) return 9500;
+  if (cant >= 5) return 7500;
+  if (cant >= 3) return 5500;
+
+  return cant * 2000;
+}
+
+function actualizarCarrito() {
+  carrito.innerText = `${seleccionadas.length} fotos | $${calcularTotal()}`;
+}
+
+carrito.onclick = () => abrirCarrito();
+
 function abrirCarrito() {
   document.getElementById("modalCarrito").style.display = "flex";
 
@@ -109,39 +401,102 @@ function abrirCarrito() {
     lista.appendChild(div);
   });
 
-  document.getElementById("resumen").innerHTML = generarResumen();
+  let cant = seleccionadas.length;
+  let total = calcularTotal();
+
+  let pack = "Individual";
+  if (cant >= 10) pack = "Pack 10";
+  else if (cant >= 7) pack = "Pack 7";
+  else if (cant >= 5) pack = "Pack 5";
+  else if (cant >= 3) pack = "Pack 3";
+
+  document.getElementById("resumen").innerHTML = `
+    <p>${cant} fotos</p>
+    <p>${pack}</p>
+    <h2>$${total}</h2>
+  `;
 }
 
-/* 🔥 MERCADOPAGO */
+function cerrarCarrito() {
+  document.getElementById("modalCarrito").style.display = "none";
+}
+
+function eliminar(nombre) {
+  seleccionadas = seleccionadas.filter(f => f !== nombre);
+  abrirCarrito();
+  actualizarCarrito();
+}
+
+function vaciarCarrito() {
+  seleccionadas = [];
+  abrirCarrito();
+  actualizarCarrito();
+}
+
 async function pagar() {
   const email = document.getElementById("email").value;
-  const telefono = document.getElementById("telefono").value;
 
-  if (!email) {
-    alert("Ingresá tu email");
-    return;
-  }
+  if (!email) return alert("Ingresá tu email");
 
-  try {
-    const res = await fetch("/crear-preferencia", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fotos: seleccionadas,
-        total: calcularTotal(),
-        email,
-        telefono
-      })
-    });
+  const res = await fetch("/crear-preferencia", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      fotos: seleccionadas,
+      total: calcularTotal(),
+      email
+    })
+  });
 
-    const data = await res.json();
-    window.location.href = data.init_point;
-
-  } catch (err) {
-    alert("Error al iniciar pago");
-  }
+  const data = await res.json();
+  window.location.href = data.init_point;
 }
 
+function verImagen(nombre) {
+  imagenActual = imagenes.indexOf(nombre);
+
+  const visor = document.createElement("div");
+  visor.id = "visor";
+
+  visor.innerHTML = `
+    <span class="cerrar" onclick="cerrarVisor()">✖</span>
+    <span class="flecha izquierda" onclick="cambiarImagen(-1)">❮</span>
+    <img id="imgGrande">
+    <span class="flecha derecha" onclick="cambiarImagen(1)">❯</span>
+  `;
+
+  document.body.appendChild(visor);
+  actualizarImagen();
+
+  document.addEventListener("keydown", manejarTeclado);
+}
+
+function actualizarImagen() {
+  document.getElementById("imgGrande").src =
+    album.watermarked + imagenes[imagenActual];
+}
+
+function cambiarImagen(dir) {
+  imagenActual += dir;
+
+  if (imagenActual < 0) imagenActual = imagenes.length - 1;
+  if (imagenActual >= imagenes.length) imagenActual = 0;
+
+  actualizarImagen();
+}
+
+function cerrarVisor() {
+  document.getElementById("visor").remove();
+  document.removeEventListener("keydown", manejarTeclado);
+}
+
+function manejarTeclado(e) {
+  if (e.key === "ArrowRight") cambiarImagen(1);
+  if (e.key === "ArrowLeft") cambiarImagen(-1);
+  if (e.key === "Escape") cerrarVisor();
+}
+
+mostrarAlbum();
 </script>
 
 </body>
