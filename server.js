@@ -1,6 +1,3 @@
-require("dotenv").config();
-console.log("TOKEN:", process.env.MP_ACCESS_TOKEN);
-
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -11,75 +8,49 @@ const { MercadoPagoConfig, Preference } = require("mercadopago");
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-const PORT = process.env.PORT || 3000;
-
-/* =========================
-   MERCADO PAGO
-========================= */
-
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN
-});
-
-/* =========================
-   ARCHIVOS ESTÁTICOS
-========================= */
-
-app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(express.static(__dirname));
 
-/* =========================
-   API ALBUMES
-========================= */
+/* 🔥 TOKEN DIRECTO */
+const client = new MercadoPagoConfig({
+  accessToken: "APP_USR-685a0cb3-6ea0-4845-986e-aaedfbcd302a"
+});
 
+/* 📁 ÁLBUMES */
 app.get("/api/albums", (req, res) => {
-  const basePath = path.join(__dirname, "images");
+  const albumsPath = path.join(__dirname, "images");
 
   try {
-    const albums = fs.readdirSync(basePath).filter(folder =>
-      fs.statSync(path.join(basePath, folder)).isDirectory()
+    const albums = fs.readdirSync(albumsPath).filter(folder =>
+      fs.statSync(path.join(albumsPath, folder)).isDirectory()
     );
 
     res.json(albums);
-  } catch (e) {
-    console.error(e);
-    res.json([]);
+  } catch (error) {
+    console.error("Error álbumes:", error);
+    res.status(500).json({ error: "Error álbumes" });
   }
 });
 
-/* =========================
-   API FOTOS
-========================= */
-
+/* 📸 FOTOS */
 app.get("/api/fotos/:album", (req, res) => {
-  const folder = path.join(__dirname, "images", req.params.album, "preview");
+  const album = req.params.album;
+  const dir = path.join(__dirname, "images", album, "preview");
 
   try {
-    const files = fs.readdirSync(folder).filter(f =>
-      f.endsWith(".jpg") || f.endsWith(".png") || f.endsWith(".jpeg")
-    );
-
-    res.json(files);
-  } catch (e) {
-    console.error(e);
-    res.json([]);
+    const fotos = fs.readdirSync(dir);
+    res.json(fotos);
+  } catch (error) {
+    console.error("Error fotos:", error);
+    res.status(500).json({ error: "Error fotos" });
   }
 });
 
-/* =========================
-   CREAR PAGO
-========================= */
-
+/* 💳 PAGO */
 app.post("/crear-pago", async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-
     const { total } = req.body;
 
-    if (!total) {
-      return res.status(400).json({ error: "Total inválido" });
-    }
+    console.log("TOTAL RECIBIDO:", total);
 
     const preference = new Preference(client);
 
@@ -87,27 +58,40 @@ app.post("/crear-pago", async (req, res) => {
       body: {
         items: [
           {
-            title: "Compra de fotos",
+            title: "Fotos deportivas",
             quantity: 1,
             unit_price: Number(total),
             currency_id: "ARS"
           }
-        ]
+        ],
+        payer: {
+          email: "test@test.com"
+        },
+        statement_descriptor: "EFEPRODUC",
+        external_reference: "compra_fotos",
+        back_urls: {
+          success: "http://localhost:3000/success.html",
+          failure: "http://localhost:3000/failure.html",
+          pending: "http://localhost:3000/pending.html"
+        },
+        auto_return: "approved"
       }
     });
 
-    console.log("MP RESPONSE:", result);
+    console.log("✅ INIT POINT:", result.init_point);
 
-    res.json({ init_point: result.init_point });
+    res.json({
+      init_point: result.init_point
+    });
 
-  } catch (err) {
-    console.error("MP ERROR:", err);
+  } catch (error) {
+    console.error("❌ ERROR REAL MP:");
+    console.error(error);
     res.status(500).json({ error: "Error en pago" });
   }
 });
 
-/* ========================= */
-
-app.listen(PORT, () => {
-  console.log("Servidor en puerto " + PORT);
+/* 🚀 SERVER */
+app.listen(3000, () => {
+  console.log("🔥 http://localhost:3000");
 });
