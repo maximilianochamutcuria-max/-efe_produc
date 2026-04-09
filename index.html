@@ -193,7 +193,7 @@ h1 { text-align:center; margin:30px 0; }
 }
 
 .btn-blue { background:#009ee3; color:white; }
-.btn-green { background:#00a650; color:white; }
+.btn-green { background:#009ee3; color:white; }
 </style>
 </head>
 
@@ -244,11 +244,14 @@ h1 { text-align:center; margin:30px 0; }
 <div id="pagoScreen">
   <div style="text-align:center;margin-top:80px">
 
-    <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.9/mercadopago/logo__large.png" width="150">
+    <img 
+      src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Mercado_Pago_Logo.svg" 
+      style="width:180px;margin-bottom:20px;"
+    >
 
-    <p>Vamos a redirigirte a MercadoPago</p>
+    <p style="font-size:18px;">Vamos a redirigirte a Mercado Pago</p>
 
-    <div id="botonesPago"></div>
+    <div id="botonesPago" style="margin-top:20px;"></div>
 
     <button class="btn" onclick="cerrarPago()">Cerrar</button>
 
@@ -311,7 +314,7 @@ function cerrarPago(){
   pagoScreen.style.display="none";
 }
 
-/* RENDER CHECKOUT */
+/* CHECKOUT */
 function renderCheckout(){
 
   const grid=document.getElementById("gridFotos");
@@ -347,7 +350,7 @@ function renderCheckout(){
   totalDiv.innerHTML="<b>Total: $"+total+"</b>";
 }
 
-/* 🔥 PAGO NUEVO (DINÁMICO) */
+/* PAGO */
 function renderPagos(){
   const cont=document.getElementById("botonesPago");
   cont.innerHTML="";
@@ -357,28 +360,16 @@ function renderPagos(){
   btn.innerText="Pagar $" + totalGlobal;
 
   btn.onclick = async () => {
-    try {
-      const res = await fetch("/crear-pago", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ total: totalGlobal })
-      });
+    const res = await fetch("/crear-pago", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ total: totalGlobal })
+    });
 
-      const data = await res.json();
-
-      if (!data.init_point) {
-        alert("Error generando pago");
-        return;
-      }
-
-      window.location.href = data.init_point;
-
-    } catch (error) {
-      console.error(error);
-      alert("Error con Mercado Pago");
-    }
+    const data = await res.json();
+    window.location.href = data.init_point;
   };
 
   cont.appendChild(btn);
