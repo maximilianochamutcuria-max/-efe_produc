@@ -19,6 +19,18 @@ h1 { margin: 20px; }
   margin: auto;
 }
 
+/* ÁLBUM */
+.album {
+  width: 300px;
+  margin: auto;
+  cursor: pointer;
+}
+
+.album img {
+  width: 100%;
+  border-radius: 10px;
+}
+
 /* GALERÍA */
 .galeria {
   column-count: 4;
@@ -30,7 +42,7 @@ h1 { margin: 20px; }
   position: relative;
   margin-bottom: 12px;
   break-inside: avoid;
-  transition: 0.25s;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .foto:hover {
@@ -41,6 +53,7 @@ h1 { margin: 20px; }
 .foto img {
   width: 100%;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 /* CHECK */
@@ -53,8 +66,8 @@ h1 { margin: 20px; }
   border-radius: 6px;
   border: 2px solid white;
   background: rgba(0,0,0,0.4);
-  z-index: 2;
   cursor: pointer;
+  z-index: 2;
 }
 
 .check::after {
@@ -74,20 +87,31 @@ h1 { margin: 20px; }
   z-index: 1;
 }
 
-.foto.selected .check::after { display: block; }
+.foto.selected .check::after {
+  display: block;
+}
 
-/* CARRITO BOTÓN */
-#carritoBtn {
+/* BOTÓN VOLVER */
+.volver {
+  margin: 20px;
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* CARRITO */
+#carrito {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: black;
   color: white;
-  padding: 15px 25px;
-  border-radius: 30px;
+  padding: 12px 25px;
+  border-radius: 25px;
   cursor: pointer;
-  font-weight: bold;
 }
 
 /* MODAL */
@@ -102,23 +126,24 @@ h1 { margin: 20px; }
   z-index:1000;
 }
 
-.modal-content {
+.modal {
   width:90%;
   height:85%;
   background:white;
   border-radius:15px;
   display:flex;
   overflow:hidden;
+  position:relative;
 }
 
-/* IZQUIERDA */
-.carrito-izq {
+/* IZQ */
+.izq {
   flex:2;
   padding:20px;
   overflow:auto;
 }
 
-.carrito-grid {
+.grid {
   display:flex;
   flex-wrap:wrap;
   gap:10px;
@@ -145,20 +170,60 @@ h1 { margin: 20px; }
   cursor:pointer;
 }
 
-/* DERECHA */
-.carrito-der {
+/* DER */
+.der {
   flex:1;
   background:#f1f1f1;
   padding:20px;
 }
 
+/* CERRAR */
 .cerrar-modal {
   position:absolute;
-  top:20px;
-  right:30px;
+  top:10px;
+  right:20px;
   font-size:25px;
   cursor:pointer;
 }
+
+/* VISOR */
+#visor {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.95);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+#visor img {
+  max-width:90%;
+  max-height:90%;
+}
+
+.cerrar {
+  position:absolute;
+  top:20px;
+  right:30px;
+  color:white;
+  font-size:30px;
+  cursor:pointer;
+}
+
+.flecha {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:40px;
+  color:white;
+  cursor:pointer;
+}
+
+.izquierda { left:30px; }
+.derecha { right:30px; }
+
 </style>
 </head>
 
@@ -167,149 +232,222 @@ h1 { margin: 20px; }
 <h1>@efe_produc</h1>
 
 <div id="contenido" class="container"></div>
-<div id="carritoBtn">🛒 0 fotos</div>
+<div id="carrito" style="display:none;">0 fotos | $0</div>
 
 <!-- MODAL -->
 <div id="modalCarrito">
-  <div class="modal-content">
+  <div class="modal">
     <span class="cerrar-modal" onclick="cerrarCarrito()">✖</span>
 
-    <div class="carrito-izq">
+    <div class="izq">
       <h3>Carrito</h3>
-      <div class="carrito-grid" id="listaCarrito"></div>
+      <div class="grid" id="listaCarrito"></div>
       <button onclick="vaciarCarrito()">Vaciar carrito</button>
     </div>
 
-    <div class="carrito-der">
+    <div class="der">
       <h3>Resumen</h3>
       <div id="resumen"></div>
     </div>
-
   </div>
 </div>
 
 <script>
 const contenido = document.getElementById("contenido");
-const carritoBtn = document.getElementById("carritoBtn");
+const carrito = document.getElementById("carrito");
 
 let seleccionadas = [];
+let imagenActual = 0;
 
 const album = {
-  preview: "images/gymna_vs_cariocas/preview/"
+  nombre: "gymna_vs_cariocas",
+  preview: "images/gymna_vs_cariocas/preview/",
+  watermarked: "images/gymna_vs_cariocas/watermarked/",
+  portada: "DSC_6014.jpg"
 };
 
-const imagenes = [
+const imagenes = [/* TODAS TUS FOTOS */ 
 "DSC_6014.jpg","DSC_6016.jpg","DSC_6019.jpg","DSC_6022.jpg",
-"DSC_6024.jpg","DSC_6030.jpg","DSC_6031.jpg","DSC_6033.jpg"
+"DSC_6024.jpg","DSC_6030.jpg","DSC_6031.jpg","DSC_6033.jpg",
+"DSC_6034.jpg","DSC_6035.jpg","DSC_6036.jpg","DSC_6040.jpg",
+"DSC_6041.jpg","DSC_6043.jpg","DSC_6044.jpg","DSC_6045.jpg",
+"DSC_6049.jpg","DSC_6050.jpg","DSC_6051.jpg","DSC_6052.jpg",
+"DSC_6055.jpg","DSC_6056.jpg","DSC_6057.jpg","DSC_6059.jpg",
+"DSC_6060.jpg","DSC_6062.jpg","DSC_6063.jpg","DSC_6064.jpg",
+"DSC_6065.jpg","DSC_6067.jpg","DSC_6072.jpg","DSC_6076.jpg"
 ];
 
 /* BLOQUEAR CLICK DERECHO */
 document.addEventListener("contextmenu", e => e.preventDefault());
 
-function abrirAlbum(){
-  contenido.innerHTML = `<div class="galeria"></div>`;
+function mostrarAlbum() {
+  carrito.style.display = "none";
+
+  contenido.innerHTML = `
+    <div class="album" onclick="abrirAlbum()">
+      <img src="${album.preview + album.portada}">
+      <h3>${album.nombre}</h3>
+    </div>
+  `;
+}
+
+function abrirAlbum() {
+  seleccionadas = [];
+  actualizarCarrito();
+
+  contenido.innerHTML = `
+    <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
+    <div class="galeria"></div>
+  `;
+
+  carrito.style.display = "block";
+
   const galeria = document.querySelector(".galeria");
 
-  imagenes.forEach(nombre=>{
+  imagenes.forEach(nombre => {
     const div = document.createElement("div");
-    div.className="foto";
+    div.className = "foto";
 
-    div.innerHTML=`
-      <img src="${album.preview+nombre}">
+    div.innerHTML = `
+      <img src="${album.preview + nombre}" onclick="verImagen('${nombre}')">
       <div class="check"></div>
     `;
 
-    div.querySelector(".check").onclick=(e)=>{
+    div.querySelector(".check").onclick = (e) => {
       e.stopPropagation();
-      toggle(div,nombre);
+      toggleSeleccion(div, nombre);
     };
 
-    div.oncontextmenu=(e)=>{
+    div.oncontextmenu = (e) => {
       e.preventDefault();
-      toggle(div,nombre);
+      toggleSeleccion(div, nombre);
     };
 
     galeria.appendChild(div);
   });
 }
 
-function toggle(div,nombre){
+function toggleSeleccion(div, nombre) {
   div.classList.toggle("selected");
 
-  if(seleccionadas.includes(nombre)){
-    seleccionadas=seleccionadas.filter(f=>f!==nombre);
-  }else{
+  if (seleccionadas.includes(nombre)) {
+    seleccionadas = seleccionadas.filter(f => f !== nombre);
+  } else {
     seleccionadas.push(nombre);
   }
 
   actualizarCarrito();
 }
 
-function actualizarCarrito(){
-  carritoBtn.innerText=`🛒 ${seleccionadas.length} fotos`;
+/* 🔥 PACKS */
+function calcularTotal() {
+  let cant = seleccionadas.length;
+  let total = 0;
+
+  if (cant >= 10) total = 12000;
+  else if (cant >= 7) total = 9500;
+  else if (cant >= 5) total = 7500;
+  else if (cant >= 3) total = 5500;
+  else total = cant * 2000;
+
+  return total;
 }
 
-/* MODAL */
-carritoBtn.onclick=()=>{
-  abrirCarrito();
-};
+function actualizarCarrito() {
+  const total = calcularTotal();
+  carrito.innerText = `${seleccionadas.length} fotos | $${total}`;
+}
 
-function abrirCarrito(){
-  const modal=document.getElementById("modalCarrito");
-  modal.style.display="flex";
+/* 👉 ABRIR MODAL */
+carrito.onclick = () => abrirCarrito();
 
-  const lista=document.getElementById("listaCarrito");
-  lista.innerHTML="";
+function abrirCarrito() {
+  document.getElementById("modalCarrito").style.display = "flex";
 
-  seleccionadas.forEach(nombre=>{
-    const div=document.createElement("div");
-    div.className="item";
+  const lista = document.getElementById("listaCarrito");
+  lista.innerHTML = "";
 
-    div.innerHTML=`
-      <img src="${album.preview+nombre}">
+  seleccionadas.forEach(nombre => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    div.innerHTML = `
+      <img src="${album.preview + nombre}">
       <div class="remove" onclick="eliminar('${nombre}')">x</div>
     `;
 
     lista.appendChild(div);
   });
 
-  calcularTotal();
-}
-
-function cerrarCarrito(){
-  document.getElementById("modalCarrito").style.display="none";
-}
-
-function eliminar(nombre){
-  seleccionadas=seleccionadas.filter(f=>f!==nombre);
-  abrirCarrito();
-  actualizarCarrito();
-}
-
-function vaciarCarrito(){
-  seleccionadas=[];
-  abrirCarrito();
-  actualizarCarrito();
-}
-
-/* 🔥 PACKS */
-function calcularTotal(){
-  let total=0;
-  let cant=seleccionadas.length;
-
-  if(cant>=10) total=12000;
-  else if(cant>=7) total=9500;
-  else if(cant>=5) total=7500;
-  else if(cant>=3) total=5500;
-  else if(cant>=1) total=2000*cant;
-
-  document.getElementById("resumen").innerHTML=`
-    <p>Fotos: ${cant}</p>
-    <h2>Total: $${total}</h2>
+  document.getElementById("resumen").innerHTML = `
+    <p>${seleccionadas.length} fotos</p>
+    <h2>$${calcularTotal()}</h2>
   `;
 }
 
-abrirAlbum();
+function cerrarCarrito() {
+  document.getElementById("modalCarrito").style.display = "none";
+}
+
+function eliminar(nombre) {
+  seleccionadas = seleccionadas.filter(f => f !== nombre);
+  abrirCarrito();
+  actualizarCarrito();
+}
+
+function vaciarCarrito() {
+  seleccionadas = [];
+  abrirCarrito();
+  actualizarCarrito();
+}
+
+/* VISOR */
+
+function verImagen(nombre) {
+  imagenActual = imagenes.indexOf(nombre);
+
+  const visor = document.createElement("div");
+  visor.id = "visor";
+
+  visor.innerHTML = `
+    <span class="cerrar" onclick="cerrarVisor()">✖</span>
+    <span class="flecha izquierda" onclick="cambiarImagen(-1)">❮</span>
+    <img id="imgGrande">
+    <span class="flecha derecha" onclick="cambiarImagen(1)">❯</span>
+  `;
+
+  document.body.appendChild(visor);
+  actualizarImagen();
+
+  document.addEventListener("keydown", manejarTeclado);
+}
+
+function actualizarImagen() {
+  document.getElementById("imgGrande").src =
+    album.watermarked + imagenes[imagenActual];
+}
+
+function cambiarImagen(dir) {
+  imagenActual += dir;
+
+  if (imagenActual < 0) imagenActual = imagenes.length - 1;
+  if (imagenActual >= imagenes.length) imagenActual = 0;
+
+  actualizarImagen();
+}
+
+function cerrarVisor() {
+  document.getElementById("visor").remove();
+  document.removeEventListener("keydown", manejarTeclado);
+}
+
+function manejarTeclado(e) {
+  if (e.key === "ArrowRight") cambiarImagen(1);
+  if (e.key === "ArrowLeft") cambiarImagen(-1);
+  if (e.key === "Escape") cerrarVisor();
+}
+
+mostrarAlbum();
 </script>
 
 </body>
