@@ -1,14 +1,16 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const mercadopago = require("mercadopago");
+
+// ✅ SDK NUEVO Mercado Pago
+const { MercadoPagoConfig, Preference } = require("mercadopago");
 
 const app = express();
 app.use(express.json());
 
-// 🔑 TU ACCESS TOKEN (YA LO PUSISTE BIEN)
-mercadopago.configure({
-  access_token: "APP_USR-7474023184061156-040900-586c24b1059e1c30ae1540291991680a-3324743930"
+// 🔑 TU ACCESS TOKEN (PRODUCCIÓN)
+const client = new MercadoPagoConfig({
+  accessToken: "APP_USR-7474023184061156-040900-586c24b1059e1c30ae1540291991680a-3324743930"
 });
 
 // 📁 Carpeta de imágenes
@@ -32,6 +34,7 @@ app.get("/api/albums", (req, res) => {
 
     res.json(albums);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error leyendo albums" });
   }
 });
@@ -59,6 +62,7 @@ app.get("/api/fotos/:album", (req, res) => {
 
     res.json(fotos);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error leyendo fotos" });
   }
 });
@@ -71,24 +75,26 @@ app.post("/crear-pago", async (req, res) => {
   try {
     const { total } = req.body;
 
-    const preference = {
-      items: [
-        {
-          title: "Compra de fotos",
-          quantity: 1,
-          unit_price: Number(total)
-        }
-      ]
-    };
+    const preferenceClient = new Preference(client);
 
-    const response = await mercadopago.preferences.create(preference);
+    const response = await preferenceClient.create({
+      body: {
+        items: [
+          {
+            title: "Compra de fotos",
+            quantity: 1,
+            unit_price: Number(total)
+          }
+        ]
+      }
+    });
 
     res.json({
-      init_point: response.body.init_point
+      init_point: response.init_point
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Error MercadoPago:", error);
     res.status(500).json({ error: "Error creando pago" });
   }
 });
@@ -103,7 +109,10 @@ app.get("/", (req, res) => {
 
 
 // ===============================
-const PORT = 3000;
+// 🚀 PUERTO (IMPORTANTE PARA RENDER)
+// ===============================
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
-  console.log("Servidor corriendo en http://localhost:3000");
+  console.log("Servidor corriendo en puerto " + PORT);
 });

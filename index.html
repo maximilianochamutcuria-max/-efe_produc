@@ -1,473 +1,196 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>@efe_produc</title>
+  <meta charset="UTF-8">
+  <title>Tienda Fotos</title>
 
-<style>
-body { margin:0; background:#f5f5f5; font-family:Arial; }
-h1 { text-align:center; margin:30px 0; }
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #f5f5f5;
+    }
 
-/* ÁLBUMES */
-.home-container {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,260px);
-  gap:30px;
-  padding:40px;
-  justify-content:center;
-}
+    h1 {
+      text-align: center;
+    }
 
-.album-card {
-  background:white;
-  border-radius:12px;
-  padding:15px;
-  box-shadow:0 5px 12px rgba(0,0,0,0.1);
-  cursor:pointer;
-}
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
 
-.album-card img {
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  border-radius:8px;
-}
+    .foto {
+      position: relative;
+      cursor: pointer;
+    }
 
-/* GALERÍA */
-.gallery-container { max-width:1200px; margin:auto; }
+    .foto img {
+      width: 100%;
+      border-radius: 10px;
+    }
 
-.gallery {
-  column-count:4;
-  column-gap:15px;
-}
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,0,0,0.4);
+      border-radius: 10px;
+      display: none;
+    }
 
-.photo {
-  position:relative;
-  break-inside:avoid;
-  margin-bottom:15px;
-}
+    .foto.selected .overlay {
+      display: block;
+    }
 
-.photo img {
-  width:100%;
-  border-radius:12px;
-  cursor:pointer;
-  transition:.3s;
-}
+    .check {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 5px;
+      border-radius: 5px;
+    }
 
-.photo:hover img { transform:scale(1.05); }
+    .carrito {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    }
 
-/* CHECK */
-.checkbox {
-  position:absolute;
-  bottom:10px;
-  left:10px;
-  width:26px;
-  height:26px;
-  border:2px solid white;
-  border-radius:6px;
-  background:rgba(0,0,0,0.5);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:white;
-  cursor:pointer;
-  z-index:2;
-}
+    .btn {
+      width: 100%;
+      padding: 15px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-.photo.selected .checkbox::after { content:"✔"; }
+    .btn-pagar {
+      background: #009ee3;
+      color: white;
+    }
 
-.photo.selected::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(255,0,0,0.4);
-  border-radius:12px;
-  pointer-events:none;
-}
-
-/* BOTONES */
-.back-btn {
-  margin:20px;
-  padding:10px;
-  background:black;
-  color:white;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-/* CARRITO */
-.cart-bar {
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:black;
-  color:white;
-  padding:15px 25px;
-  border-radius:20px;
-  display:none;
-  cursor:pointer;
-  z-index:9999;
-}
-
-/* MODAL */
-.modal {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.95);
-  justify-content:center;
-  align-items:center;
-  z-index:99999;
-}
-
-.modal img {
-  max-width:90vw;
-  max-height:90vh;
-}
-
-.modal-close {
-  position:absolute;
-  top:20px;
-  right:20px;
-  color:white;
-  font-size:30px;
-  cursor:pointer;
-}
-
-/* CHECKOUT */
-#checkout, #pagoScreen {
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:85%;
-  background:white;
-  border-radius:20px 20px 0 0;
-  display:none;
-  z-index:99999;
-}
-
-.checkout-body {
-  display:flex;
-  height:100%;
-}
-
-.checkout-left {
-  flex:2;
-  padding:20px;
-  overflow:auto;
-}
-
-.grid-fotos {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,100px);
-  gap:10px;
-}
-
-.grid-fotos img {
-  width:100%;
-  border-radius:10px;
-}
-
-.checkout-right {
-  flex:1;
-  background:#f7f7f7;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-}
-
-.card {
-  background:white;
-  padding:15px;
-  border-radius:12px;
-}
-
-.btn {
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  width:100%;
-}
-
-.btn-blue { background:#009ee3; color:white; }
-.btn-green { background:#00a650; color:white; }
-</style>
+    .btn-cerrar {
+      background: #ccc;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>@efe_produc</h1>
+<h1>Seleccioná tus fotos</h1>
 
-<div id="app"></div>
-<div id="cartBar" class="cart-bar"></div>
+<div class="grid" id="grid"></div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <img id="modalImg">
-  <div class="modal-close" onclick="cerrarModal()">✖</div>
-</div>
+<div class="carrito">
+  <div id="resumen"></div>
 
-<!-- CHECKOUT -->
-<div id="checkout">
-  <div class="checkout-body">
+  <button class="btn btn-pagar" onclick="pagarMercadoPago()">
+    Pagar con Mercado Pago
+  </button>
 
-    <div class="checkout-left">
-      <div id="gridFotos" class="grid-fotos"></div>
-      <div style="margin-top:15px;color:red;cursor:pointer;" onclick="vaciarCarrito()">
-        🗑 Limpiar carrito
-      </div>
-    </div>
-
-    <div class="checkout-right">
-
-      <div class="card">
-        <b>Pedido</b>
-        <div id="detallePedido"></div>
-        <div id="total"></div>
-      </div>
-
-      <button class="btn btn-blue" onclick="irAPago()">
-        Continuar
-      </button>
-
-      <button class="btn" onclick="cerrarCheckout()">Cerrar</button>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- PANTALLA DE PAGO -->
-<div id="pagoScreen">
-  <div style="text-align:center;margin-top:80px">
-
-    <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.9/mercadopago/logo__large.png" width="150">
-
-    <p>Vamos a redirigirte a MercadoPago</p>
-
-    <div id="botonesPago"></div>
-
-    <button class="btn" onclick="cerrarPago()">Cerrar</button>
-
-  </div>
+  <button class="btn btn-cerrar" onclick="limpiarCarrito()">
+    Limpiar carrito
+  </button>
 </div>
 
 <script>
-
-const app = document.getElementById("app");
-const cartBar = document.getElementById("cartBar");
-
 let seleccionadas = [];
-let currentAlbum = "";
-let totalGlobal = 0;
 
-const LINKS = {
-  2000:"https://mpago.la/17zfiHq",
-  12000:"https://mpago.la/1fNeWh5"
-};
+// 📸 Cargar fotos
+async function cargarFotos() {
+  const res = await fetch("/api/fotos/demo");
+  const fotos = await res.json();
 
-/* MODAL */
-function abrirModal(src){
-  modal.style.display="flex";
-  modalImg.src=src;
-}
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
 
-function cerrarModal(){
-  modal.style.display="none";
-}
+  fotos.forEach(foto => {
+    const div = document.createElement("div");
+    div.classList.add("foto");
 
-/* BOTÓN */
-function actualizarBoton(){
-  cartBar.style.display = seleccionadas.length ? "block":"none";
-  cartBar.innerText = "🛒 "+seleccionadas.length+" fotos";
-}
-
-cartBar.onclick = abrirCheckout;
-
-function abrirCheckout(){
-  checkout.style.display="block";
-  renderCheckout();
-}
-
-function cerrarCheckout(){
-  checkout.style.display="none";
-}
-
-/* PRECIO */
-function calcularPrecio(n){
-  let total=0;
-  while(n>0){
-    if(n>=10){total+=12000;n-=10;}
-    else {total+=n*2000;break;}
-  }
-  return total;
-}
-
-/* PAGOS */
-function generarPagos(total){
-  let parts=[];
-  while(total>0){
-    if(total>=12000){parts.push(12000); total-=12000;}
-    else {parts.push(2000); total-=2000;}
-  }
-  return parts;
-}
-
-function irAPago(){
-  checkout.style.display="none";
-  pagoScreen.style.display="block";
-  renderPagos();
-}
-
-function cerrarPago(){
-  pagoScreen.style.display="none";
-}
-
-/* RENDER */
-function renderCheckout(){
-
-  const grid=document.getElementById("gridFotos");
-  const detalle=document.getElementById("detallePedido");
-  const totalDiv=document.getElementById("total");
-
-  grid.innerHTML="";
-  detalle.innerHTML="";
-
-  let agrupado={}, total=0;
-
-  seleccionadas.forEach(i=>{
-    if(!agrupado[i.album]) agrupado[i.album]=[];
-    agrupado[i.album].push(i.foto);
-  });
-
-  for(let album in agrupado){
-
-    agrupado[album].forEach(f=>{
-      const img=document.createElement("img");
-      img.src=`/images/${album}/preview/${f}`;
-      grid.appendChild(img);
-    });
-
-    let c=agrupado[album].length;
-    let p=calcularPrecio(c);
-    total+=p;
-
-    detalle.innerHTML+=`<b>${album}</b><br>${c} fotos → $${p}<br><br>`;
-  }
-
-  totalGlobal=total;
-  totalDiv.innerHTML="<b>Total: $"+total+"</b>";
-}
-
-function renderPagos(){
-  const cont=document.getElementById("botonesPago");
-  cont.innerHTML="";
-
-  const pagos=generarPagos(totalGlobal);
-
-  pagos.forEach(monto=>{
-    if(LINKS[monto]){
-      const btn=document.createElement("button");
-      btn.className="btn btn-green";
-      btn.innerText="Pagar $"+monto;
-      btn.onclick=()=>window.location.href=LINKS[monto];
-      cont.appendChild(btn);
-    }
-  });
-}
-
-/* VACIAR */
-function vaciarCarrito(){
-  seleccionadas=[];
-  actualizarBoton();
-  renderCheckout();
-}
-
-/* ÁLBUMES */
-async function mostrarAlbums(){
-  const res=await fetch("/api/albums");
-  const albums=await res.json();
-
-  app.innerHTML=`<div class="home-container"></div>`;
-  const cont=app.firstChild;
-
-  for(const album of albums){
-    const fotos=await (await fetch(`/api/fotos/${album}`)).json();
-
-    const div=document.createElement("div");
-    div.className="album-card";
-    div.innerHTML=`
-      <b>${album}</b>
-      <div>${fotos.length} fotos</div>
-      <img src="/images/${album}/preview/${fotos[0]}">
+    div.innerHTML = `
+      <img src="/images/demo/preview/${foto}">
+      <div class="overlay"></div>
+      <div class="check">✔</div>
     `;
-    div.onclick=()=>abrirAlbum(album);
-    cont.appendChild(div);
-  }
-}
 
-/* GALERÍA */
-async function abrirAlbum(nombre){
-  currentAlbum=nombre;
+    div.onclick = () => toggleFoto(div, foto);
 
-  const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
-
-  app.innerHTML=`
-    <div class="gallery-container">
-      <div class="back-btn" onclick="mostrarAlbums()">← Volver</div>
-      <div class="gallery" id="gallery"></div>
-    </div>
-  `;
-
-  const gallery=document.getElementById("gallery");
-
-  fotos.forEach(foto=>{
-    const div=document.createElement("div");
-    div.className="photo";
-
-    const img=document.createElement("img");
-    img.src=`/images/${nombre}/preview/${foto}`;
-    img.onclick=()=>abrirModal(`/images/${nombre}/watermarked/${foto}`);
-
-    const check=document.createElement("div");
-    check.className="checkbox";
-
-    check.onclick=(e)=>{
-      e.stopPropagation();
-      toggle(div,foto);
-    };
-
-    div.oncontextmenu=(e)=>{
-      e.preventDefault();
-      toggle(div,foto);
-    };
-
-    div.appendChild(img);
-    div.appendChild(check);
-    gallery.appendChild(div);
+    grid.appendChild(div);
   });
 }
 
-/* TOGGLE */
-function toggle(div,foto){
-  const i=seleccionadas.findIndex(f=>f.foto===foto && f.album===currentAlbum);
-
-  if(i!==-1){
-    seleccionadas.splice(i,1);
+// ✅ seleccionar / deseleccionar
+function toggleFoto(div, foto) {
+  if (seleccionadas.includes(foto)) {
+    seleccionadas = seleccionadas.filter(f => f !== foto);
     div.classList.remove("selected");
   } else {
-    seleccionadas.push({foto,album:currentAlbum});
+    seleccionadas.push(foto);
     div.classList.add("selected");
   }
 
-  actualizarBoton();
+  actualizarResumen();
 }
 
-mostrarAlbums();
+// 💰 calcular total (MISMA LÓGICA QUE YA TENÍAS)
+function obtenerTotal() {
+  const cantidad = seleccionadas.length;
 
+  if (cantidad >= 10) return 12000;
+  if (cantidad >= 5) return 7500;
+  return cantidad * 2000;
+}
+
+// 🧾 resumen
+function actualizarResumen() {
+  const total = obtenerTotal();
+
+  document.getElementById("resumen").innerHTML = `
+    <strong>${seleccionadas.length} fotos</strong><br>
+    Total: $${total}
+  `;
+}
+
+// 🧹 limpiar
+function limpiarCarrito() {
+  seleccionadas = [];
+  document.querySelectorAll(".foto").forEach(f => f.classList.remove("selected"));
+  actualizarResumen();
+}
+
+// 💳 MERCADO PAGO (DINÁMICO)
+async function pagarMercadoPago() {
+  const total = obtenerTotal();
+
+  try {
+    const res = await fetch("/crear-pago", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ total })
+    });
+
+    const data = await res.json();
+
+    window.location.href = data.init_point;
+
+  } catch (error) {
+    alert("Error al iniciar pago");
+    console.error(error);
+  }
+}
+
+cargarFotos();
 </script>
 
 </body>
