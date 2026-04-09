@@ -193,6 +193,7 @@ h1 { text-align:center; margin:30px 0; }
 }
 
 .btn-blue { background:#009ee3; color:white; }
+.btn-green { background:#00a650; color:white; }
 </style>
 </head>
 
@@ -238,9 +239,8 @@ h1 { text-align:center; margin:30px 0; }
         <input placeholder="Teléfono">
       </div>
 
-      <button class="btn btn-blue" onclick="pagarMercadoPago()">
-        Mercado Pago
-      </button>
+      <!-- 🔥 BOTONES DE PAGO -->
+      <div id="botonesPago"></div>
 
       <button class="btn" onclick="cerrarCheckout()">Cerrar</button>
 
@@ -258,12 +258,8 @@ let seleccionadas = [];
 let currentAlbum = "";
 let totalGlobal = 0;
 
-/* LINKS */
 const LINKS = {
   2000:"https://mpago.la/17zfiHq",
-  5500:"",
-  7500:"",
-  9500:"",
   12000:"https://mpago.la/1fNeWh5"
 };
 
@@ -283,7 +279,6 @@ function actualizarBoton(){
   cartBar.innerText = "🛒 "+seleccionadas.length+" fotos";
 }
 
-/* CHECKOUT */
 cartBar.onclick = abrirCheckout;
 
 function abrirCheckout(){
@@ -300,40 +295,19 @@ function calcularPrecio(n){
   let total=0;
   while(n>0){
     if(n>=10){total+=12000;n-=10;}
-    else if(n>=7){total+=9500;n-=7;}
-    else if(n>=5){total+=7500;n-=5;}
-    else if(n>=3){total+=5500;n-=3;}
     else {total+=n*2000;break;}
   }
   return total;
 }
 
-/* LINKS */
+/* GENERAR LINKS */
 function generarLinksPago(total){
-  let links=[];
+  let parts=[];
   while(total>0){
-    if(total>=12000){links.push(LINKS[12000]);total-=12000;}
-    else {links.push(LINKS[2000]);total-=2000;}
+    if(total>=12000){parts.push(12000); total-=12000;}
+    else {parts.push(2000); total-=2000;}
   }
-  return links;
-}
-
-/* 💰 FIX FINAL */
-function pagarMercadoPago(){
-
-  const links = generarLinksPago(totalGlobal);
-
-  if(links.length === 0){
-    alert("No hay links configurados");
-    return;
-  }
-
-  links.forEach((link, i)=>{
-    setTimeout(()=>{
-      window.open(link, "_blank");
-    }, i * 500);
-  });
-
+  return parts;
 }
 
 /* RENDER */
@@ -343,10 +317,12 @@ function renderCheckout(){
   const detalle=document.getElementById("detallePedido");
   const totalDiv=document.getElementById("total");
   const info=document.getElementById("infoUpsell");
+  const botones=document.getElementById("botonesPago");
 
   grid.innerHTML="";
   detalle.innerHTML="";
   info.innerHTML="";
+  botones.innerHTML="";
 
   let agrupado={}, total=0;
 
@@ -368,14 +344,23 @@ function renderCheckout(){
     total+=p;
 
     detalle.innerHTML+=`<b>${album}</b><br>${c} fotos → $${p}<br><br>`;
-
-    if(c<3){
-      info.innerHTML=`Agregá ${3-c} fotos y pagás pack de 3`;
-    }
   }
 
   totalGlobal=total;
   totalDiv.innerHTML="<b>Total: $"+total+"</b>";
+
+  /* 🔥 BOTONES DE PAGO DINÁMICOS */
+  const pagos = generarLinksPago(total);
+
+  pagos.forEach(monto=>{
+    if(LINKS[monto]){
+      const btn=document.createElement("button");
+      btn.className="btn btn-green";
+      btn.innerText="Pagar $"+monto;
+      btn.onclick=()=>window.open(LINKS[monto],"_blank");
+      botones.appendChild(btn);
+    }
+  });
 }
 
 /* VACIAR */
