@@ -47,7 +47,7 @@ h1 {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 🔥 HOVER EFECTO */
+/* HOVER */
 .foto:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 10px 25px rgba(0,0,0,0.25);
@@ -83,7 +83,7 @@ h1 {
   line-height: 28px;
 }
 
-/* OVERLAY ROJO */
+/* OVERLAY */
 .foto.selected::after {
   content: "";
   position: absolute;
@@ -196,6 +196,9 @@ const imagenes = [
   "DSC_6065.jpg","DSC_6067.jpg","DSC_6072.jpg","DSC_6076.jpg"
 ];
 
+/* 🔥 BLOQUEAR CLICK DERECHO GLOBAL */
+document.addEventListener("contextmenu", e => e.preventDefault());
+
 function mostrarAlbum() {
   carrito.style.display = "none";
 
@@ -229,8 +232,15 @@ function abrirAlbum() {
       <div class="check"></div>
     `;
 
+    // CLICK IZQUIERDO CHECK
     div.querySelector(".check").onclick = (e) => {
       e.stopPropagation();
+      toggleSeleccion(div, nombre);
+    };
+
+    // 🔥 CLICK DERECHO = SELECCIONAR
+    div.oncontextmenu = (e) => {
+      e.preventDefault();
       toggleSeleccion(div, nombre);
     };
 
