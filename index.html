@@ -539,7 +539,7 @@ async function pagar() {
   });
 
   const data = await res.json();
-  window.location.href = data.init_point;
+  window.location.assign(data.init_point);
 }
 
 function verImagen(nombre) {
