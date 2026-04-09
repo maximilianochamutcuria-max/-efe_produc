@@ -5,119 +5,161 @@
 <title>@efe_produc</title>
 
 <style>
-body { margin:0; background:#f5f5f5; font-family:Arial; }
-h1 { text-align:center; margin:30px 0; }
+body { margin:0; font-family:Arial; background:#f5f5f5; }
+h1 { text-align:center; }
 
-/* ÁLBUMES */
-.home-container {
+/* GALERÍA */
+.gallery {
   display:grid;
-  grid-template-columns:repeat(auto-fill,260px);
-  gap:30px;
-  padding:40px;
-  justify-content:center;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:15px;
+  padding:20px;
 }
 
-.album-card {
-  background:white;
-  border-radius:12px;
-  padding:15px;
-  box-shadow:0 5px 12px rgba(0,0,0,0.1);
+.photo {
+  position:relative;
+}
+
+.photo img {
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-radius:10px;
   cursor:pointer;
 }
 
-.album-card img {
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  border-radius:8px;
+.photo.selected::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,0,0,0.4);
+  border-radius:10px;
 }
 
-/* GALERÍA */
-.gallery { column-count:4; column-gap:15px; }
-.photo { position:relative; margin-bottom:15px; }
-.photo img { width:100%; border-radius:12px; cursor:pointer; }
-
-.checkbox {
-  position:absolute; bottom:10px; left:10px;
-  width:26px; height:26px;
-  background:rgba(0,0,0,0.6);
-  color:white; display:flex; align-items:center; justify-content:center;
+/* CHECK */
+.check {
+  position:absolute;
+  bottom:8px;
+  left:8px;
+  background:black;
+  color:white;
+  padding:4px 6px;
   border-radius:6px;
 }
 
-.photo.selected::after {
-  content:""; position:absolute; inset:0;
-  background:rgba(255,0,0,0.4);
-  border-radius:12px;
+/* VISOR */
+#viewer {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+#viewer img {
+  max-width:80%;
+  max-height:80%;
+}
+
+.nav {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:40px;
+  color:white;
+  cursor:pointer;
+}
+
+.left { left:20px; }
+.right { right:20px; }
+
+.close {
+  position:absolute;
+  top:20px;
+  right:20px;
+  font-size:30px;
+  color:white;
+  cursor:pointer;
 }
 
 /* CHECKOUT */
 #checkout {
   position:fixed;
-  bottom:0; left:0;
-  width:100%; height:85%;
+  bottom:0;
+  width:100%;
+  height:80%;
   background:white;
-  border-radius:20px 20px 0 0;
   display:none;
+  border-radius:20px 20px 0 0;
 }
 
-.checkout-body { display:flex; height:100%; }
+.checkout-body {
+  display:flex;
+  height:100%;
+}
+
+.left-panel {
+  flex:1;
+  overflow:auto;
+  padding:20px;
+}
 
 .grid-fotos {
   display:grid;
-  grid-template-columns:repeat(auto-fill,100px);
+  grid-template-columns:repeat(auto-fill,80px);
   gap:10px;
 }
 
-.item {
-  position:relative;
-}
+.item { position:relative; }
 
 .item img {
   width:100%;
-  border-radius:10px;
+  border-radius:8px;
 }
 
 .remove {
   position:absolute;
-  top:5px; right:5px;
+  top:2px;
+  right:2px;
   background:red;
   color:white;
   border-radius:50%;
-  width:20px; height:20px;
+  width:18px;
+  height:18px;
   display:flex;
-  align-items:center;
   justify-content:center;
-  cursor:pointer;
+  align-items:center;
   font-size:12px;
+  cursor:pointer;
 }
 
-.right {
-  padding:20px;
+.right-panel {
   width:300px;
-  background:#f7f7f7;
+  padding:20px;
+  background:#f1f1f1;
 }
 
 input {
   width:100%;
-  padding:10px;
   margin:5px 0;
+  padding:10px;
   border-radius:8px;
   border:1px solid #ccc;
 }
 
 button {
-  padding:12px;
   width:100%;
+  padding:10px;
   margin-top:10px;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
   cursor:pointer;
 }
 
-.btn-main { background:#009ee3; color:white; }
+.main { background:#009ee3; color:white; }
 
-.cart-bar {
+.cart {
   position:fixed;
   bottom:20px;
   left:50%;
@@ -135,27 +177,36 @@ button {
 
 <h1>@efe_produc</h1>
 
-<div id="app"></div>
-<div id="cartBar" class="cart-bar"></div>
+<div id="gallery" class="gallery"></div>
+<div id="cart" class="cart"></div>
 
+<!-- VISOR -->
+<div id="viewer">
+  <div class="close" onclick="cerrarViewer()">✖</div>
+  <div class="nav left" onclick="prev()">❮</div>
+  <img id="viewerImg">
+  <div class="nav right" onclick="next()">❯</div>
+</div>
+
+<!-- CHECKOUT -->
 <div id="checkout">
   <div class="checkout-body">
 
-    <div style="flex:1;padding:20px;overflow:auto;">
+    <div class="left-panel">
       <div id="gridFotos" class="grid-fotos"></div>
-      <div style="color:red;cursor:pointer" onclick="vaciarCarrito()">🗑 Limpiar carrito</div>
+      <div onclick="vaciar()">🗑 Limpiar</div>
     </div>
 
-    <div class="right">
+    <div class="right-panel">
       <div id="detalle"></div>
       <div id="total"></div>
 
-      <h3>Enviar fotos</h3>
+      <h3>Datos</h3>
       <input id="email" placeholder="Email">
       <input placeholder="Teléfono">
-      <input placeholder="Código descuento">
+      <input placeholder="Código">
 
-      <button class="btn-main" onclick="irAPago()">Continuar</button>
+      <button class="main" onclick="pagar()">Continuar</button>
       <button onclick="cerrarCheckout()">Cerrar</button>
     </div>
 
@@ -164,182 +215,145 @@ button {
 
 <script>
 
-const app = document.getElementById("app");
-const cartBar = document.getElementById("cartBar");
+let fotos = [];
+let seleccion = [];
+let indexActual = 0;
 
-let seleccionadas = [];
-let currentAlbum = "";
-let totalGlobal = 0;
-
-/* PRECIO CORREGIDO */
-function calcularPrecio(n){
-  let total=0;
-
-  if(n>=10){
-    total += 12000;
-    n -= 10;
-  }
-
-  if(n>=3){
-    total += 5500;
-    n -= 3;
-  }
-
-  total += n*2000;
-
-  return total;
+/* PRECIO */
+function precio(n){
+  let t=0;
+  if(n>=10){ t+=12000; n-=10; }
+  if(n>=3){ t+=5500; n-=3; }
+  t+=n*2000;
+  return t;
 }
 
-/* CHECKOUT */
-function renderCheckout(){
+/* CARGAR */
+async function cargar(){
+  const res = await fetch("/api/fotos/gymna_vs_cariocas");
+  fotos = await res.json();
 
-  const grid=document.getElementById("gridFotos");
-  const detalle=document.getElementById("detalle");
-  const totalDiv=document.getElementById("total");
+  const g = document.getElementById("gallery");
 
-  grid.innerHTML="";
-  detalle.innerHTML="";
-
-  let agrupado={}, total=0;
-
-  seleccionadas.forEach(i=>{
-    if(!agrupado[i.album]) agrupado[i.album]=[];
-    agrupado[i.album].push(i.foto);
-  });
-
-  for(let album in agrupado){
-
-    agrupado[album].forEach(f=>{
-      const div=document.createElement("div");
-      div.className="item";
-
-      div.innerHTML=`
-        <img src="/images/${album}/preview/${f}">
-        <div class="remove" onclick="eliminarFoto('${album}','${f}')">✖</div>
-      `;
-
-      grid.appendChild(div);
-    });
-
-    let c=agrupado[album].length;
-    let p=calcularPrecio(c);
-    total+=p;
-
-    detalle.innerHTML+=`<b>${album}</b><br>${c} fotos → $${p}<br><br>`;
-  }
-
-  totalGlobal=total;
-  totalDiv.innerHTML="<b>Total: $"+total+"</b>";
-}
-
-function eliminarFoto(album,foto){
-  seleccionadas = seleccionadas.filter(f=>!(f.album===album && f.foto===foto));
-  renderCheckout();
-  actualizarBoton();
-}
-
-function vaciarCarrito(){
-  seleccionadas=[];
-  renderCheckout();
-  actualizarBoton();
-}
-
-/* BOTÓN */
-function actualizarBoton(){
-  cartBar.style.display = seleccionadas.length ? "block":"none";
-  cartBar.innerText = "🛒 "+seleccionadas.length+" fotos";
-}
-
-cartBar.onclick = ()=>{
-  checkout.style.display="block";
-  renderCheckout();
-};
-
-function cerrarCheckout(){
-  checkout.style.display="none";
-}
-
-function irAPago(){
-  const email = document.getElementById("email").value;
-
-  if(!email){
-    alert("Ingresá tu email");
-    return;
-  }
-
-  fetch("/crear-pago",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ total: totalGlobal })
-  })
-  .then(r=>r.json())
-  .then(data=>{
-    window.location.href = data.init_point;
-  });
-}
-
-/* ÁLBUMES */
-async function mostrarAlbums(){
-  const res=await fetch("/api/albums");
-  const albums=await res.json();
-
-  app.innerHTML=`<div class="home-container"></div>`;
-  const cont=app.firstChild;
-
-  for(const album of albums){
-    const fotos=await (await fetch(`/api/fotos/${album}`)).json();
-
-    const div=document.createElement("div");
-    div.className="album-card";
-    div.innerHTML=`
-      <b>${album}</b>
-      <div>${fotos.length} fotos</div>
-      <img src="/images/${album}/preview/${fotos[0]}">
-    `;
-    div.onclick=()=>abrirAlbum(album);
-    cont.appendChild(div);
-  }
-}
-
-/* GALERÍA */
-async function abrirAlbum(nombre){
-  currentAlbum=nombre;
-
-  const fotos=await (await fetch(`/api/fotos/${nombre}`)).json();
-
-  app.innerHTML=`<div class="gallery" id="gallery"></div>`;
-  const gallery=document.getElementById("gallery");
-
-  fotos.forEach(foto=>{
+  fotos.forEach((f,i)=>{
     const div=document.createElement("div");
     div.className="photo";
 
     div.innerHTML=`
-      <img src="/images/${nombre}/preview/${foto}">
-      <div class="checkbox"></div>
+      <img src="/images/gymna_vs_cariocas/preview/${f}">
+      <div class="check">+</div>
     `;
 
-    div.onclick=()=>toggle(div,foto);
-
-    gallery.appendChild(div);
+    div.onclick=()=>toggle(div,f,i);
+    g.appendChild(div);
   });
 }
 
-function toggle(div,foto){
-  const i=seleccionadas.findIndex(f=>f.foto===foto && f.album===currentAlbum);
+function toggle(div,f,i){
+  indexActual=i;
 
-  if(i!==-1){
-    seleccionadas.splice(i,1);
+  const existe = seleccion.find(x=>x===f);
+
+  if(existe){
+    seleccion = seleccion.filter(x=>x!==f);
     div.classList.remove("selected");
   } else {
-    seleccionadas.push({foto,album:currentAlbum});
+    seleccion.push(f);
     div.classList.add("selected");
   }
 
-  actualizarBoton();
+  actualizar();
 }
 
-mostrarAlbums();
+/* VISOR */
+function abrir(i){
+  indexActual=i;
+  viewer.style.display="flex";
+  viewerImg.src=`/images/gymna_vs_cariocas/preview/${fotos[i]}`;
+}
+
+function cerrarViewer(){ viewer.style.display="none"; }
+function next(){ indexActual=(indexActual+1)%fotos.length; abrir(indexActual); }
+function prev(){ indexActual=(indexActual-1+fotos.length)%fotos.length; abrir(indexActual); }
+
+/* BOTÓN */
+function actualizar(){
+  cart.style.display = seleccion.length?"block":"none";
+  cart.innerText = seleccion.length+" fotos";
+}
+
+cart.onclick=()=>{
+  checkout.style.display="block";
+  renderCheckout();
+};
+
+function cerrarCheckout(){ checkout.style.display="none"; }
+
+/* CHECKOUT */
+function renderCheckout(){
+
+  gridFotos.innerHTML="";
+  detalle.innerHTML="";
+
+  seleccion.forEach(f=>{
+    const d=document.createElement("div");
+    d.className="item";
+
+    d.innerHTML=`
+      <img src="/images/gymna_vs_cariocas/preview/${f}">
+      <div class="remove" onclick="remove('${f}')">✖</div>
+    `;
+
+    gridFotos.appendChild(d);
+  });
+
+  let t=precio(seleccion.length);
+
+  detalle.innerHTML=`${seleccion.length} fotos`;
+  total.innerHTML=`<b>Total: $${t}</b>`;
+}
+
+/* REMOVE */
+function remove(f){
+  seleccion = seleccion.filter(x=>x!==f);
+  renderCheckout();
+  actualizar();
+}
+
+function vaciar(){
+  seleccion=[];
+  renderCheckout();
+  actualizar();
+}
+
+/* PAGO */
+function pagar(){
+
+  const email=document.getElementById("email").value;
+
+  if(!email){
+    alert("Ingresá email");
+    return;
+  }
+
+  const total = precio(seleccion.length);
+
+  fetch("/crear-pago",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ total })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(!d.init_point){
+      alert("Error en pago");
+      return;
+    }
+    window.location.href = d.init_point;
+  });
+}
+
+cargar();
 
 </script>
 
