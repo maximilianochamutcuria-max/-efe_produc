@@ -4,23 +4,24 @@ const path = require("path");
 const mercadopago = require("mercadopago");
 
 const app = express();
-
-// 🔥 IMPORTANTE (para recibir datos del frontend)
 app.use(express.json());
 
-// 🔑 CONFIGURAR MERCADOPAGO
+// 🔑 TU ACCESS TOKEN (YA LO PUSISTE BIEN)
 mercadopago.configure({
-  access_token: "TU_ACCESS_TOKEN_AQUI"
+  access_token: "APP_USR-7474023184061156-040900-586c24b1059e1c30ae1540291991680a-3324743930"
 });
 
-// 📁 Carpeta base de imágenes
+// 📁 Carpeta de imágenes
 const BASE_PATH = path.join(__dirname, "images");
 
-// 🔥 Servir archivos estáticos
+// 📸 Servir archivos
 app.use("/images", express.static(BASE_PATH));
-app.use(express.static(__dirname)); // index.html
+app.use(express.static(__dirname));
 
-// 📸 LISTAR ÁLBUMES
+
+// ===============================
+// 📂 LISTAR ÁLBUMES
+// ===============================
 app.get("/api/albums", (req, res) => {
   try {
     const albums = fs.readdirSync(BASE_PATH)
@@ -30,14 +31,15 @@ app.get("/api/albums", (req, res) => {
       });
 
     res.json(albums);
-
   } catch (error) {
-    console.error("Error leyendo albums:", error);
     res.status(500).json({ error: "Error leyendo albums" });
   }
 });
 
+
+// ===============================
 // 📸 LISTAR FOTOS
+// ===============================
 app.get("/api/fotos/:album", (req, res) => {
   const album = req.params.album;
 
@@ -56,24 +58,23 @@ app.get("/api/fotos/:album", (req, res) => {
       );
 
     res.json(fotos);
-
   } catch (error) {
-    console.error("Error leyendo fotos:", error);
     res.status(500).json({ error: "Error leyendo fotos" });
   }
 });
 
-// 💰 CREAR PAGO MERCADOPAGO (PRO)
+
+// ===============================
+// 💳 CREAR PAGO DINÁMICO
+// ===============================
 app.post("/crear-pago", async (req, res) => {
-
-  const { total } = req.body;
-
   try {
+    const { total } = req.body;
 
     const preference = {
       items: [
         {
-          title: "Fotos deportivas",
+          title: "Compra de fotos",
           quantity: 1,
           unit_price: Number(total)
         }
@@ -87,20 +88,22 @@ app.post("/crear-pago", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error creando pago:", error);
-    res.status(500).send("Error creando pago");
+    console.error(error);
+    res.status(500).json({ error: "Error creando pago" });
   }
-
 });
 
+
+// ===============================
 // 🏠 INDEX
+// ===============================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// 🚀 PUERTO
-const PORT = process.env.PORT || 3000;
 
+// ===============================
+const PORT = 3000;
 app.listen(PORT, () => {
-  console.log("Servidor corriendo en puerto", PORT);
+  console.log("Servidor corriendo en http://localhost:3000");
 });
