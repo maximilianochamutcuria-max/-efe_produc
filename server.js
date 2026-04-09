@@ -1,89 +1,136 @@
 const express = require("express");
+const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
-// ✅ NUEVO SDK
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
-// 🔐 TU ACCESS TOKEN
+/* =========================
+   CONFIG
+========================= */
+
+const PORT = process.env.PORT || 3000;
+
+// 🔴 PONÉ TU ACCESS TOKEN REAL
 const client = new MercadoPagoConfig({
-  accessToken: "APP_USR-7474023184061156-040900-586c24b1059e1c30ae1540291991680a-3324743930"
+  accessToken: "TU_ACCESS_TOKEN_AQUI"
 });
 
-const preference = new Preference(client);
+/* =========================
+   RUTAS ESTÁTICAS
+========================= */
 
-// 📁 carpeta imágenes
-const BASE_PATH = path.join(__dirname, "images");
+// sirve imágenes
+app.use("/images", express.static(path.join(__dirname, "images")));
 
-// servir archivos
-app.use("/images", express.static(BASE_PATH));
+// sirve frontend
 app.use(express.static(__dirname));
 
 /* =========================
-   📸 ÁLBUMES
+   API ALBUMES
 ========================= */
 
 app.get("/api/albums", (req, res) => {
-  const albums = fs.readdirSync(BASE_PATH)
-    .filter(f => fs.statSync(path.join(BASE_PATH, f)).isDirectory());
+  const basePath = path.join(__dirname, "images");
 
-  res.json(albums);
-});
+  try {
+    const albums = fs.readdirSync(basePath).filter(folder =>
+      fs.statSync(path.join(basePath, folder)).isDirectory()
+    );
 
-app.get("/api/fotos/:album", (req, res) => {
-  const folder = path.join(BASE_PATH, req.params.album, "preview");
+    res.json(albums);
 
-  if (!fs.existsSync(folder)) return res.json([]);
-
-  const fotos = fs.readdirSync(folder)
-    .filter(f => f.endsWith(".jpg") || f.endsWith(".png") || f.endsWith(".jpeg"));
-
-  res.json(fotos);
+  } catch (error) {
+    console.error("Error leyendo albums:", error);
+    res.status(500).json([]);
+  }
 });
 
 /* =========================
-   💰 CREAR PAGO (FIX NUEVO SDK)
+   API FOTOS POR ALBUM
+========================= */
+
+app.get("/api/fotos/:album", (req, res) => {
+  const album = req.params.album;
+  const folderPath = path.join(__dirname, "images", album, "preview");
+
+  try {
+    const files = fs.readdirSync(folderPath).filter(file =>
+      file.endsWith(".jpg") || file.endsWith(".png") || file.endsWith(".jpeg")
+    );
+
+    res.json(files);
+
+  } catch (error) {
+    console.error("Error leyendo fotos:", error);
+    res.status(500).json([]);
+  }
+});
+
+/* =========================
+   CREAR PAGO (MERCADO PAGO)
 ========================= */
 
 app.post("/crear-pago", async (req, res) => {
   try {
     const { total } = req.body;
 
+    if (!total || isNaN(total)) {
+      return res.status(400).json({ error: "Total inválido" });
+    }
+
+    const preference = new Preference(client);
+
     const result = await preference.create({
       body: {
         items: [
           {
-            title: "Compra de fotos",
+            title: "Compra de fotos deportivas",
             quantity: 1,
-            currency_id: "ARS",
-            unit_price: Number(total)
+            unit_price: Number(total),
+            currency_id: "ARS"
           }
         ],
         back_urls: {
-          success: "http://localhost:3000/success.html",
-          failure: "http://localhost:3000/failure.html",
-          pending: "http://localhost:3000/pending.html"
+          success: "https://tuweb.com/success",
+          failure: "https://tuweb.com/failure",
+          pending: "https://tuweb.com/pending"
         },
         auto_return: "approved"
       }
     });
 
-    res.json({ init_point: result.init_point });
+    console.log("MP OK:", result.id);
+
+    res.json({
+      init_point: result.init_point
+    });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error creando pago" });
+    console.error("ERROR MERCADO PAGO:", error);
+    res.status(500).json({
+      error: "Error creando pago",
+      detalle: error.message
+    });
   }
 });
 
-/* ========================= */
+/* =========================
+   TEST
+========================= */
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+app.get("/ping", (req, res) => {
+  res.send("Servidor funcionando 🚀");
 });
 
-const PORT = 3000;
-app.listen(PORT, () => console.log("🔥 Servidor corriendo en puerto " + PORT));
+/* =========================
+   START
+========================= */
+
+app.listen(PORT, () => {
+  console.log("Servidor corriendo en puerto " + PORT);
+});
