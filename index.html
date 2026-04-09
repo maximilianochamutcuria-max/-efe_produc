@@ -6,28 +6,36 @@
 
 <style>
 body { margin:0; font-family:Arial; background:#f5f5f5; }
+
 h1 { text-align:center; }
 
-/* GALERÍA */
+/* GALERÍA TIPO PINTEREST */
 .gallery {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-  gap:15px;
+  column-count:4;
+  column-gap:15px;
   padding:20px;
 }
 
 .photo {
   position:relative;
+  margin-bottom:15px;
+  break-inside:avoid;
 }
 
 .photo img {
   width:100%;
-  height:200px;
-  object-fit:cover;
   border-radius:10px;
   cursor:pointer;
+  transition:0.3s;
 }
 
+/* HOVER */
+.photo:hover img {
+  transform:scale(1.03);
+  filter:brightness(0.85);
+}
+
+/* SELECCIÓN */
 .photo.selected::after {
   content:"";
   position:absolute;
@@ -36,7 +44,6 @@ h1 { text-align:center; }
   border-radius:10px;
 }
 
-/* CHECK */
 .check {
   position:absolute;
   bottom:8px;
@@ -55,11 +62,12 @@ h1 { text-align:center; }
   display:none;
   align-items:center;
   justify-content:center;
+  z-index:999;
 }
 
 #viewer img {
-  max-width:80%;
-  max-height:80%;
+  max-width:85%;
+  max-height:85%;
 }
 
 .nav {
@@ -92,6 +100,7 @@ h1 { text-align:center; }
   background:white;
   display:none;
   border-radius:20px 20px 0 0;
+  z-index:998;
 }
 
 .checkout-body {
@@ -169,6 +178,7 @@ button {
   padding:10px 20px;
   border-radius:20px;
   cursor:pointer;
+  z-index:999;
 }
 </style>
 </head>
@@ -204,7 +214,6 @@ button {
       <h3>Datos</h3>
       <input id="email" placeholder="Email">
       <input placeholder="Teléfono">
-      <input placeholder="Código">
 
       <button class="main" onclick="pagar()">Continuar</button>
       <button onclick="cerrarCheckout()">Cerrar</button>
@@ -240,19 +249,23 @@ async function cargar(){
     div.className="photo";
 
     div.innerHTML=`
-      <img src="/images/gymna_vs_cariocas/preview/${f}">
+      <img src="/images/gymna_vs_cariocas/preview/${f}" onclick="abrir(${i})">
       <div class="check">+</div>
     `;
 
-    div.onclick=()=>toggle(div,f,i);
+    div.onclick=(e)=>{
+      if(e.target.tagName !== "IMG"){
+        toggle(div,f,i);
+      }
+    };
+
     g.appendChild(div);
   });
 }
 
+/* SELECCIÓN */
 function toggle(div,f,i){
-  indexActual=i;
-
-  const existe = seleccion.find(x=>x===f);
+  const existe = seleccion.includes(f);
 
   if(existe){
     seleccion = seleccion.filter(x=>x!==f);
@@ -276,7 +289,7 @@ function cerrarViewer(){ viewer.style.display="none"; }
 function next(){ indexActual=(indexActual+1)%fotos.length; abrir(indexActual); }
 function prev(){ indexActual=(indexActual-1+fotos.length)%fotos.length; abrir(indexActual); }
 
-/* BOTÓN */
+/* CARRITO */
 function actualizar(){
   cart.style.display = seleccion.length?"block":"none";
   cart.innerText = seleccion.length+" fotos";
@@ -291,9 +304,7 @@ function cerrarCheckout(){ checkout.style.display="none"; }
 
 /* CHECKOUT */
 function renderCheckout(){
-
   gridFotos.innerHTML="";
-  detalle.innerHTML="";
 
   seleccion.forEach(f=>{
     const d=document.createElement("div");
@@ -307,10 +318,7 @@ function renderCheckout(){
     gridFotos.appendChild(d);
   });
 
-  let t=precio(seleccion.length);
-
-  detalle.innerHTML=`${seleccion.length} fotos`;
-  total.innerHTML=`<b>Total: $${t}</b>`;
+  total.innerHTML=`<b>Total: $${precio(seleccion.length)}</b>`;
 }
 
 /* REMOVE */
@@ -345,11 +353,16 @@ function pagar(){
   })
   .then(r=>r.json())
   .then(d=>{
+    console.log(d); // DEBUG
     if(!d.init_point){
-      alert("Error en pago");
+      alert("Error en Mercado Pago");
       return;
     }
     window.location.href = d.init_point;
+  })
+  .catch(e=>{
+    console.error(e);
+    alert("Error conexión backend");
   });
 }
 
