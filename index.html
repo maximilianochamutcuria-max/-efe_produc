@@ -7,7 +7,6 @@
 <style>
 body { margin:0; font-family:Arial; background:#f5f5f5; }
 
-/* TITULO */
 h1 { text-align:center; }
 
 /* ALBUMES */
@@ -23,12 +22,6 @@ h1 { text-align:center; }
   border-radius:12px;
   overflow:hidden;
   cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-  transition:0.3s;
-}
-
-.album:hover {
-  transform:scale(1.03);
 }
 
 .album img {
@@ -37,11 +30,7 @@ h1 { text-align:center; }
   object-fit:cover;
 }
 
-.album h3 {
-  padding:10px;
-}
-
-/* GALERIA PINTEREST */
+/* GALERIA */
 .gallery {
   column-count:4;
   column-gap:15px;
@@ -50,20 +39,14 @@ h1 { text-align:center; }
 
 .photo {
   margin-bottom:15px;
-  position:relative;
   break-inside:avoid;
+  position:relative;
 }
 
 .photo img {
   width:100%;
   border-radius:10px;
   cursor:pointer;
-  transition:0.3s;
-}
-
-.photo:hover img {
-  transform:scale(1.03);
-  filter:brightness(0.85);
 }
 
 .photo.selected::after {
@@ -74,130 +57,30 @@ h1 { text-align:center; }
   border-radius:10px;
 }
 
-.check {
-  position:absolute;
-  bottom:8px;
-  left:8px;
-  background:black;
-  color:white;
-  padding:4px 6px;
-  border-radius:6px;
-}
-
 /* VISOR */
 #viewer {
   position:fixed;
   inset:0;
   background:rgba(0,0,0,0.9);
   display:none;
-  align-items:center;
   justify-content:center;
-  z-index:999;
+  align-items:center;
 }
 
 #viewer img {
-  max-width:85%;
-  max-height:85%;
+  max-width:80%;
 }
-
-.nav {
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:40px;
-  color:white;
-  cursor:pointer;
-}
-
-.left { left:20px; }
-.right { right:20px; }
 
 .close {
   position:absolute;
   top:20px;
   right:20px;
+  color:white;
   font-size:30px;
-  color:white;
   cursor:pointer;
 }
 
-/* CHECKOUT */
-#checkout {
-  position:fixed;
-  bottom:0;
-  width:100%;
-  height:80%;
-  background:white;
-  display:none;
-  border-radius:20px 20px 0 0;
-  z-index:998;
-}
-
-.checkout-body {
-  display:flex;
-  height:100%;
-}
-
-.left-panel {
-  flex:1;
-  overflow:auto;
-  padding:20px;
-}
-
-.grid-fotos {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,80px);
-  gap:10px;
-}
-
-.item { position:relative; }
-
-.item img {
-  width:100%;
-  border-radius:8px;
-}
-
-.remove {
-  position:absolute;
-  top:2px;
-  right:2px;
-  background:red;
-  color:white;
-  border-radius:50%;
-  width:18px;
-  height:18px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:12px;
-  cursor:pointer;
-}
-
-.right-panel {
-  width:300px;
-  padding:20px;
-  background:#f1f1f1;
-}
-
-input {
-  width:100%;
-  margin:5px 0;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-button {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.main { background:#009ee3; color:white; }
-
+/* CART */
 .cart {
   position:fixed;
   bottom:20px;
@@ -208,14 +91,23 @@ button {
   padding:10px 20px;
   border-radius:20px;
   cursor:pointer;
-  z-index:999;
 }
 
-/* VOLVER */
-.back {
-  margin:20px;
-  cursor:pointer;
-  font-weight:bold;
+/* CHECKOUT */
+#checkout {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  height:70%;
+  background:white;
+  display:none;
+  padding:20px;
+}
+
+button {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -225,50 +117,26 @@ button {
 <h1>@efe_produc</h1>
 
 <div id="albums" class="albums"></div>
-
 <div id="gallery" class="gallery" style="display:none;"></div>
-
-<div id="back" class="back" onclick="volver()" style="display:none;">⬅ Volver</div>
-
 <div id="cart" class="cart"></div>
 
 <!-- VISOR -->
 <div id="viewer">
-  <div class="close" onclick="cerrarViewer()">✖</div>
-  <div class="nav left" onclick="prev()">❮</div>
+  <div class="close" onclick="viewer.style.display='none'">✖</div>
   <img id="viewerImg">
-  <div class="nav right" onclick="next()">❯</div>
 </div>
 
 <!-- CHECKOUT -->
 <div id="checkout">
-  <div class="checkout-body">
-
-    <div class="left-panel">
-      <div id="gridFotos" class="grid-fotos"></div>
-      <div onclick="vaciar()">🗑 Limpiar</div>
-    </div>
-
-    <div class="right-panel">
-      <div id="total"></div>
-
-      <h3>Datos</h3>
-      <input id="email" placeholder="Email">
-      <input placeholder="Teléfono">
-
-      <button class="main" onclick="pagar()">Continuar</button>
-      <button onclick="cerrarCheckout()">Cerrar</button>
-    </div>
-
-  </div>
+  <h3 id="total"></h3>
+  <input id="email" placeholder="Email">
+  <button onclick="pagar()">Continuar</button>
 </div>
 
 <script>
-
 let fotos = [];
 let seleccion = [];
 let albumActual = "";
-let indexActual = 0;
 
 /* PRECIO */
 function precio(n){
@@ -279,95 +147,59 @@ function precio(n){
   return t;
 }
 
-/* CARGAR ALBUMES */
+/* ALBUMES */
 async function cargarAlbums(){
   const res = await fetch("/api/albums");
-  const albums = await res.json();
+  const data = await res.json();
 
-  const cont = document.getElementById("albums");
-
-  albums.forEach(a=>{
+  data.forEach(a=>{
     const div=document.createElement("div");
     div.className="album";
-
-    div.innerHTML=`
-      <img src="/images/${a}/preview/${a}_1.jpg">
-      <h3>${a}</h3>
-    `;
-
+    div.innerHTML=`<img src="/images/${a}/preview/${a}_1.jpg"><h3>${a}</h3>`;
     div.onclick=()=>abrirAlbum(a);
-
-    cont.appendChild(div);
+    albums.appendChild(div);
   });
 }
 
-/* ABRIR ALBUM */
-async function abrirAlbum(nombre){
-
-  albumActual = nombre;
-
+/* ABRIR */
+async function abrirAlbum(a){
+  albumActual=a;
   albums.style.display="none";
   gallery.style.display="block";
-  back.style.display="block";
 
-  const res = await fetch(`/api/fotos/${nombre}`);
+  const res = await fetch(`/api/fotos/${a}`);
   fotos = await res.json();
 
   gallery.innerHTML="";
 
   fotos.forEach((f,i)=>{
-    const div=document.createElement("div");
-    div.className="photo";
+    const d=document.createElement("div");
+    d.className="photo";
 
-    div.innerHTML=`
-      <img src="/images/${nombre}/preview/${f}" onclick="abrir(${i})">
-      <div class="check">+</div>
-    `;
+    d.innerHTML=`<img src="/images/${a}/preview/${f}">`;
 
-    div.onclick=(e)=>{
-      if(e.target.tagName !== "IMG"){
-        toggle(div,f);
+    d.onclick=()=>{
+      if(seleccion.includes(f)){
+        seleccion = seleccion.filter(x=>x!==f);
+        d.classList.remove("selected");
+      } else {
+        seleccion.push(f);
+        d.classList.add("selected");
       }
+      actualizar();
     };
 
-    gallery.appendChild(div);
+    d.querySelector("img").onclick=(e)=>{
+      e.stopPropagation();
+      viewer.style.display="flex";
+      viewerImg.src=`/images/${a}/preview/${f}`;
+    };
+
+    gallery.appendChild(d);
   });
 }
 
-/* VOLVER */
-function volver(){
-  gallery.style.display="none";
-  albums.style.display="grid";
-  back.style.display="none";
-}
-
-/* SELECCION */
-function toggle(div,f){
-  const existe = seleccion.includes(f);
-
-  if(existe){
-    seleccion = seleccion.filter(x=>x!==f);
-    div.classList.remove("selected");
-  } else {
-    seleccion.push(f);
-    div.classList.add("selected");
-  }
-
-  actualizar();
-}
-
-/* VISOR */
-function abrir(i){
-  indexActual=i;
-  viewer.style.display="flex";
-  viewerImg.src=`/images/${albumActual}/preview/${fotos[i]}`;
-}
-
-function cerrarViewer(){ viewer.style.display="none"; }
-function next(){ indexActual=(indexActual+1)%fotos.length; abrir(indexActual); }
-function prev(){ indexActual=(indexActual-1+fotos.length)%fotos.length; abrir(indexActual); }
-
-/* CARRITO */
+/* CART */
 function actualizar(){
   cart.style.display = seleccion.length?"block":"none";
   cart.innerText = seleccion.length+" fotos";
@@ -375,53 +207,11 @@ function actualizar(){
 
 cart.onclick=()=>{
   checkout.style.display="block";
-  renderCheckout();
+  total.innerText="Total: $"+precio(seleccion.length);
 };
-
-function cerrarCheckout(){ checkout.style.display="none"; }
-
-/* CHECKOUT */
-function renderCheckout(){
-  gridFotos.innerHTML="";
-
-  seleccion.forEach(f=>{
-    const d=document.createElement("div");
-    d.className="item";
-
-    d.innerHTML=`
-      <img src="/images/${albumActual}/preview/${f}">
-      <div class="remove" onclick="remove('${f}')">✖</div>
-    `;
-
-    gridFotos.appendChild(d);
-  });
-
-  total.innerHTML=`<b>Total: $${precio(seleccion.length)}</b>`;
-}
-
-/* REMOVE */
-function remove(f){
-  seleccion = seleccion.filter(x=>x!==f);
-  renderCheckout();
-  actualizar();
-}
-
-function vaciar(){
-  seleccion=[];
-  renderCheckout();
-  actualizar();
-}
 
 /* PAGO */
 function pagar(){
-
-  const email=document.getElementById("email").value;
-
-  if(!email){
-    alert("Ingresá email");
-    return;
-  }
-
   const total = precio(seleccion.length);
 
   fetch("/crear-pago",{
@@ -431,20 +221,15 @@ function pagar(){
   })
   .then(r=>r.json())
   .then(d=>{
-    if(!d.init_point){
+    if(d.init_point){
+      window.location.href=d.init_point;
+    } else {
       alert("Error en pago");
-      return;
     }
-    window.location.href = d.init_point;
-  })
-  .catch(()=>{
-    alert("Error conexión backend");
   });
 }
 
-/* INIT */
 cargarAlbums();
-
 </script>
 
 </body>
