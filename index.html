@@ -496,11 +496,24 @@ function abrirAlbum() {
 function toggleSeleccion(div, nombre) {
   div.classList.toggle("selected");
 
-  if (seleccionadas.includes(nombre)) {
-    seleccionadas = seleccionadas.filter(f => f !== nombre);
-  } else {
-    seleccionadas.push(nombre);
-  }
+  const rutaOriginal = album.preview.replace("preview", "original") + nombre;
+
+const index = carrito.findIndex(f => f.original === rutaOriginal);
+
+if (index >= 0) {
+  carrito.splice(index, 1);
+} else {
+  carrito.push({ original: rutaOriginal });
+}
+
+console.log("CARRITO REAL:", carrito);
+
+// mantenés esto para UI
+if (seleccionadas.includes(nombre)) {
+  seleccionadas = seleccionadas.filter(f => f !== nombre);
+} else {
+  seleccionadas.push(nombre);
+}
 
   // 🔥 CARRITO REAL (CON FOTOS ORIGINALES)
   const ruta = `${album.original}${nombre}`;
