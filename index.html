@@ -652,7 +652,6 @@ function copiarTexto(id) {
 }
 
 function crearOrden() {
-  function crearOrden() {
 
   const email = document.getElementById("email").value;
   const telefono = document.getElementById("telefono").value;
@@ -684,12 +683,11 @@ Total: $${total}
 Enviá el comprobante por WhatsApp para recibir tus fotos.
 `;
 
-  const telefonoDestino = "5493816657619"; // 👈 TU NÚMERO CON CÓDIGO PAÍS
+  const telefonoDestino = "5493816657619";
 
   const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
   window.open(url, "_blank");
-}
 }</script>
 
 <div id="pantallaAviso" class="pantalla" style="display:none;">
