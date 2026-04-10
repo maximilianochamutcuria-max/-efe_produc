@@ -82,15 +82,20 @@ app.get("/pedido/:id", (req, res) => {
     return res.send("❌ Pedido no encontrado");
   }
 
-  let html = `
-    <h1>Pedido ${req.params.id}</h1>
-    <p><b>Email:</b> ${pedido.email}</p>
-    <p><b>Teléfono:</b> ${pedido.telefono}</p>
-    <p><b>Total:</b> $${pedido.total}</p>
-    <hr>
-    if (pedido.estado !== "pagado") {
-  html += `<p><b>Pedido pendiente de pago</b></p>`;
+let html = `
+  <h1>Pedido ${req.params.id}</h1>
+  <p><b>Email:</b> ${pedido.email}</p>
+  <p><b>Teléfono:</b> ${pedido.telefono}</p>
+  <p><b>Total:</b> $${pedido.total}</p>
+  <hr>
+`;
+
+// 🔒 SI NO PAGÓ
+if (pedido.estado !== "pagado") {
+  html += `<p><b>⚠️ Pedido pendiente de pago</b></p>`;
 } else {
+
+  // 📸 SI PAGÓ
   html += `<h2>Fotos:</h2>`;
 
   if (Array.isArray(pedido.fotos)) {
@@ -102,8 +107,8 @@ app.get("/pedido/:id", (req, res) => {
       `;
     });
   }
+
 }
-  `;
 
   if (Array.isArray(pedido.fotos)) {
   pedido.fotos.forEach(foto => {
