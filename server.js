@@ -89,7 +89,7 @@ app.get("/pedido/:id", (req, res) => {
     <p><b>Total:</b> $${pedido.total}</p>
     <hr>
     if (pedido.estado !== "pagado") {
-  html += `<p>🔒 Este pedido aún no fue confirmado.</p>`;
+  html += `<p><b>Pedido pendiente de pago</b></p>`;
 } else {
   html += `<h2>Fotos:</h2>`;
 
