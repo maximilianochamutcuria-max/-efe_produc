@@ -88,7 +88,21 @@ app.get("/pedido/:id", (req, res) => {
     <p><b>Teléfono:</b> ${pedido.telefono}</p>
     <p><b>Total:</b> $${pedido.total}</p>
     <hr>
-    <h2>Fotos:</h2>
+    if (pedido.estado !== "pagado") {
+  html += `<p>🔒 Este pedido aún no fue confirmado.</p>`;
+} else {
+  html += `<h2>Fotos:</h2>`;
+
+  if (Array.isArray(pedido.fotos)) {
+    pedido.fotos.forEach(foto => {
+      html += `
+        <div style="margin-bottom:20px;">
+          <img src="${foto.original}" style="width:300px;">
+        </div>
+      `;
+    });
+  }
+}
   `;
 
   if (Array.isArray(pedido.fotos)) {
@@ -105,6 +119,40 @@ app.get("/pedido/:id", (req, res) => {
 
   res.send(html);
 });
+
+// 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
+app.get("/admin", (req, res) => {
+
+  let html = `<h1>📦 Pedidos</h1>`;
+
+  Object.keys(pedidos).forEach(id => {
+    const p = pedidos[id];
+
+    html += `
+      <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+        <b>Pedido:</b> ${id}<br>
+        <b>Email:</b> ${p.email}<br>
+        <b>Total:</b> $${p.total}<br>
+        <b>Estado:</b> ${p.estado}<br>
+        <a href="/pedido/${id}" target="_blank">👉 Ver pedido</a>
+      </div>
+    `;
+  });
+
+  res.send(html);
+});
+app.get("/pagar/:id", (req, res) => {
+  const pedido = pedidos[req.params.id];
+
+  if (!pedido) return res.send("❌ Pedido no encontrado");
+
+  pedido.estado = "pagado";
+
+  res.send(`✅ Pedido ${req.params.id} marcado como PAGADO`);
+});
+
+
+// 🔥 ARRANCAR SERVIDOR
 app.listen(3000, () => {
   console.log("🔥 http://localhost:3000");
 });
