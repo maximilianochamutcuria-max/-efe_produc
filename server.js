@@ -6,7 +6,15 @@ const { MercadoPagoConfig, Preference } = require("mercadopago");
 const app = express();
 app.use(cors());
 app.use(express.json());
+const fs = require("fs");
+
 let pedidos = {};
+
+try {
+  pedidos = JSON.parse(fs.readFileSync("pedidos.json"));
+} catch {
+  pedidos = {};
+}
 
 // 🔥 SERVIR ARCHIVOS (ESTO ES LO QUE TE FALTABA)
 app.use(express.static(__dirname));
@@ -69,6 +77,7 @@ app.post("/crear-pedido", (req, res) => {
     total,
     estado: "pendiente"
   };
+  fs.writeFileSync("pedidos.json", JSON.stringify(pedidos, null, 2));
 
   console.log("📦 Pedido guardado:", pedidoId);
 
