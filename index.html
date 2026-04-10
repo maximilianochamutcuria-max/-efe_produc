@@ -621,6 +621,8 @@ function copiarTexto(id) {
   navigator.clipboard.writeText(texto);
 
   alert("Copiado: " + texto);
+}function abrirAviso() {
+  document.getElementById("pantallaAviso").style.display = "flex";
 }</script>
 
 <div id="pantallaAviso" class="pantalla" style="display:none;">
@@ -637,6 +639,23 @@ function copiarTexto(id) {
     </p>
 
     <button class="btn-pagar" onclick="crearOrden()">Crear orden</button>
+
+  </div>
+</div>
+<div id="pantallaDatos" class="pantalla" style="display:none;">
+  <div class="box verde">
+
+    <p><b>El pedido está listo, estos son los datos para la transferencia bancaria:</b></p>
+
+    <p><b>Nombre:</b> Maximiliano Chamut Curia</p>
+    <p><b>CVU:</b> 0000003100089071728987</p>
+    <p><b>Alias:</b> maximilianochamutmp</p>
+
+    <p><b>Total:</b> $<span id="totalFinal"></span></p>
+
+    <p style="opacity:0.7;">
+      Enviá el comprobante por WhatsApp para recibir tus fotos.
+    </p>
 
   </div>
 </div>
