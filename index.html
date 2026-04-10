@@ -367,6 +367,29 @@ h1 { margin: 20px; }
 
       <button class="btn-pagar" onclick="pagar()">Pagar con MercadoPago</button>
       <button class="btn-transferencia" onclick="mostrarTransferencia()">Transferencia</button>
+      <div id="transferenciaBox" class="transferencia-box" style="display:none;">
+  <h3>Datos para transferencia</h3>
+
+  <p><b>Titular:</b> Juan Manuel Carabajal Monteros</p>
+
+  <p>
+    <b>CBU:</b> 
+    <span id="cbu">0000003100043282820177</span>
+    <button onclick="copiarTexto('cbu')">Copiar</button>
+  </p>
+
+  <p>
+    <b>Alias:</b> 
+    <span id="alias">juanmacarabajal</span>
+    <button onclick="copiarTexto('alias')">Copiar</button>
+  </p>
+
+  <p><b>Total:</b> $<span id="totalTransferencia"></span></p>
+
+  <p style="font-size:14px;opacity:0.7;">
+    Enviá el comprobante luego del pago
+  </p>
+</div>
     </div>
   </div>
 </div>
