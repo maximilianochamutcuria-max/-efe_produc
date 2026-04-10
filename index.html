@@ -611,7 +611,18 @@ function manejarTeclado(e) {
 }
 
 mostrarAlbum();
-</script>
+function mostrarTransferencia() {
+  document.getElementById("transferenciaBox").style.display = "block";
+  document.getElementById("totalTransferencia").innerText = total;
+}
+
+function copiarTexto(id) {
+  const texto = document.getElementById(id).innerText;
+
+  navigator.clipboard.writeText(texto);
+
+  alert("Copiado: " + texto);
+}</script>
 
 </body>
 </html>
