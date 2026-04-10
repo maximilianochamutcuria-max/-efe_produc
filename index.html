@@ -419,7 +419,8 @@ h1 { margin: 20px; }
 
 <script>
 const contenido = document.getElementById("contenido");
-const carrito = document.getElementById("carrito");
+const carritoUI = document.getElementById("carrito"); // 👉 solo para mostrar
+let carrito = []; // 👉 este es el verdadero carrito (datos)
 
 let seleccionadas = [];
 let imagenActual = 0;
@@ -428,6 +429,7 @@ const album = {
   nombre: "gymna_vs_cariocas",
   preview: "images/gymna_vs_cariocas/preview/",
   watermarked: "images/gymna_vs_cariocas/watermarked/",
+  original: "images/gymna_vs_cariocas/original/", // 👈 AGREGAR ESTO
   portada: "DSC_6014.jpg"
 };
 
@@ -445,7 +447,7 @@ const imagenes = [
 document.addEventListener("contextmenu", e => e.preventDefault());
 
 function mostrarAlbum() {
-  carrito.style.display = "none";
+  carritoUI.style.display = "none";
 
   contenido.innerHTML = `
     <div class="album" onclick="abrirAlbum()">
@@ -464,7 +466,7 @@ function abrirAlbum() {
     <div class="galeria"></div>
   `;
 
-  carrito.style.display = "block";
+  carritoUI.style.display = "block";
 
   const galeria = document.querySelector(".galeria");
 
@@ -500,6 +502,19 @@ function toggleSeleccion(div, nombre) {
     seleccionadas.push(nombre);
   }
 
+  // 🔥 CARRITO REAL (CON FOTOS ORIGINALES)
+  const ruta = `${album.original}${nombre}`;
+
+  const index = carrito.findIndex(f => f.original === ruta);
+
+  if (index >= 0) {
+    carrito.splice(index, 1);
+  } else {
+    carrito.push({ original: ruta });
+  }
+
+  console.log("CARRITO REAL:", carrito);
+
   actualizarCarrito();
 }
 
@@ -515,10 +530,10 @@ function calcularTotal() {
 }
 
 function actualizarCarrito() {
-  carrito.innerText = `${seleccionadas.length} fotos | $${calcularTotal()}`;
+  carritoUI.innerText = `${seleccionadas.length} fotos | $${calcularTotal()}`;
 }
 
-carrito.onclick = () => abrirCarrito();
+carritoUI.onclick = () => abrirCarrito();
 
 function abrirCarrito() {
   document.getElementById("modalCarrito").style.display = "flex";
@@ -669,7 +684,7 @@ async function crearOrden() {
     return;
   }
 
-  const totalFinal = typeof total !== "undefined" ? total : 0;
+  const totalFinal = calcularTotal();
 
   const pedidoId = Math.floor(1000 + Math.random() * 9000);
   const codigo = Math.random().toString(36).substring(2, 6).toUpperCase() + "-" +
