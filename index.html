@@ -651,7 +651,7 @@ function copiarTexto(id) {
   document.getElementById("pantallaAviso").style.display = "flex";
 }
 
-function crearOrden() {
+async function crearOrden() {
 
   const emailInput = document.getElementById("email");
   const telefonoInput = document.getElementById("telefono");
@@ -691,6 +691,19 @@ Total: $${totalFinal}
 Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
   const telefonoDestino = "5493816657619";
+  await fetch("/crear-pedido", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    pedidoId,
+    fotos: carrito, // 👈 array de fotos seleccionadas
+    email,
+    telefono,
+    total: totalFinal
+  })
+});
 
   const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
