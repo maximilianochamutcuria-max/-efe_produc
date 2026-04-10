@@ -91,13 +91,17 @@ app.get("/pedido/:id", (req, res) => {
     <h2>Fotos:</h2>
   `;
 
+  if (Array.isArray(pedido.fotos)) {
   pedido.fotos.forEach(foto => {
     html += `
       <div style="margin-bottom:20px;">
-        <img src="${foto.original}" style="width:300px;">
+        <img src="${foto.original || foto}" style="width:300px;">
       </div>
     `;
   });
+} else {
+  html += "<p>⚠️ No hay fotos en este pedido</p>";
+}
 
   res.send(html);
 });

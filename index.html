@@ -691,6 +691,7 @@ Total: $${totalFinal}
 Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
   const telefonoDestino = "5493816657619";
+  console.log("ENVIANDO PEDIDO:", pedidoId, carrito);
   await fetch("/crear-pedido", {
   method: "POST",
   headers: {
