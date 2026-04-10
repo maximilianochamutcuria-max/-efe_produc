@@ -6,6 +6,7 @@ const { MercadoPagoConfig, Preference } = require("mercadopago");
 const app = express();
 app.use(cors());
 app.use(express.json());
+let pedidos = {};
 
 // 🔥 SERVIR ARCHIVOS (ESTO ES LO QUE TE FALTABA)
 app.use(express.static(__dirname));
@@ -57,6 +58,49 @@ app.post("/crear-preferencia", async (req, res) => {
 });
 
 // 🔥 ARRANCAR SERVIDOR
+// 🔥 CREAR PEDIDO
+app.post("/crear-pedido", (req, res) => {
+  const { pedidoId, fotos, email, telefono, total } = req.body;
+
+  pedidos[pedidoId] = {
+    fotos,
+    email,
+    telefono,
+    total,
+    estado: "pendiente"
+  };
+
+  console.log("📦 Pedido guardado:", pedidoId);
+
+  res.json({ ok: true });
+});
+// 🔥 VER PEDIDO
+app.get("/pedido/:id", (req, res) => {
+  const pedido = pedidos[req.params.id];
+
+  if (!pedido) {
+    return res.send("❌ Pedido no encontrado");
+  }
+
+  let html = `
+    <h1>Pedido ${req.params.id}</h1>
+    <p><b>Email:</b> ${pedido.email}</p>
+    <p><b>Teléfono:</b> ${pedido.telefono}</p>
+    <p><b>Total:</b> $${pedido.total}</p>
+    <hr>
+    <h2>Fotos:</h2>
+  `;
+
+  pedido.fotos.forEach(foto => {
+    html += `
+      <div style="margin-bottom:20px;">
+        <img src="${foto.original}" style="width:300px;">
+      </div>
+    `;
+  });
+
+  res.send(html);
+});
 app.listen(3000, () => {
   console.log("🔥 http://localhost:3000");
 });
