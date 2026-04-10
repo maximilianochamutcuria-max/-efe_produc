@@ -725,7 +725,7 @@ Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
   const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
-  //window.location.href = url; // 👈 IMPORTANTE: mejor que window.open en mobile
+  window.location.href = url; // 👈 IMPORTANTE: mejor que window.open en mobile
 }</script>
 
 <div id="pantallaAviso" class="pantalla" style="display:none;">
