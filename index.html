@@ -492,43 +492,27 @@ function abrirAlbum() {
     galeria.appendChild(div);
   });
 }
-
 function toggleSeleccion(div, nombre) {
   div.classList.toggle("selected");
 
-  
-
-// mantenés esto para UI
-if (seleccionadas.includes(nombre)) {
-  seleccionadas = seleccionadas.filter(f => f !== nombre);
-} else {
-  seleccionadas.push(nombre);
-}
-function toggleSeleccion(div, nombre) {
-  div.classList.toggle("selected");
-
-  // 👉 RUTA REAL DE LA FOTO ORIGINAL
   const ruta = `${album.original}${nombre}`;
 
-  const index = carrito.findIndex(f => f.original === ruta);
+  const existe = carrito.find(f => f.original === ruta);
 
-  if (index >= 0) {
-    carrito.splice(index, 1);
+  if (existe) {
+    carrito = carrito.filter(f => f.original !== ruta);
   } else {
     carrito.push({ original: ruta });
   }
 
   console.log("CARRITO REAL:", carrito);
 
-  // 👉 UI (esto es solo visual)
   if (seleccionadas.includes(nombre)) {
     seleccionadas = seleccionadas.filter(f => f !== nombre);
   } else {
     seleccionadas.push(nombre);
   }
 
-  actualizarCarrito();
-}
   actualizarCarrito();
 }
 
