@@ -652,42 +652,7 @@ function copiarTexto(id) {
 }
 
 function crearOrden() {
-
-  const email = document.getElementById("email").value;
-  const telefono = document.getElementById("telefono").value;
-
-  if (!email || !telefono) {
-    alert("Completá email y teléfono");
-    return;
-  }
-
-  // 🔢 GENERAR ID PEDIDO
-  const pedidoId = Math.floor(1000 + Math.random() * 9000);
-  const codigo = Math.random().toString(36).substring(2, 6).toUpperCase() + "-" +
-                 Math.random().toString(36).substring(2, 6).toUpperCase();
-
-  const fecha = new Date().toLocaleDateString();
-
-  const mensaje = `
-Hola! Te paso el resumen de mi pedido
-
-Pedido: #${pedidoId} / ${codigo}
-Tienda: efe_produc
-Fecha: ${fecha}
-
-Teléfono: ${telefono}
-Email: ${email}
-
-Total: $${total}
-
-Enviá el comprobante por WhatsApp para recibir tus fotos.
-`;
-
-  const telefonoDestino = "5493816657619";
-
-  const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
-
-  window.open(url, "_blank");
+  alert("FUNCIONANDO");
 }</script>
 
 <div id="pantallaAviso" class="pantalla" style="display:none;">
