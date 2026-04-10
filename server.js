@@ -123,7 +123,14 @@ app.get("/pedido/:id", (req, res) => {
 // 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
 app.get("/admin", (req, res) => {
 
-  let html = `<h1>📦 Pedidos</h1>`;
+let html = `
+  <h1>Pedido ${req.params.id}</h1>
+  <p><b>Email:</b> ${pedido.email}</p>
+  <p><b>Teléfono:</b> ${pedido.telefono}</p>
+  <p><b>Total:</b> $${pedido.total}</p>
+  <hr>
+  <h2>Fotos:</h2>
+`;
 
   Object.keys(pedidos).forEach(id => {
     const p = pedidos[id];
