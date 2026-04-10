@@ -677,6 +677,7 @@ async function crearOrden() {
 
   const fecha = new Date().toLocaleDateString();
 
+  const linkAdmin = `http://localhost:3000/pedido/${pedidoId}`;
   const mensaje = `Hola! Te paso el resumen de mi pedido
 
 Pedido: #${pedidoId} / ${codigo}
@@ -687,6 +688,7 @@ Teléfono: ${telefono}
 Email: ${email}
 
 Total: $${totalFinal}
+🔗 Link admin: ${linkAdmin}
 
 Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
