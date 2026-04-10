@@ -495,7 +495,7 @@ function abrirAlbum() {
 function toggleSeleccion(div, nombre) {
   div.classList.toggle("selected");
 
-  const ruta = `${album.original}${nombre}`;
+  const ruta = `${window.location.origin}/${album.original}${nombre}`;
 
   const existe = carrito.find(f => f.original === ruta);
 
