@@ -128,14 +128,7 @@ if (pedido.estado !== "pagado") {
 // 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
 app.get("/admin", (req, res) => {
 
-let html = `
-  <h1>Pedido ${req.params.id}</h1>
-  <p><b>Email:</b> ${pedido.email}</p>
-  <p><b>Teléfono:</b> ${pedido.telefono}</p>
-  <p><b>Total:</b> $${pedido.total}</p>
-  <hr>
-  <h2>Fotos:</h2>
-`;
+  let html = `<h1>📦 Pedidos</h1>`;
 
   Object.keys(pedidos).forEach(id => {
     const p = pedidos[id];
@@ -146,7 +139,10 @@ let html = `
         <b>Email:</b> ${p.email}<br>
         <b>Total:</b> $${p.total}<br>
         <b>Estado:</b> ${p.estado}<br>
-        <a href="/pedido/${id}" target="_blank">👉 Ver pedido</a>
+
+        <a href="/pedido/${id}" target="_blank">👉 Ver pedido</a><br><br>
+
+        <a href="/pagar/${id}" target="_blank">✅ Marcar como pagado</a>
       </div>
     `;
   });
