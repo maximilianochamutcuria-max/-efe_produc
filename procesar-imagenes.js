@@ -49,7 +49,7 @@ const svgText = `
       font-size: ${Math.floor(metadata.width / 8)}px;
       font-weight: bold;
       font-family: Arial, sans-serif;
-      opacity: 0.35;
+      opacity: 0.55;
     }
   </style>
   <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="title">
