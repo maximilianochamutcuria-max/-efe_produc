@@ -486,9 +486,6 @@ async function abrirAlbum(nombre) {
   });
 }
 
-    galeria.appendChild(div);
-  });
-}
 function toggleSeleccion(div, nombre) {
   div.classList.toggle("selected");
 
@@ -541,7 +538,7 @@ function abrirCarrito() {
     div.className = "item";
 
     div.innerHTML = `
-      <img src="${album.preview + nombre}">
+      <img src="${albumActual.preview + nombre}">
       <div class="remove" onclick="eliminar('${nombre}')">x</div>
     `;
 
@@ -620,7 +617,7 @@ function verImagen(nombre) {
 
 function actualizarImagen() {
   document.getElementById("imgGrande").src =
-    album.watermarked + imagenes[imagenActual];
+    albumActual.preview + imagenes[imagenActual];
 }
 
 function cambiarImagen(dir) {
