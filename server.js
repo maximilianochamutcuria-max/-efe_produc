@@ -117,12 +117,12 @@ portada = files.length > 0 ? files[0] : null;
     }
 
     return {
-      nombre,
-      portada,
-      preview: `/images/${nombre}/preview/`,
-      original: `/images/${nombre}/original/`
-    };
-  });
+  nombre,
+  portada,
+  preview: `/images/${nombre}/preview/`,
+  original: `/images/${nombre}/original/`,
+  watermarked: `/images/${nombre}/watermarked/`
+};
 
   res.json(data);
 });
@@ -135,10 +135,11 @@ app.get("/album/:nombre", (req, res) => {
 
   res.json({
     album: {
-      nombre,
-      preview: `/images/${nombre}/preview/`,
-      original: `/images/${nombre}/original/`
-    },
+  nombre,
+  preview: `/images/${nombre}/preview/`,
+  original: `/images/${nombre}/original/`,
+  watermarked: `/images/${nombre}/watermarked/`
+}
     imagenes
   });
 });
