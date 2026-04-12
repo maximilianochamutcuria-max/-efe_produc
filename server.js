@@ -174,7 +174,57 @@ app.get("/pagar/:id", async (req, res) => {
   res.send(`✅ Pedido ${req.params.id} marcado como PAGADO`);
 });
 
+app.post("/webhook", async (req, res) => {
+  try {
+    const data = req.body;
 
+    console.log("🔔 WEBHOOK:", data);
+
+    // Solo nos interesa cuando es un pago
+    if (data.type === "payment") {
+
+      const paymentId = data.data.id;
+
+      const fetch = (...args) =>
+        import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
+      // Traer info del pago desde MercadoPago
+      const response = await fetch(
+        `https://api.mercadopago.com/v1/payments/${paymentId}`,
+        {
+          headers: {
+            Authorization: `Bearer APP_USR-6334214303353461-040900-cc61c12b09cebb5053374f72bf65ee4e`,
+          },
+        }
+      );
+
+      const payment = await response.json();
+
+      console.log("💰 PAYMENT:", payment);
+
+      // Si está aprobado
+      if (payment.status === "approved") {
+
+        const pedidoId = payment.metadata.pedidoId;
+
+        console.log("📦 Pedido a actualizar:", pedidoId);
+
+        await supabase
+          .from("Pedidos")
+          .update({ estado: "pagado" })
+          .eq("id", pedidoId);
+
+        console.log("✅ Pedido marcado como pagado");
+      }
+    }
+
+    res.sendStatus(200);
+
+  } catch (error) {
+    console.log("❌ ERROR WEBHOOK:", error);
+    res.sendStatus(500);
+  }
+});
 // 🔥 ARRANCAR SERVIDOR
 app.listen(3000, () => {
   console.log("🔥 http://localhost:3000");
