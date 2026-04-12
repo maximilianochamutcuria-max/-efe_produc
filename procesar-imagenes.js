@@ -36,17 +36,17 @@ async function procesarAlbum(album) {
 
    
 
-    // 🔹 WATERMARK INTELIGENTE (HORIZONTAL vs VERTICAL)
+    // 🔹 WATERMARK PRO (2 horizontal / 3 vertical)
 const image = sharp(input);
 const metadata = await image.metadata();
 
 const isVertical = metadata.height > metadata.width;
 
-// 🔹 CONFIG TEXTO
+// 🔹 CONFIG
 const fontSize = Math.floor(metadata.width / 7);
 
-// 🔹 FUNCIÓN PARA CREAR SVG
-function crearSVG(offsetY = 0) {
+// 🔹 GENERADOR SVG
+function crearSVG(offsetY) {
   return `
   <svg width="${metadata.width}" height="${metadata.height}">
     <style>
@@ -59,7 +59,7 @@ function crearSVG(offsetY = 0) {
       }
     </style>
 
-    <g transform="rotate(-35 ${metadata.width/2} ${metadata.height/2 + offsetY})">
+    <g transform="rotate(-35 ${metadata.width/2} ${metadata.height/2})">
       <text 
         x="50%" 
         y="${50 + (offsetY / metadata.height) * 100}%" 
@@ -73,31 +73,29 @@ function crearSVG(offsetY = 0) {
   `;
 }
 
-// 🔹 COMPOSICIÓN
-let composites = [];
+let offsets = [];
 
-// 👉 SI ES VERTICAL → DOS TEXTOS
+// 📱 VERTICAL → 3 marcas
 if (isVertical) {
-  composites.push({
-    input: Buffer.from(crearSVG(-metadata.height * 0.25)),
-    top: 0,
-    left: 0
-  });
-
-  composites.push({
-    input: Buffer.from(crearSVG(metadata.height * 0.25)),
-    top: 0,
-    left: 0
-  });
-
+  offsets = [
+    -metadata.height * 0.35,
+    0,
+    metadata.height * 0.35
+  ];
 } else {
-  // 👉 HORIZONTAL → UNO SOLO (bien centrado)
-  composites.push({
-    input: Buffer.from(crearSVG(0)),
-    top: 0,
-    left: 0
-  });
+  // 📸 HORIZONTAL → 2 marcas
+  offsets = [
+    -metadata.height * 0.25,
+    metadata.height * 0.25
+  ];
 }
+
+// 🔹 ARMAR COMPOSICIÓN
+const composites = offsets.map(offset => ({
+  input: Buffer.from(crearSVG(offset)),
+  top: 0,
+  left: 0
+}));
 
 // 🔹 APLICAR
 await image
