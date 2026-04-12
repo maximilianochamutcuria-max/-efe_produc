@@ -109,86 +109,111 @@ app.get("/pedido/:id", async (req, res) => {
   <head>
     <title>Pedido ${pedido.id}</title>
     <style>
-      body {
-        font-family: Arial;
-        background: #f5f5f5;
-        padding: 20px;
-      }
-      .container {
-        max-width: 900px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-      }
-      h1 {
-        margin-bottom: 10px;
-      }
-      .info {
-        margin-bottom: 20px;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 15px;
-      }
-      .foto {
-        background: #fafafa;
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-      img {
-        width: 100%;
-        border-radius: 8px;
-      }
-      .btn {
-        display: inline-block;
-        margin-top: 10px;
-        padding: 8px 12px;
-        background: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 14px;
-      }
-      .btn:hover {
-        background: #0056b3;
-      }
-      .pendiente {
-        color: red;
-        font-weight: bold;
-      }
-        @media (max-width: 768px) {
   body {
-    padding: 10px;
+    font-family: Arial;
+    background: #f5f5f5;
+    padding: 20px;
   }
 
   .container {
-    padding: 15px;
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
   }
 
   h1 {
-    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .info {
+    margin-bottom: 20px;
   }
 
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
   }
 
   .foto {
-    padding: 8px;
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  img {
+    width: 100%;
+    border-radius: 8px;
   }
 
   .btn {
-    width: 100%;
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
     font-size: 14px;
-    padding: 10px;
   }
-}
-    </style>
+
+  .btn:hover {
+    background: #0056b3;
+  }
+
+  .pendiente {
+    color: red;
+    font-weight: bold;
+  }
+
+  /* 📱 TABLET */
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+
+    .container {
+      padding: 15px;
+    }
+
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .foto {
+      padding: 8px;
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  /* 📱 CELULAR */
+  @media (max-width: 480px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    h1 {
+      font-size: 18px;
+    }
+
+    .info p {
+      font-size: 14px;
+    }
+
+    .btn {
+      padding: 12px;
+      font-size: 15px;
+    }
+  }
+</style>
   </head>
   <body>
     <div class="container">
