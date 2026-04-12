@@ -616,8 +616,9 @@ function verImagen(nombre) {
 }
 
 function actualizarImagen() {
-  document.getElementById("imgGrande").src =
-    albumActual.watermarked + imagenes[imagenActual];
+  const ruta = albumActual.watermarked + imagenes[imagenActual];
+
+  document.getElementById("imgGrande").src = encodeURI(ruta);
 }
 
 function cambiarImagen(dir) {
