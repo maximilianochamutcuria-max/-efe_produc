@@ -425,41 +425,39 @@ let carrito = []; // 👉 este es el verdadero carrito (datos)
 let seleccionadas = [];
 let imagenActual = 0;
 
-const album = {
-  nombre: "gymna_vs_cariocas",
-  preview: "images/gymna_vs_cariocas/preview/",
-  watermarked: "images/gymna_vs_cariocas/watermarked/",
-  original: "images/gymna_vs_cariocas/original/", // 👈 AGREGAR ESTO
-  portada: "DSC_6014.jpg"
-};
 
-const imagenes = [
-"DSC_6014.jpg","DSC_6016.jpg","DSC_6019.jpg","DSC_6022.jpg",
-"DSC_6024.jpg","DSC_6030.jpg","DSC_6031.jpg","DSC_6033.jpg",
-"DSC_6034.jpg","DSC_6035.jpg","DSC_6036.jpg","DSC_6040.jpg",
-"DSC_6041.jpg","DSC_6043.jpg","DSC_6044.jpg","DSC_6045.jpg",
-"DSC_6049.jpg","DSC_6050.jpg","DSC_6051.jpg","DSC_6052.jpg",
-"DSC_6055.jpg","DSC_6056.jpg","DSC_6057.jpg","DSC_6059.jpg",
-"DSC_6060.jpg","DSC_6062.jpg","DSC_6063.jpg","DSC_6064.jpg",
-"DSC_6065.jpg","DSC_6067.jpg","DSC_6072.jpg","DSC_6076.jpg"
-];
+
+
 
 document.addEventListener("contextmenu", e => e.preventDefault());
 
-function mostrarAlbum() {
+async function mostrarAlbum() {
   carritoUI.style.display = "none";
 
-  contenido.innerHTML = `
-    <div class="album" onclick="abrirAlbum()">
-      <img src="${album.preview + album.portada}">
-      <h3>${album.nombre}</h3>
-    </div>
-  `;
+  const res = await fetch("/albums");
+  const albums = await res.json();
+
+  contenido.innerHTML = "";
+
+  albums.forEach(album => {
+    contenido.innerHTML += `
+      <div class="album" onclick="abrirAlbum('${album.nombre}')">
+        <img src="${album.preview + album.portada}">
+        <h3>${album.nombre}</h3>
+      </div>
+    `;
+  });
 }
 
-function abrirAlbum() {
+async function abrirAlbum(nombre) {
   seleccionadas = [];
   actualizarCarrito();
+
+  const res = await fetch(`/album/${nombre}`);
+  const data = await res.json();
+
+  window.albumActual = data.album;
+  const imagenes = data.imagenes;
 
   contenido.innerHTML = `
     <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
@@ -470,24 +468,23 @@ function abrirAlbum() {
 
   const galeria = document.querySelector(".galeria");
 
-  imagenes.forEach(nombre => {
+  imagenes.forEach(nombreImg => {
     const div = document.createElement("div");
     div.className = "foto";
 
     div.innerHTML = `
-      <img src="${album.preview + nombre}" onclick="verImagen('${nombre}')">
+      <img src="${albumActual.preview + nombreImg}" onclick="verImagen('${nombreImg}')">
       <div class="check"></div>
     `;
 
     div.querySelector(".check").onclick = (e) => {
       e.stopPropagation();
-      toggleSeleccion(div, nombre);
+      toggleSeleccion(div, nombreImg);
     };
 
-    div.oncontextmenu = (e) => {
-      e.preventDefault();
-      toggleSeleccion(div, nombre);
-    };
+    galeria.appendChild(div);
+  });
+}
 
     galeria.appendChild(div);
   });
@@ -495,7 +492,7 @@ function abrirAlbum() {
 function toggleSeleccion(div, nombre) {
   div.classList.toggle("selected");
 
-  const ruta = `${window.location.origin}/${album.original}${nombre}`;
+  const ruta = `${window.location.origin}${albumActual.original}${nombre}`;
 
   const existe = carrito.find(f => f.original === ruta);
 
