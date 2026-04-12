@@ -110,8 +110,10 @@ const albums = fs.readdirSync(basePath).filter(folder => {
     let portada = null;
 
     if (fs.existsSync(previewPath)) {
-      const files = fs.readdirSync(previewPath);
-      portada = files[0];
+    const files = fs.readdirSync(previewPath).filter(f => !f.startsWith(".")
+);
+
+portada = files.length > 0 ? files[0] : null;
     }
 
     return {
