@@ -34,23 +34,53 @@ async function procesarAlbum(album) {
       .jpeg({ quality: 50 })
       .toFile(previewOutput);
 
-    // 🔹 WATERMARK
-    const image = sharp(input);
-    const metadata = await image.metadata();
+   
 
-    const watermark = await sharp(watermarkPath)
-      .resize({ width: Math.floor(metadata.width * 0.3) })
-      .png()
-      .toBuffer();
+    // 🔹 WATERMARK MIX PRO
+const image = sharp(input);
+const metadata = await image.metadata();
 
-    await image
-      .composite([{
-        input: watermark,
-        gravity: "center",
-        blend: "overlay"
-      }])
-      .jpeg({ quality: 90 })
-      .toFile(watermarkOutput);
+// 🔹 LOGO CENTRAL GRANDE
+const watermarkCentral = await sharp(watermarkPath)
+  .resize({ width: Math.floor(metadata.width * 0.4) })
+  .png()
+  .toBuffer();
+
+// 🔹 LOGO CHICO PARA REPETIR
+const watermarkSmall = await sharp(watermarkPath)
+  .resize({ width: Math.floor(metadata.width * 0.15) })
+  .png()
+  .toBuffer();
+
+// 🔹 GENERAR PATRÓN (rejilla)
+const pattern = [];
+
+const spacingX = 300;
+const spacingY = 200;
+
+for (let y = 0; y < metadata.height; y += spacingY) {
+  for (let x = 0; x < metadata.width; x += spacingX) {
+    pattern.push({
+      input: watermarkSmall,
+      top: y,
+      left: x,
+      blend: "overlay"
+    });
+  }
+}
+
+// 🔹 COMPOSICIÓN FINAL
+await image
+  .composite([
+    {
+      input: watermarkCentral,
+      gravity: "center",
+      blend: "overlay"
+    },
+    ...pattern
+  ])
+  .jpeg({ quality: 90 })
+  .toFile(watermarkOutput);
   }
 }
 
