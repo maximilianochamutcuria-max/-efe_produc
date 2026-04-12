@@ -36,36 +36,37 @@ async function procesarAlbum(album) {
 
    
 
-    // 🔹 WATERMARK REJILLA SUAVE (PRO)
+    // 🔹 WATERMARK TEXTO CENTRAL (PRO)
 const image = sharp(input);
 const metadata = await image.metadata();
 
-// 🔹 LOGO MÁS CHICO
-const watermarkSmall = await sharp(watermarkPath)
-  .resize({ width: Math.floor(metadata.width * 0.08) }) // más chico
-  .png()
-  .toBuffer();
+// 🔹 CREAR SVG CON TEXTO
+const svgText = `
+<svg width="${metadata.width}" height="${metadata.height}">
+  <style>
+    .title {
+      fill: white;
+      font-size: ${Math.floor(metadata.width / 8)}px;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      opacity: 0.25;
+    }
+  </style>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="title">
+    Efe_produc
+  </text>
+</svg>
+`;
 
-// 🔹 PATRÓN MÁS ESPACIADO
-const pattern = [];
-
-const spacingX = 500;
-const spacingY = 350;
-
-for (let y = 0; y < metadata.height; y += spacingY) {
-  for (let x = 0; x < metadata.width; x += spacingX) {
-    pattern.push({
-      input: watermarkSmall,
-      top: y,
-      left: x,
-      blend: "overlay"
-    });
-  }
-}
-
-// 🔹 COMPOSICIÓN FINAL
+// 🔹 APLICAR WATERMARK
 await image
-  .composite(pattern)
+  .composite([
+    {
+      input: Buffer.from(svgText),
+      top: 0,
+      left: 0
+    }
+  ])
   .jpeg({ quality: 90 })
   .toFile(watermarkOutput);
   }
