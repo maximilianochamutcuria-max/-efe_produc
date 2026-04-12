@@ -40,10 +40,14 @@ async function procesarAlbum(album) {
 const image = sharp(input);
 const metadata = await image.metadata();
 
-const isVertical = metadata.height > metadata.width;
 
 // 🔹 CONFIG
-const fontSize = Math.floor(metadata.width / 7);
+const isVertical = metadata.height > metadata.width;
+
+// 🔹 tamaño dinámico
+const fontSize = isVertical
+  ? Math.floor(metadata.width / 7)   // vertical
+  : Math.floor(metadata.width / 10); // horizontal
 
 // 🔹 GENERADOR SVG
 function crearSVG(offsetY) {
