@@ -97,33 +97,33 @@ app.get("/albums", (req, res) => {
   const basePath = path.join(__dirname, "images");
 
   if (!fs.existsSync(basePath)) {
-  return res.json([]);
-}
+    return res.json([]);
+  }
 
-const albums = fs.readdirSync(basePath).filter(folder => {
+  const albums = fs.readdirSync(basePath).filter(folder => {
     return fs.statSync(path.join(basePath, folder)).isDirectory();
   });
 
-  cconst data = albums.map(nombre => {
-  const previewPath = path.join(basePath, nombre, "preview");
+  const data = albums.map(nombre => {
+    const previewPath = path.join(basePath, nombre, "preview");
 
-  let portada = null;
+    let portada = null;
 
-  if (fs.existsSync(previewPath)) {
-    const files = fs.readdirSync(previewPath).filter(f => !f.startsWith("."));
-    portada = files.length > 0 ? files[0] : null;
-  }
+    if (fs.existsSync(previewPath)) {
+      const files = fs.readdirSync(previewPath).filter(f => !f.startsWith("."));
+      portada = files.length > 0 ? files[0] : null;
+    }
 
-  return {
-    nombre,
-    portada,
-    preview: `/images/${nombre}/preview/`,
-    original: `/images/${nombre}/original/`,
-    watermarked: `/images/${nombre}/watermarked/`
-  };
-});
+    return {
+      nombre,
+      portada,
+      preview: `/images/${nombre}/preview/`,
+      original: `/images/${nombre}/original/`,
+      watermarked: `/images/${nombre}/watermarked/`
+    };
+  });
 
-res.json(data);
+  res.json(data);
 });
 app.get("/album/:nombre", (req, res) => {
   const nombre = req.params.nombre;
