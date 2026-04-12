@@ -107,6 +107,7 @@ app.get("/pedido/:id", async (req, res) => {
   let html = `
   <html>
   <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedido ${pedido.id}</title>
     <style>
   body {
