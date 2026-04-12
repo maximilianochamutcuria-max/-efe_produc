@@ -36,27 +36,21 @@ async function procesarAlbum(album) {
 
    
 
-    // 🔹 WATERMARK MIX (SUAVE + PRO)
+    // 🔹 WATERMARK SOLO REJILLA (PRO)
 const image = sharp(input);
 const metadata = await image.metadata();
 
-// 🔹 LOGO CENTRAL (SUAVE)
-const watermarkCentral = await sharp(watermarkPath)
-  .resize({ width: Math.floor(metadata.width * 0.5) })
-  .png()
-  .toBuffer();
-
-// 🔹 LOGO CHICO (REPETIDO)
+// 🔹 LOGO CHICO
 const watermarkSmall = await sharp(watermarkPath)
   .resize({ width: Math.floor(metadata.width * 0.12) })
   .png()
   .toBuffer();
 
-// 🔹 PATRÓN MÁS ESPACIADO (más prolijo)
+// 🔹 PATRÓN (rejilla)
 const pattern = [];
 
-const spacingX = 400;
-const spacingY = 300;
+const spacingX = 350;
+const spacingY = 250;
 
 for (let y = 0; y < metadata.height; y += spacingY) {
   for (let x = 0; x < metadata.width; x += spacingX) {
@@ -71,14 +65,7 @@ for (let y = 0; y < metadata.height; y += spacingY) {
 
 // 🔹 COMPOSICIÓN FINAL
 await image
-  .composite([
-    {
-      input: watermarkCentral,
-      gravity: "center",
-      blend: "overlay"
-    },
-    ...pattern
-  ])
+  .composite(pattern)
   .jpeg({ quality: 90 })
   .toFile(watermarkOutput);
   }
