@@ -105,26 +105,98 @@ app.get("/pedido/:id", async (req, res) => {
   }
 
   let html = `
-    <h1>Pedido ${pedido.id}</h1>
-    <p><b>Email:</b> ${pedido.email}</p>
-    <p><b>Teléfono:</b> ${pedido.telefono}</p>
-    <p><b>Total:</b> $${pedido.total}</p>
-    <hr>
-  `;
+  <html>
+  <head>
+    <title>Pedido ${pedido.id}</title>
+    <style>
+      body {
+        font-family: Arial;
+        background: #f5f5f5;
+        padding: 20px;
+      }
+      .container {
+        max-width: 900px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+      }
+      h1 {
+        margin-bottom: 10px;
+      }
+      .info {
+        margin-bottom: 20px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+      .foto {
+        background: #fafafa;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      img {
+        width: 100%;
+        border-radius: 8px;
+      }
+      .btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 12px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      .btn:hover {
+        background: #0056b3;
+      }
+      .pendiente {
+        color: red;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📦 Pedido ${pedido.id}</h1>
 
-  if (pedido.estado !== "pagado") {
-    html += `<p><b>⚠️ Pedido pendiente de pago</b></p>`;
-  } else {
-    html += `<h2>Fotos:</h2>`;
+      <div class="info">
+        <p><b>Email:</b> ${pedido.email}</p>
+        <p><b>Teléfono:</b> ${pedido.telefono}</p>
+        <p><b>Total:</b> $${pedido.total}</p>
+      </div>
+`;
 
-    pedido.fotos.forEach(foto => {
-      html += `
-        <div style="margin-bottom:20px;">
-          <img src="${foto.original}" style="width:300px;">
-        </div>
-      `;
-    });
-  }
+if (pedido.estado !== "pagado") {
+  html += `<p class="pendiente">⚠️ Pedido pendiente de pago</p>`;
+} else {
+  html += `<div class="grid">`;
+
+  pedido.fotos.forEach(foto => {
+    const url = foto.original || foto;
+
+    html += `
+      <div class="foto">
+        <img src="${url}">
+        <a href="${url}" download class="btn">⬇ Descargar</a>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+}
+
+html += `
+    </div>
+  </body>
+  </html>
+`;
 
   res.send(html);
 });
