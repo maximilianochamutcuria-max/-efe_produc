@@ -104,27 +104,26 @@ const albums = fs.readdirSync(basePath).filter(folder => {
     return fs.statSync(path.join(basePath, folder)).isDirectory();
   });
 
-  const data = albums.map(nombre => {
-    const previewPath = path.join(basePath, nombre, "preview");
+  cconst data = albums.map(nombre => {
+  const previewPath = path.join(basePath, nombre, "preview");
 
-    let portada = null;
+  let portada = null;
 
-    if (fs.existsSync(previewPath)) {
-    const files = fs.readdirSync(previewPath).filter(f => !f.startsWith(".")
-);
+  if (fs.existsSync(previewPath)) {
+    const files = fs.readdirSync(previewPath).filter(f => !f.startsWith("."));
+    portada = files.length > 0 ? files[0] : null;
+  }
 
-portada = files.length > 0 ? files[0] : null;
-    }
+  return {
+    nombre,
+    portada,
+    preview: `/images/${nombre}/preview/`,
+    original: `/images/${nombre}/original/`,
+    watermarked: `/images/${nombre}/watermarked/`
+  };
+});
 
-    return {
-  nombre,
-  portada,
-  preview: `/images/${nombre}/preview/`,
-  original: `/images/${nombre}/original/`,
-  watermarked: `/images/${nombre}/watermarked/`
-};
-
-  res.json(data);
+res.json(data);
 });
 app.get("/album/:nombre", (req, res) => {
   const nombre = req.params.nombre;
@@ -134,14 +133,14 @@ app.get("/album/:nombre", (req, res) => {
   const imagenes = fs.readdirSync(previewPath);
 
   res.json({
-    album: {
-  nombre,
-  preview: `/images/${nombre}/preview/`,
-  original: `/images/${nombre}/original/`,
-  watermarked: `/images/${nombre}/watermarked/`
-}
-    imagenes
-  });
+  album: {
+    nombre,
+    preview: `/images/${nombre}/preview/`,
+    original: `/images/${nombre}/original/`,
+    watermarked: `/images/${nombre}/watermarked/`
+  },
+  imagenes
+});
 });
 // 🔥 VER PEDIDO
 app.get("/pedido/:id", async (req, res) => {
