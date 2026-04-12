@@ -36,21 +36,21 @@ async function procesarAlbum(album) {
 
    
 
-    // 🔹 WATERMARK SOLO REJILLA (PRO)
+    // 🔹 WATERMARK REJILLA SUAVE (PRO)
 const image = sharp(input);
 const metadata = await image.metadata();
 
-// 🔹 LOGO CHICO
+// 🔹 LOGO MÁS CHICO
 const watermarkSmall = await sharp(watermarkPath)
-  .resize({ width: Math.floor(metadata.width * 0.12) })
+  .resize({ width: Math.floor(metadata.width * 0.08) }) // más chico
   .png()
   .toBuffer();
 
-// 🔹 PATRÓN (rejilla)
+// 🔹 PATRÓN MÁS ESPACIADO
 const pattern = [];
 
-const spacingX = 350;
-const spacingY = 250;
+const spacingX = 500;
+const spacingY = 350;
 
 for (let y = 0; y < metadata.height; y += spacingY) {
   for (let x = 0; x < metadata.width; x += spacingX) {
