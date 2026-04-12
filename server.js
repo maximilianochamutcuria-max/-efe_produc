@@ -27,7 +27,7 @@ const preference = new Preference(client);
 // 🔥 CREAR LINK DE PAGO
 app.post("/crear-preferencia", async (req, res) => {
   try {
-    const { total, email, telefono, fotos } = req.body;
+    const { total, email, telefono, fotos, pedidoId } = req.body;
 
     const result = await preference.create({
       body: {
@@ -42,9 +42,11 @@ app.post("/crear-preferencia", async (req, res) => {
           email: email,
         },
         metadata: {
-          fotos: fotos,
-          telefono: telefono,
-        },
+  fotos: fotos,
+  telefono: telefono,
+  pedidoId: pedidoId
+},
+notification_url: "https://efe-produc-21iy.onrender.com/webhook",
         back_urls: {
   success: "https://www.google.com",
   failure: "https://www.google.com",
