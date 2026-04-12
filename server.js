@@ -99,30 +99,30 @@ app.post("/crear-pedido", async (req, res) => {
   res.json({ ok: true });
 });
 // 🔥 VER PEDIDO
-app.get("/pedido/:id", (req, res) => {
-  const pedido = pedidos[req.params.id];
+app.get("/pedido/:id", async (req, res) => {
+  const { data: pedido, error } = await supabase
+    .from("pedidos")
+    .select("*")
+    .eq("id", req.params.id)
+    .single();
 
-  if (!pedido) {
+  if (error || !pedido) {
     return res.send("❌ Pedido no encontrado");
   }
 
-let html = `
-  <h1>Pedido ${req.params.id}</h1>
-  <p><b>Email:</b> ${pedido.email}</p>
-  <p><b>Teléfono:</b> ${pedido.telefono}</p>
-  <p><b>Total:</b> $${pedido.total}</p>
-  <hr>
-`;
+  let html = `
+    <h1>Pedido ${pedido.id}</h1>
+    <p><b>Email:</b> ${pedido.email}</p>
+    <p><b>Teléfono:</b> ${pedido.telefono}</p>
+    <p><b>Total:</b> $${pedido.total}</p>
+    <hr>
+  `;
 
-// 🔒 SI NO PAGÓ
-if (pedido.estado !== "pagado") {
-  html += `<p><b>⚠️ Pedido pendiente de pago</b></p>`;
-} else {
+  if (pedido.estado !== "pagado") {
+    html += `<p><b>⚠️ Pedido pendiente de pago</b></p>`;
+  } else {
+    html += `<h2>Fotos:</h2>`;
 
-  // 📸 SI PAGÓ
-  html += `<h2>Fotos:</h2>`;
-
-  if (Array.isArray(pedido.fotos)) {
     pedido.fotos.forEach(foto => {
       html += `
         <div style="margin-bottom:20px;">
@@ -131,20 +131,6 @@ if (pedido.estado !== "pagado") {
       `;
     });
   }
-
-}
-
-  if (Array.isArray(pedido.fotos)) {
-  pedido.fotos.forEach(foto => {
-    html += `
-      <div style="margin-bottom:20px;">
-        <img src="${foto.original || foto}" style="width:300px;">
-      </div>
-    `;
-  });
-} else {
-  html += "<p>⚠️ No hay fotos en este pedido</p>";
-}
 
   res.send(html);
 });
@@ -180,12 +166,16 @@ app.get("/admin", async (req, res) => {
 
   res.send(html);
 });
-app.get("/pagar/:id", (req, res) => {
-  const pedido = pedidos[req.params.id];
+app.get("/pagar/:id", async (req, res) => {
 
-  if (!pedido) return res.send("❌ Pedido no encontrado");
+  const { error } = await supabase
+    .from("pedidos")
+    .update({ estado: "pagado" })
+    .eq("id", req.params.id);
 
-  pedido.estado = "pagado";
+  if (error) {
+    return res.send("❌ Error al actualizar");
+  }
 
   res.send(`✅ Pedido ${req.params.id} marcado como PAGADO`);
 });
