@@ -160,6 +160,34 @@ app.get("/pedido/:id", async (req, res) => {
         color: red;
         font-weight: bold;
       }
+        @media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .foto {
+    padding: 8px;
+  }
+
+  .btn {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+}
     </style>
   </head>
   <body>
@@ -213,23 +241,81 @@ app.get("/admin", async (req, res) => {
     return res.send("❌ Error cargando pedidos");
   }
 
-  let html = `<h1>📦 Pedidos</h1>`;
+  let html = `
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      padding: 10px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    a {
+      display: block;
+      margin-top: 8px;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .ver {
+      background: black;
+      color: white;
+    }
+
+    .pagar {
+      background: green;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+
+      .card {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>📦 Pedidos</h1>
+`;
 
   pedidosDB.forEach(p => {
     html += `
-      <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-        <b>Pedido:</b> ${p.id}<br>
-        <b>Email:</b> ${p.email}<br>
-        <b>Total:</b> $${p.total}<br>
-        <b>Estado:</b> ${p.estado}<br>
+  <div class="card">
+    <b>Pedido:</b> ${p.id}<br>
+    <b>Email:</b> ${p.email}<br>
+    <b>Total:</b> $${p.total}<br>
+    <b>Estado:</b> ${p.estado}<br>
 
-        <a href="/pedido/${p.id}" target="_blank">👉 Ver pedido</a><br><br>
-
-        <a href="/pagar/${p.id}" target="_blank">✅ Marcar como pagado</a>
-      </div>
-    `;
+    <a class="ver" href="/pedido/${p.id}" target="_blank">👉 Ver pedido</a>
+    <a class="pagar" href="/pagar/${p.id}" target="_blank">✅ Marcar como pagado</a>
+  </div>
+`;
   });
-
+html += `
+</body>
+</html>
+`;
   res.send(html);
 });
 app.get("/pagar/:id", async (req, res) => {
