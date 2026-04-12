@@ -12,15 +12,7 @@ const supabase = createClient(
 const app = express();
 app.use(cors());
 app.use(express.json());
-const fs = require("fs");
 
-let pedidos = {};
-
-try {
-  pedidos = JSON.parse(fs.readFileSync("pedidos.json"));
-} catch {
-  pedidos = {};
-}
 
 // 🔥 SERVIR ARCHIVOS (ESTO ES LO QUE TE FALTABA)
 app.use(express.static(__dirname));
@@ -77,7 +69,7 @@ app.post("/crear-pedido", async (req, res) => {
   const { pedidoId, fotos, email, telefono, total } = req.body;
 
   const { error } = await supabase
-    .from("pedidos")
+    .from("Pedidos")
     .insert([
       {
         id: pedidoId,
@@ -101,7 +93,7 @@ app.post("/crear-pedido", async (req, res) => {
 // 🔥 VER PEDIDO
 app.get("/pedido/:id", async (req, res) => {
   const { data: pedido, error } = await supabase
-    .from("pedidos")
+    .from("Pedidos")
     .select("*")
     .eq("id", req.params.id)
     .single();
@@ -139,7 +131,7 @@ app.get("/pedido/:id", async (req, res) => {
 app.get("/admin", async (req, res) => {
 
   const { data: pedidosDB, error } = await supabase
-    .from("pedidos")
+    .from("Pedidos")
     .select("*")
     .order("id", { ascending: false });
 
@@ -169,7 +161,7 @@ app.get("/admin", async (req, res) => {
 app.get("/pagar/:id", async (req, res) => {
 
   const { error } = await supabase
-    .from("pedidos")
+    .from("Pedidos")
     .update({ estado: "pagado" })
     .eq("id", req.params.id);
 
