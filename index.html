@@ -457,7 +457,7 @@ async function abrirAlbum(nombre) {
   const data = await res.json();
 
   window.albumActual = data.album;
-  const imagenes = data.imagenes;
+  window.imagenes = data.imagenes;
 
   contenido.innerHTML = `
     <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
