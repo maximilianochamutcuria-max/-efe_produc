@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 const { createClient } = require("@supabase/supabase-js");
 
@@ -91,6 +92,53 @@ app.post("/crear-pedido", async (req, res) => {
   console.log("📦 Pedido guardado en Supabase:", pedidoId);
 
   res.json({ ok: true });
+});
+app.get("/albums", (req, res) => {
+  const basePath = path.join(__dirname, "images");
+
+  if (!fs.existsSync(basePath)) {
+  return res.json([]);
+}
+
+const albums = fs.readdirSync(basePath).filter(folder => {
+    return fs.statSync(path.join(basePath, folder)).isDirectory();
+  });
+
+  const data = albums.map(nombre => {
+    const previewPath = path.join(basePath, nombre, "preview");
+
+    let portada = null;
+
+    if (fs.existsSync(previewPath)) {
+      const files = fs.readdirSync(previewPath);
+      portada = files[0];
+    }
+
+    return {
+      nombre,
+      portada,
+      preview: `/images/${nombre}/preview/`,
+      original: `/images/${nombre}/original/`
+    };
+  });
+
+  res.json(data);
+});
+app.get("/album/:nombre", (req, res) => {
+  const nombre = req.params.nombre;
+
+  const previewPath = path.join(__dirname, "images", nombre, "preview");
+
+  const imagenes = fs.readdirSync(previewPath);
+
+  res.json({
+    album: {
+      nombre,
+      preview: `/images/${nombre}/preview/`,
+      original: `/images/${nombre}/original/`
+    },
+    imagenes
+  });
 });
 // 🔥 VER PEDIDO
 app.get("/pedido/:id", async (req, res) => {
@@ -254,6 +302,10 @@ html += `
 
   res.send(html);
 });
+// 🔥 ALBUMES AUTOMÁTICOS
+
+// 🔥 ABRIR UN ÁLBUM
+
 
 // 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
 app.get("/admin", async (req, res) => {
