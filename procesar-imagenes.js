@@ -36,27 +36,27 @@ async function procesarAlbum(album) {
 
    
 
-    // 🔹 WATERMARK MIX PRO
+    // 🔹 WATERMARK MIX (SUAVE + PRO)
 const image = sharp(input);
 const metadata = await image.metadata();
 
-// 🔹 LOGO CENTRAL GRANDE
+// 🔹 LOGO CENTRAL (SUAVE)
 const watermarkCentral = await sharp(watermarkPath)
-  .resize({ width: Math.floor(metadata.width * 0.4) })
+  .resize({ width: Math.floor(metadata.width * 0.5) })
   .png()
   .toBuffer();
 
-// 🔹 LOGO CHICO PARA REPETIR
+// 🔹 LOGO CHICO (REPETIDO)
 const watermarkSmall = await sharp(watermarkPath)
-  .resize({ width: Math.floor(metadata.width * 0.15) })
+  .resize({ width: Math.floor(metadata.width * 0.12) })
   .png()
   .toBuffer();
 
-// 🔹 GENERAR PATRÓN (rejilla)
+// 🔹 PATRÓN MÁS ESPACIADO (más prolijo)
 const pattern = [];
 
-const spacingX = 300;
-const spacingY = 200;
+const spacingX = 400;
+const spacingY = 300;
 
 for (let y = 0; y < metadata.height; y += spacingY) {
   for (let x = 0; x < metadata.width; x += spacingX) {
