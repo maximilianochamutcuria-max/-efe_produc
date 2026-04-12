@@ -130,7 +130,12 @@ app.get("/album/:nombre", (req, res) => {
 
   const previewPath = path.join(__dirname, "images", nombre, "preview");
 
-  const imagenes = fs.readdirSync(previewPath);
+  const imagenes = fs.readdirSync(previewPath).filter(f =>
+  !f.startsWith(".") &&
+  (f.toLowerCase().endsWith(".jpg") ||
+   f.toLowerCase().endsWith(".jpeg") ||
+   f.toLowerCase().endsWith(".png"))
+);
 
   res.json({
   album: {
