@@ -2,6 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const { MercadoPagoConfig, Preference } = require("mercadopago");
+const { createClient } = require("@supabase/supabase-js");
+
+const supabase = createClient(
+  "https://swgrwobncwvlodoeuznc.supabase.co",
+  "sb_publishable_8Po5qb6-B7HiTkU-RvqVtw_rvIuED_d"
+);
 
 const app = express();
 app.use(cors());
@@ -67,19 +73,28 @@ app.post("/crear-preferencia", async (req, res) => {
 
 // 🔥 ARRANCAR SERVIDOR
 // 🔥 CREAR PEDIDO
-app.post("/crear-pedido", (req, res) => {
+app.post("/crear-pedido", async (req, res) => {
   const { pedidoId, fotos, email, telefono, total } = req.body;
 
-  pedidos[pedidoId] = {
-    fotos,
-    email,
-    telefono,
-    total,
-    estado: "pendiente"
-  };
-  fs.writeFileSync("pedidos.json", JSON.stringify(pedidos, null, 2));
+  const { error } = await supabase
+    .from("pedidos")
+    .insert([
+      {
+        id: pedidoId,
+        fotos,
+        email,
+        telefono,
+        total,
+        estado: "pendiente"
+      }
+    ]);
 
-  console.log("📦 Pedido guardado:", pedidoId);
+  if (error) {
+    console.log("❌ ERROR SUPABASE:", error);
+    return res.status(500).json({ error: "Error al guardar pedido" });
+  }
+
+  console.log("📦 Pedido guardado en Supabase:", pedidoId);
 
   res.json({ ok: true });
 });
@@ -135,23 +150,30 @@ if (pedido.estado !== "pagado") {
 });
 
 // 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
-app.get("/admin", (req, res) => {
+app.get("/admin", async (req, res) => {
+
+  const { data: pedidosDB, error } = await supabase
+    .from("pedidos")
+    .select("*")
+    .order("id", { ascending: false });
+
+  if (error) {
+    return res.send("❌ Error cargando pedidos");
+  }
 
   let html = `<h1>📦 Pedidos</h1>`;
 
-  Object.keys(pedidos).forEach(id => {
-    const p = pedidos[id];
-
+  pedidosDB.forEach(p => {
     html += `
       <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-        <b>Pedido:</b> ${id}<br>
+        <b>Pedido:</b> ${p.id}<br>
         <b>Email:</b> ${p.email}<br>
         <b>Total:</b> $${p.total}<br>
         <b>Estado:</b> ${p.estado}<br>
 
-        <a href="/pedido/${id}" target="_blank">👉 Ver pedido</a><br><br>
+        <a href="/pedido/${p.id}" target="_blank">👉 Ver pedido</a><br><br>
 
-        <a href="/pagar/${id}" target="_blank">✅ Marcar como pagado</a>
+        <a href="/pagar/${p.id}" target="_blank">✅ Marcar como pagado</a>
       </div>
     `;
   });
