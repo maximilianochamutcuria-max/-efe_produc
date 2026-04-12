@@ -36,54 +36,43 @@ async function procesarAlbum(album) {
 
    
 
-    // 🔹 WATERMARK BRANDING PRO (TEXTO + LOGO)
+    // 🔹 WATERMARK TEXTO DIAGONAL PRO
 const image = sharp(input);
 const metadata = await image.metadata();
 
-// 🔹 CARGAR LOGO
-const logo = await sharp(watermarkPath)
-  .resize({ width: Math.floor(metadata.width * 0.15) })
-  .png()
-  .toBuffer();
-
-// 🔹 SVG CON TEXTO + LOGO
+// 🔹 SVG TEXTO DIAGONAL
 const svgText = `
 <svg width="${metadata.width}" height="${metadata.height}">
   <style>
-    @font-face {
-      font-family: 'MiFuente';
-      src: url('fuente.ttf');
-    }
-
     .title {
       fill: white;
-      font-size: ${Math.floor(metadata.width / 8)}px;
-      font-family: 'MiFuente', Arial, sans-serif;
-      opacity: 0.65;
+      font-size: ${Math.floor(metadata.width / 7)}px;
+      font-family: Impact, Arial Black, sans-serif;
+      opacity: 0.75;
       font-weight: bold;
     }
   </style>
 
-  <!-- TEXTO -->
-  <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" class="title">
-    Efe_produc
-  </text>
+  <g transform="rotate(-35 ${metadata.width/2} ${metadata.height/2})">
+    <text 
+      x="50%" 
+      y="50%" 
+      text-anchor="middle" 
+      dominant-baseline="middle" 
+      class="title">
+      Efe_produc
+    </text>
+  </g>
 </svg>
 `;
 
-// 🔹 COMPOSICIÓN FINAL
+// 🔹 APLICAR
 await image
   .composite([
     {
       input: Buffer.from(svgText),
       top: 0,
       left: 0
-    },
-    {
-      input: logo,
-      top: Math.floor(metadata.height / 2 - 150),
-      left: Math.floor(metadata.width / 2 - 75),
-      blend: "over"
     }
   ])
   .jpeg({ quality: 90 })
