@@ -30,9 +30,10 @@ async function procesarAlbum(album) {
 
     // 🔹 PREVIEW (calidad baja)
     await sharp(input)
-      .resize({ width: 800 })
-      .jpeg({ quality: 50 })
-      .toFile(previewOutput);
+  .resize({ width: 600 }) // 👈 más chica
+  .jpeg({ quality: 30 })  // 👈 mucha menos calidad
+  .blur(1)                // 👈 le agrega leve blur anti screenshot
+  .toFile(previewOutput);
 
    
 
