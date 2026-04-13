@@ -11,9 +11,11 @@ async function procesarAlbum(album) {
   const originalPath = path.join(basePath, album, "original");
   const previewPath = path.join(basePath, album, "preview");
   const watermarkedPath = path.join(basePath, album, "watermarked");
+  const thumbPath = path.join(basePath, album, "thumb"); // 👈 NUEVO
 
   if (!fs.existsSync(previewPath)) fs.mkdirSync(previewPath);
   if (!fs.existsSync(watermarkedPath)) fs.mkdirSync(watermarkedPath);
+  if (!fs.existsSync(thumbPath)) fs.mkdirSync(thumbPath); // 👈 NUEVO
 
   const files = fs.readdirSync(originalPath).filter(f =>
     f.toLowerCase().endsWith(".jpg") ||
