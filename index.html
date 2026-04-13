@@ -473,6 +473,7 @@ async function mostrarAlbum() {
   const res = await fetch("/albums");
   const albums = await res.json();
 
+  contenido.className = "container inicio"; // 👈 AGREGAR ESTA LÍNEA
   contenido.innerHTML = "";
 
   albums.forEach(album => {
@@ -495,7 +496,7 @@ async function abrirAlbum(nombre) {
 
   window.albumActual = data.album;
   window.imagenes = data.imagenes;
-
+contenido.className = "container"; // 👈 ESTA LÍNEA
   contenido.innerHTML = `
     <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
     <div class="galeria"></div>
