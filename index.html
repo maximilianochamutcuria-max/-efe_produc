@@ -224,6 +224,15 @@ h1 { margin: 20px; }
   max-width:90%;
   max-height:90%;
 }
+.contenedor-img {
+  position: relative;
+  display: inline-block;
+}
+
+.contenedor-img img {
+  max-width: 90%;
+  max-height: 90%;
+}
 
 .cerrar {
   position:absolute;
@@ -247,17 +256,16 @@ h1 { margin: 20px; }
 .derecha { right:30px; }
 
 /* 🛒 BOTÓN CARRITO VISOR */
-.btn-carrito {
+..btn-carrito {
   position: absolute;
-  top: 20px;
-  right: 80px; /* separado de la X */
-  background: black;
+  top: 15px;
+  right: 15px;
+  background: rgba(0,0,0,0.7);
   color: white;
-  font-size: 22px;
-  padding: 12px;
+  font-size: 20px;
+  padding: 10px;
   border-radius: 50%;
   cursor: pointer;
-  z-index: 1000;
 }
 
 .btn-carrito:hover {
@@ -673,7 +681,13 @@ function verImagen(nombre) {
   <span class="cerrar" onclick="cerrarVisor()">✖</span>
 
   <span class="flecha izquierda" onclick="cambiarImagen(-1)">❮</span>
+  <div class="contenedor-img">
   <img id="imgGrande">
+
+  <div class="btn-carrito" id="btnCarritoVisor" onclick="agregarDesdeVisor()">
+    🛒
+  </div>
+</div>
 
   <span class="flecha derecha" onclick="cambiarImagen(1)">❯</span>
 
