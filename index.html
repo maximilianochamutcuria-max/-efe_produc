@@ -774,12 +774,26 @@ function agregarDesdeVisor() {
 function cerrarVisor() {
   document.getElementById("visor").remove();
   document.removeEventListener("keydown", manejarTeclado);
+
+  actualizarGaleria(); // 🔥 esto hace la magia
 }
 
 function manejarTeclado(e) {
   if (e.key === "ArrowRight") cambiarImagen(1);
   if (e.key === "ArrowLeft") cambiarImagen(-1);
   if (e.key === "Escape") cerrarVisor();
+}
+function actualizarGaleria() {
+  document.querySelectorAll(".foto").forEach(div => {
+    const img = div.querySelector("img");
+    const nombre = decodeURIComponent(img.src.split("/").pop());
+
+    if (seleccionadas.includes(nombre)) {
+      div.classList.add("selected");
+    } else {
+      div.classList.remove("selected");
+    }
+  });
 }
 
 const params = new URLSearchParams(window.location.search);
