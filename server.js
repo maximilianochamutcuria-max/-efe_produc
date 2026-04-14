@@ -46,10 +46,67 @@ async function procesarAlbum(album) {
       .blur(1.5)
       .toFile(thumbOutput);
 
-    // 🔹 WATERMARK
-    await sharp(input)
-      .jpeg({ quality: 90 })
-      .toFile(watermarkOutput);
+    const image = sharp(input);
+const metadata = await image.metadata();
+
+const isVertical = metadata.height > metadata.width;
+
+const fontSize = isVertical
+  ? Math.floor(metadata.width / 7)
+  : Math.floor(metadata.width / 10);
+
+function crearSVG(offsetY) {
+  return `
+  <svg width="${metadata.width}" height="${metadata.height}">
+    <style>
+      .title {
+        fill: white;
+        font-size: ${fontSize}px;
+        font-family: Impact, Arial Black, sans-serif;
+        opacity: 0.75;
+        font-weight: bold;
+      }
+    </style>
+
+    <g transform="rotate(-35 ${metadata.width/2} ${metadata.height/2})">
+      <text 
+        x="50%" 
+        y="${50 + (offsetY / metadata.height) * 100}%" 
+        text-anchor="middle" 
+        dominant-baseline="middle" 
+        class="title">
+        Efe_produc
+      </text>
+    </g>
+  </svg>
+  `;
+}
+
+let offsets = [];
+
+if (isVertical) {
+  offsets = [
+    -metadata.height * 0.35,
+    0,
+    metadata.height * 0.35
+  ];
+} else {
+  offsets = [
+    -metadata.height * 0.25,
+    metadata.height * 0.25
+  ];
+}
+
+const composites = offsets.map(offset => ({
+  input: Buffer.from(crearSVG(offset)),
+  top: 0,
+  left: 0
+}));
+
+await image
+  .composite(composites)
+  .jpeg({ quality: 90 })
+  .toFile(watermarkOutput);
   }
 }
 
