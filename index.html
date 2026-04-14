@@ -488,6 +488,8 @@ async function mostrarAlbum() {
 }
 
 async function abrirAlbum(nombre) {
+  window.history.pushState({}, "", `?album=${nombre}`); // 👈 ESTA LÍNEA NUEVA
+
   seleccionadas = [];
   actualizarCarrito();
 
@@ -679,7 +681,14 @@ function manejarTeclado(e) {
   if (e.key === "Escape") cerrarVisor();
 }
 
-mostrarAlbum();
+const params = new URLSearchParams(window.location.search);
+const albumURL = params.get("album");
+
+if (albumURL) {
+  abrirAlbum(albumURL);
+} else {
+  mostrarAlbum();
+}
 function mostrarTransferencia() {
   document.getElementById("transferenciaBox").style.display = "block";
   document.getElementById("totalTransferencia").innerText = total;
