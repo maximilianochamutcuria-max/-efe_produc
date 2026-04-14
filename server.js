@@ -3,8 +3,55 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const sharp = require("sharp");
+const ADMIN_PASSWORD = "1234";
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 const { createClient } = require("@supabase/supabase-js");
+async function procesarAlbum(album) {
+  const basePath = path.join(__dirname, "images");
+
+  const originalPath = path.join(basePath, album, "original");
+  const previewPath = path.join(basePath, album, "preview");
+  const watermarkedPath = path.join(basePath, album, "watermarked");
+  const thumbPath = path.join(basePath, album, "thumb");
+
+  if (!fs.existsSync(previewPath)) fs.mkdirSync(previewPath, { recursive: true });
+  if (!fs.existsSync(watermarkedPath)) fs.mkdirSync(watermarkedPath, { recursive: true });
+  if (!fs.existsSync(thumbPath)) fs.mkdirSync(thumbPath, { recursive: true });
+
+  const files = fs.readdirSync(originalPath).filter(f =>
+    f.toLowerCase().endsWith(".jpg") ||
+    f.toLowerCase().endsWith(".jpeg") ||
+    f.toLowerCase().endsWith(".png")
+  );
+
+  for (const file of files) {
+    const input = path.join(originalPath, file);
+    const previewOutput = path.join(previewPath, file);
+    const watermarkOutput = path.join(watermarkedPath, file);
+    const thumbOutput = path.join(thumbPath, file);
+
+    console.log("Procesando:", file);
+
+    // 🔹 PREVIEW
+    await sharp(input)
+      .resize({ width: 800 })
+      .jpeg({ quality: 60 })
+      .toFile(previewOutput);
+
+    // 🔹 THUMB (anti robo)
+    await sharp(input)
+      .resize({ width: 400 })
+      .jpeg({ quality: 25 })
+      .blur(1.5)
+      .toFile(thumbOutput);
+
+    // 🔹 WATERMARK
+    await sharp(input)
+      .jpeg({ quality: 90 })
+      .toFile(watermarkOutput);
+  }
+}
 
 const supabase = createClient(
   "https://swgrwobncwvlodoeuznc.supabase.co",
@@ -322,7 +369,57 @@ html += `
 
 // 🔥 ABRIR UN ÁLBUM
 
+const upload = multer({ dest: "uploads/" });
+
+app.post("/subir", upload.array("fotos"), async (req, res) => {
+  try {
+    const album = req.body.album;
+
+    if (!album) {
+      return res.send("❌ Falta nombre del álbum");
+    }
+
+    const albumPath = path.join(__dirname, "images", album);
+    const originalPath = path.join(albumPath, "original");
+
+    // Crear carpetas
+    fs.mkdirSync(originalPath, { recursive: true });
+
+    // Mover archivos a /original
+    for (const file of req.files) {
+  const uniqueName =
+    Date.now() +
+    "-" +
+    Math.random().toString(36).substring(7) +
+    "-" +
+    file.originalname;
+
+  const newPath = path.join(originalPath, uniqueName);
+
+  fs.renameSync(file.path, newPath);
+}
+
+    console.log("📸 Fotos subidas:", album);
+
+    // 🔥 PROCESAR AUTOMÁTICAMENTE
+    await procesarAlbum(album);
+
+    res.send(`
+      <h2>✅ Álbum creado</h2>
+      <a href="/admin-panel">⬅ Volver</a>
+    `);
+
+  } catch (error) {
+    console.log("❌ ERROR SUBIDA:", error);
+    res.send("❌ Error al subir fotos");
+  }
+});
 app.get("/admin-panel", (req, res) => {
+  const pass = req.query.pass;
+
+  if (pass !== ADMIN_PASSWORD) {
+    return res.send("❌ No autorizado");
+  }
   res.send(`
   <html>
   <head>
