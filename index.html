@@ -519,6 +519,24 @@ let carrito = []; // 👉 este es el verdadero carrito (datos)
 let seleccionadas = [];
 let imagenActual = 0;
 let desdeMenu = false;
+let startX = 0;
+
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e => {
+  const endX = e.changedTouches[0].clientX;
+  const diff = startX - endX;
+
+  if (Math.abs(diff) > 50) { // sensibilidad
+    if (diff > 0) {
+      cambiarImagen(1); // 👉 swipe izquierda = siguiente
+    } else {
+      cambiarImagen(-1); // 👉 swipe derecha = anterior
+    }
+  }
+});
 
 
 
@@ -808,6 +826,16 @@ if (albumURL) {
 } else {
   mostrarAlbum();
 }
+window.addEventListener("popstate", () => {
+  const params = new URLSearchParams(window.location.search);
+  const albumURL = params.get("album");
+
+  if (albumURL) {
+    abrirAlbum(albumURL);
+  } else {
+    mostrarAlbum();
+  }
+});
 function mostrarTransferencia() {
   document.getElementById("transferenciaBox").style.display = "block";
   document.getElementById("totalTransferencia").innerText = total;
