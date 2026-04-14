@@ -468,6 +468,15 @@ let imagenActual = 0;
 document.addEventListener("contextmenu", e => e.preventDefault());
 
 async function mostrarAlbum() {
+
+  // 🔒 BLOQUEO DE MODO PRIVADO
+  const params = new URLSearchParams(window.location.search);
+  const albumURL = params.get("album");
+
+  if (albumURL) {
+    return;
+  }
+
   carritoUI.style.display = "none";
 
   const res = await fetch("/albums");
