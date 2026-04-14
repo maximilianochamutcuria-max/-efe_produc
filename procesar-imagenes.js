@@ -37,13 +37,32 @@ await sharp(input)
   .jpeg({ quality: 60 })
   .toFile(previewOutput);
 
-// 🔹 THUMB (galería fea anti robo)
-await sharp(input)
-  .resize({ width: 450 })      // un poco más chica
-  .jpeg({ quality: 25 })       // más comprimida
-  .blur(1.3)                   // blur medio
-  .modulate({ brightness: 1.03 })
-  .toFile(thumbOutput);
+// 🔹 THUMB (adaptativo según orientación)
+const imageThumb = sharp(input);
+const metadataThumb = await imageThumb.metadata();
+
+const isVerticalThumb = metadataThumb.height > metadataThumb.width;
+
+if (isVerticalThumb) {
+  // 📱 VERTICAL → más agresivo
+  await imageThumb
+    .resize({ width: 350 })
+    .jpeg({ quality: 20 })
+    .blur(1.6)
+    .modulate({ brightness: 1.05 })
+    .gamma(1.3)
+    .toFile(thumbOutput);
+
+} else {
+  // 📸 HORIZONTAL → como te gusta
+  await imageThumb
+    .resize({ width: 450 })
+    .jpeg({ quality: 25 })
+    .blur(1.3)
+    .modulate({ brightness: 1.03 })
+    .gamma(1.2)
+    .toFile(thumbOutput);
+}
 
 
     // 🔹 WATERMARK PRO (2 horizontal / 3 vertical)
