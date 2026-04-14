@@ -34,8 +34,9 @@ h1 { margin: 20px; }
 
 /* GALERÍA */
 .galeria {
-  column-count: 4;
-  column-gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
   padding: 20px;
 }
 
@@ -311,10 +312,10 @@ h1 { margin: 20px; }
   }
 
   .galeria {
-    column-count: 2;
-    padding: 10px;
-    column-gap: 8px;
-  }
+  grid-template-columns: repeat(2, 1fr);
+  padding: 10px;
+  gap: 8px;
+}
 
   .foto {
     margin-bottom: 8px;
