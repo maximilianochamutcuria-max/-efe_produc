@@ -634,12 +634,32 @@ function toggleSeleccion(div, nombre) {
 function calcularTotal() {
   let cant = seleccionadas.length;
 
-  if (cant >= 10) return 12000;
-  if (cant >= 7) return 9500;
-  if (cant >= 5) return 7500;
-  if (cant >= 3) return 5500;
+  if (cant === 0) return 0;
 
-  return cant * 2000;
+  // PACK BASE
+  if (cant <= 10) {
+    if (cant >= 10) return 12000;
+    if (cant >= 7) return 9500;
+    if (cant >= 5) return 7500;
+    if (cant >= 3) return 5500;
+    return cant * 2000;
+  }
+
+  // 🔥 MÁS DE 10 → pack + extras
+  let extras = cant - 10;
+
+  let totalExtras = 0;
+
+  if (extras >= 3) {
+    totalExtras += 5500;
+    extras -= 3;
+  }
+
+  if (extras >= 1) {
+    totalExtras += extras * 2000;
+  }
+
+  return 12000 + totalExtras;
 }
 
 function actualizarCarrito() {
