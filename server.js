@@ -321,7 +321,76 @@ html += `
 
 // 🔥 ABRIR UN ÁLBUM
 
+app.get("/admin-panel", (req, res) => {
 
+  let html = `
+  <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        font-family: Arial;
+        background: #111;
+        color: white;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .card {
+        background: #222;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .card:hover {
+        background: #333;
+      }
+
+      a {
+        text-decoration: none;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1>⚙️ Panel de Control</h1>
+
+    <div class="grid">
+
+      <a href="/admin">
+        <div class="card">📦 Ver pedidos</div>
+      </a>
+
+      <a href="/albums">
+        <div class="card">🖼 Ver álbumes (JSON)</div>
+      </a>
+
+      <a href="/">
+        <div class="card">🌐 Ir a la web</div>
+      </a>
+
+    </div>
+
+  </body>
+  </html>
+  `;
+
+  res.send(html);
+});
 // 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
 app.get("/admin", async (req, res) => {
 
