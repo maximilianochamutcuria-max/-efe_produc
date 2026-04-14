@@ -38,6 +38,7 @@ h1 { margin: 20px; }
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   padding: 20px;
+  grid-auto-flow: dense;
 }
 
 .foto {
@@ -54,6 +55,8 @@ h1 { margin: 20px; }
 
 .foto img {
   width: 100%;
+  height: auto;
+  display: block;
   border-radius: 10px;
   cursor: pointer;
 }
@@ -143,15 +146,16 @@ h1 { margin: 20px; }
 
 /* IZQ */
 .izq {
-  flex:2;
-  padding:20px;
-  overflow:auto;
+  flex: 1.5;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 .grid {
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  align-content: start;
 }
 
 .item {
@@ -159,8 +163,10 @@ h1 { margin: 20px; }
 }
 
 .item img {
-  width:80px;
-  border-radius:6px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 .remove {
@@ -656,22 +662,6 @@ function calcularTotal() {
   return total;
 }
 
-  // 🔥 MÁS DE 10 → pack + extras
-  let extras = cant - 10;
-
-  let totalExtras = 0;
-
-  if (extras >= 3) {
-    totalExtras += 5500;
-    extras -= 3;
-  }
-
-  if (extras >= 1) {
-    totalExtras += extras * 2000;
-  }
-
-  return 12000 + totalExtras;
-}
 
 function actualizarCarrito() {
   carritoUI.innerText = `${seleccionadas.length} fotos | $${calcularTotal()}`;
