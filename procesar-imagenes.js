@@ -27,6 +27,7 @@ async function procesarAlbum(album) {
     const input = path.join(originalPath, file);
     const previewOutput = path.join(previewPath, file);
     const watermarkOutput = path.join(watermarkedPath, file);
+    const thumbOutput = path.join(thumbPath, file);
 
     console.log("Procesando:", file);
 
