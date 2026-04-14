@@ -133,26 +133,25 @@ app.get("/album/:nombre", (req, res) => {
 
   let previewPath = path.join(__dirname, "images", nombre, "preview");
 
-if (!fs.existsSync(previewPath) || fs.readdirSync(previewPath).length === 0) {
-  previewPath = path.join(__dirname, "images", nombre, "thumb");
-}");
+  if (!fs.existsSync(previewPath) || fs.readdirSync(previewPath).length === 0) {
+    previewPath = path.join(__dirname, "images", nombre, "thumb");
+  }
 
   const imagenes = fs.readdirSync(previewPath).filter(f =>
-  !f.startsWith(".") &&
-  (f.toLowerCase().endsWith(".jpg") ||
-   f.toLowerCase().endsWith(".jpeg") ||
-   f.toLowerCase().endsWith(".png"))
-);
+    !f.startsWith(".") &&
+    (f.toLowerCase().endsWith(".jpg") ||
+     f.toLowerCase().endsWith(".jpeg") ||
+     f.toLowerCase().endsWith(".png"))
+  );
 
   res.json({
-  album: {
-    nombre,
-    preview: `/images/${nombre}/preview/`,
-    original: `/images/${nombre}/original/`,
-    watermarked: `/images/${nombre}/watermarked/`
-  },
-  imagenes
-});
+    album: {
+      preview: `/images/${nombre}/preview/`,
+      original: `/images/${nombre}/original/`,
+      watermarked: `/images/${nombre}/watermarked/`
+    },
+    imagenes
+  });
 });
 // 🔥 VER PEDIDO
 app.get("/pedido/:id", async (req, res) => {
