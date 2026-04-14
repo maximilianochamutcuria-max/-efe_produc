@@ -323,46 +323,51 @@ html += `
 // 🔥 ABRIR UN ÁLBUM
 
 app.get("/admin-panel", (req, res) => {
-
-  let html = `
+  res.send(`
   <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       body {
         font-family: Arial;
-        background: #111;
+        background: #0f0f0f;
         color: white;
+        text-align: center;
         padding: 20px;
       }
 
       h1 {
-        text-align: center;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
+        margin-bottom: 30px;
       }
 
       .card {
-        background: #222;
-        padding: 25px;
+        background: #1c1c1c;
+        padding: 20px;
         border-radius: 12px;
-        text-align: center;
-        cursor: pointer;
-        transition: 0.2s;
+        margin: 15px auto;
+        max-width: 400px;
       }
 
-      .card:hover {
-        background: #333;
-      }
-
-      a {
+      a, button {
+        display: block;
+        margin: 10px 0;
+        padding: 12px;
+        border-radius: 8px;
         text-decoration: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .btn {
+        background: #333;
         color: white;
+      }
+
+      input {
+        margin: 10px 0;
+        padding: 10px;
+        width: 90%;
       }
     </style>
   </head>
@@ -370,25 +375,25 @@ app.get("/admin-panel", (req, res) => {
 
     <h1>⚙️ Panel de Control</h1>
 
-    <div class="grid">
+    <div class="card">
+      <a class="btn" href="/admin">📦 Ver pedidos</a>
+      <a class="btn" href="/">🖼 Ver álbumes</a>
+    </div>
 
-      <a href="/admin">
-        <div class="card">📦 Ver pedidos</div>
-      </a>
+    <div class="card">
+      <h3>📤 Subir álbum</h3>
 
-      <a href="/">🖼 Ver álbumes</a>
-        <div class="card">🖼 Ver álbumes (JSON)</div>
-      </a>
-
-      <a href="/">
-        <div class="card">🌐 Ir a la web</div>
-      </a>
-
+      <form action="/subir" method="post" enctype="multipart/form-data">
+        <input type="text" name="album" placeholder="Nombre del álbum" required>
+        <input type="file" name="fotos" multiple required>
+        <button type="submit">Subir fotos</button>
+      </form>
     </div>
 
   </body>
   </html>
-  `;
+  `);
+});
 
   res.send(html);
 });
