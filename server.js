@@ -375,7 +375,7 @@ app.get("/admin-panel", (req, res) => {
         <div class="card">📦 Ver pedidos</div>
       </a>
 
-      <a href="/albums">
+      <a href="/">🖼 Ver álbumes</a>
         <div class="card">🖼 Ver álbumes (JSON)</div>
       </a>
 
