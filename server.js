@@ -395,8 +395,7 @@ app.get("/admin-panel", (req, res) => {
   `);
 });
 
-  res.send(html);
-});
+  
 // 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
 app.get("/admin", async (req, res) => {
 
