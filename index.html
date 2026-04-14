@@ -636,14 +636,27 @@ function calcularTotal() {
 
   if (cant === 0) return 0;
 
-  // PACK BASE
-  if (cant <= 10) {
-    if (cant >= 10) return 12000;
-    if (cant >= 7) return 9500;
-    if (cant >= 5) return 7500;
-    if (cant >= 3) return 5500;
-    return cant * 2000;
-  }
+  // 💥 cantidad dentro del bloque (1 a 10)
+  let resto = cant % 10;
+  let bloques = Math.floor(cant / 10);
+
+  let total = bloques * 12000;
+
+  // 🔥 tabla base
+  if (resto === 0) return total;
+
+  if (resto === 1) total += 2000;
+  else if (resto === 2) total += 4000;
+  else if (resto === 3) total += 5500;
+  else if (resto === 4) total += 7500;
+  else if (resto === 5) total += 7500;
+  else if (resto === 6) total += 9500;
+  else if (resto === 7) total += 9500;
+  else if (resto === 8) total += 11500;
+  else if (resto === 9) total += 13500;
+
+  return total;
+}
 
   // 🔥 MÁS DE 10 → pack + extras
   let extras = cant - 10;
