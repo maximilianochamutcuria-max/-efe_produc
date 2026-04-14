@@ -224,14 +224,26 @@ h1 { margin: 20px; }
   max-width:90%;
   max-height:90%;
 }
+#visor img {
+  pointer-events: none;
+}
 .contenedor-img {
   position: relative;
   display: inline-block;
 }
 
+.contenedor-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 .contenedor-img img {
-  max-width: 90vw;
-  max-height: 85vh;
+  max-width: 80vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
   object-fit: contain;
 }
 
@@ -252,6 +264,14 @@ h1 { margin: 20px; }
   color:white;
   cursor:pointer;
 }
+.cerrar {
+  z-index: 1001;
+}
+
+.flecha {
+  z-index: 1001;
+}
+
 
 .izquierda { left:30px; }
 .derecha { right:30px; }
@@ -267,6 +287,7 @@ h1 { margin: 20px; }
   padding: 10px;
   border-radius: 50%;
   cursor: pointer;
+  z-index: 1001; /* 👈 AGREGALO ACÁ */
 }
 
 .btn-carrito:hover {
