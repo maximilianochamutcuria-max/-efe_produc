@@ -636,13 +636,11 @@ function calcularTotal() {
 
   if (cant === 0) return 0;
 
-  // 💥 cantidad dentro del bloque (1 a 10)
   let resto = cant % 10;
   let bloques = Math.floor(cant / 10);
 
   let total = bloques * 12000;
 
-  // 🔥 tabla base
   if (resto === 0) return total;
 
   if (resto === 1) total += 2000;
