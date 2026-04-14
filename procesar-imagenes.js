@@ -39,10 +39,10 @@ await sharp(input)
 
 // 🔹 THUMB (galería fea anti robo)
 await sharp(input)
-  .resize({ width: 500 })     // un poco más grande
-  .jpeg({ quality: 35 })      // calidad media-baja
-  .blur(1)                    // blur suave
-  .modulate({ brightness: 1.02 }) // leve ajuste
+  .resize({ width: 450 })      // un poco más chica
+  .jpeg({ quality: 25 })       // más comprimida
+  .blur(1.3)                   // blur medio
+  .modulate({ brightness: 1.03 })
   .toFile(thumbOutput);
 
 
