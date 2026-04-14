@@ -31,15 +31,20 @@ async function procesarAlbum(album) {
 
     console.log("Procesando:", file);
 
-    // 🔹 PREVIEW (calidad baja)
-    await sharp(input)
-  .resize({ width: 400 })       // 👈 más chica
-  .jpeg({ quality: 15 })        // 👈 muy comprimida
-  .blur(2)                      // 👈 blur fuerte
-  .modulate({ brightness: 1.05 }) // 👈 leve lavado
+// 🔹 PREVIEW (portada)
+await sharp(input)
+  .resize({ width: 800 })
+  .jpeg({ quality: 60 })
+  .toFile(previewOutput);
+
+// 🔹 THUMB (galería fea anti robo)
+await sharp(input)
+  .resize({ width: 400 })
+  .jpeg({ quality: 15 })
+  .blur(2)
+  .modulate({ brightness: 1.05 })
   .toFile(thumbOutput);
 
-   
 
     // 🔹 WATERMARK PRO (2 horizontal / 3 vertical)
 const image = sharp(input);
