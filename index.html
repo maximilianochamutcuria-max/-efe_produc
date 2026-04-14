@@ -246,6 +246,24 @@ h1 { margin: 20px; }
 .izquierda { left:30px; }
 .derecha { right:30px; }
 
+/* 🛒 BOTÓN CARRITO VISOR */
+.btn-carrito {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background: black;
+  color: white;
+  font-size: 22px;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.btn-carrito:hover {
+  transform: scale(1.1);
+}
+
 /* 📱 MOBILE */
 @media (max-width: 768px) {
 
@@ -652,11 +670,17 @@ function verImagen(nombre) {
   visor.id = "visor";
 
   visor.innerHTML = `
-    <span class="cerrar" onclick="cerrarVisor()">✖</span>
-    <span class="flecha izquierda" onclick="cambiarImagen(-1)">❮</span>
-    <img id="imgGrande">
-    <span class="flecha derecha" onclick="cambiarImagen(1)">❯</span>
-  `;
+  <span class="cerrar" onclick="cerrarVisor()">✖</span>
+
+  <span class="flecha izquierda" onclick="cambiarImagen(-1)">❮</span>
+  <img id="imgGrande">
+
+  <span class="flecha derecha" onclick="cambiarImagen(1)">❯</span>
+
+  <div class="btn-carrito" id="btnCarritoVisor" onclick="agregarDesdeVisor()">
+  🛒
+</div>
+`;
 
   document.body.appendChild(visor);
   actualizarImagen();
@@ -665,9 +689,20 @@ function verImagen(nombre) {
 }
 
 function actualizarImagen() {
-  const ruta = albumActual.watermarked + imagenes[imagenActual];
+  const nombre = imagenes[imagenActual];
+  const ruta = albumActual.watermarked + nombre;
 
   document.getElementById("imgGrande").src = encodeURI(ruta);
+
+  // 🔥 CAMBIAR ICONO
+  const btn = document.getElementById("btnCarritoVisor");
+
+  if (btn) {
+    const urlOriginal = `${window.location.origin}${albumActual.original}${nombre}`;
+    const existe = carrito.find(f => f.original === urlOriginal);
+
+    btn.innerHTML = existe ? "❌" : "🛒";
+  }
 }
 
 function cambiarImagen(dir) {
@@ -677,6 +712,24 @@ function cambiarImagen(dir) {
   if (imagenActual >= imagenes.length) imagenActual = 0;
 
   actualizarImagen();
+}
+function agregarDesdeVisor() {
+  const nombre = imagenes[imagenActual];
+
+  const ruta = `${window.location.origin}${albumActual.original}${nombre}`;
+
+  const existe = carrito.find(f => f.original === ruta);
+
+  if (existe) {
+    carrito = carrito.filter(f => f.original !== ruta);
+    seleccionadas = seleccionadas.filter(f => f !== nombre);
+  } else {
+    carrito.push({ original: ruta });
+    seleccionadas.push(nombre);
+  }
+
+  actualizarCarrito();
+  actualizarImagen(); // 🔥 clave para cambiar icono
 }
 
 function cerrarVisor() {
