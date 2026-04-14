@@ -230,8 +230,9 @@ h1 { margin: 20px; }
 }
 
 .contenedor-img img {
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
 }
 
 .cerrar {
@@ -256,7 +257,7 @@ h1 { margin: 20px; }
 .derecha { right:30px; }
 
 /* 🛒 BOTÓN CARRITO VISOR */
-..btn-carrito {
+.btn-carrito {
   position: absolute;
   top: 15px;
   right: 15px;
@@ -486,6 +487,7 @@ let carrito = []; // 👉 este es el verdadero carrito (datos)
 
 let seleccionadas = [];
 let imagenActual = 0;
+let desdeMenu = false;
 
 
 
@@ -494,36 +496,29 @@ let imagenActual = 0;
 document.addEventListener("contextmenu", e => e.preventDefault());
 
 async function mostrarAlbum() {
-
-  // 🔒 BLOQUEO DE MODO PRIVADO
-  const params = new URLSearchParams(window.location.search);
-  const albumURL = params.get("album");
-
-  if (albumURL) {
-    return;
-  }
-
   carritoUI.style.display = "none";
 
   const res = await fetch("/albums");
   const albums = await res.json();
 
-  contenido.className = "container inicio"; // 👈 AGREGAR ESTA LÍNEA
+  contenido.className = "container inicio";
   contenido.innerHTML = "";
 
   albums.forEach(album => {
-  contenido.innerHTML += `
-    <div class="card" onclick="abrirAlbum('${album.nombre}')">
-      <h3>${album.nombre}</h3>
-      <p>${album.cantidad || ""} fotos</p>
-      <img src="${album.preview + album.portada}">
-    </div>
-  `;
-});
+    contenido.innerHTML += `
+      <div class="card" onclick="abrirAlbum('${album.nombre}', true)">
+        <h3>${album.nombre}</h3>
+        <p>${album.cantidad || ""} fotos</p>
+        <img src="${album.preview + album.portada}">
+      </div>
+    `;
+  });
 }
 
-async function abrirAlbum(nombre) {
-  window.history.pushState({}, "", `?album=${nombre}`); // 👈 ESTA LÍNEA NUEVA
+async function abrirAlbum(nombre, desdeClick = false) {
+  desdeMenu = desdeClick;
+
+  window.history.pushState({}, "", `?album=${nombre}`);
 
   seleccionadas = [];
   actualizarCarrito();
@@ -533,9 +528,11 @@ async function abrirAlbum(nombre) {
 
   window.albumActual = data.album;
   window.imagenes = data.imagenes;
-contenido.className = "container"; // 👈 ESTA LÍNEA
+
+  contenido.className = "container";
+
   contenido.innerHTML = `
-    <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
+    ${desdeMenu ? `<button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>` : ""}
     <div class="galeria"></div>
   `;
 
@@ -691,9 +688,7 @@ function verImagen(nombre) {
 
   <span class="flecha derecha" onclick="cambiarImagen(1)">❯</span>
 
-  <div class="btn-carrito" id="btnCarritoVisor" onclick="agregarDesdeVisor()">
-  🛒
-</div>
+  
 `;
 
   document.body.appendChild(visor);
