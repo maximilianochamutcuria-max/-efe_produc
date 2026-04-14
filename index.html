@@ -745,10 +745,13 @@ function actualizarImagen() {
 }
 
 function cambiarImagen(dir) {
-  imagenActual += dir;
+  const total = imagenes.length;
 
-  if (imagenActual < 0) imagenActual = imagenes.length - 1;
-  if (imagenActual >= imagenes.length) imagenActual = 0;
+  if (dir === 1) {
+    imagenActual = (imagenActual + 1) % total;
+  } else if (dir === -1) {
+    imagenActual = (imagenActual - 1 + total) % total;
+  }
 
   actualizarImagen();
 }
