@@ -118,12 +118,12 @@ portada = files.length > 0 ? files[0] : null;
     }
 
     return {
-      nombre,
-      portada: portada || ""
-      preview: `/images/${nombre}/preview/`,
-      original: `/images/${nombre}/original/`,
-      watermarked: `/images/${nombre}/watermarked/`
-    };
+  nombre,
+  portada: portada || "",
+  preview: `/images/${nombre}/preview/`,
+  original: `/images/${nombre}/original/`,
+  watermarked: `/images/${nombre}/watermarked/`
+};
   });
 
   res.json(data);
