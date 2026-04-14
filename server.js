@@ -123,6 +123,7 @@ portada = files.length > 0 ? files[0] : null;
   preview: `/images/${nombre}/preview/`,
   original: `/images/${nombre}/original/`,
   watermarked: `/images/${nombre}/watermarked/`
+  thumb: `/images/${nombre}/thumb/`,
 };
   });
 
