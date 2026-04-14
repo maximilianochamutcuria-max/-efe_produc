@@ -131,7 +131,11 @@ portada = files.length > 0 ? files[0] : null;
 app.get("/album/:nombre", (req, res) => {
   const nombre = req.params.nombre;
 
-  const previewPath = path.join(__dirname, "images", nombre, "preview");
+  let previewPath = path.join(__dirname, "images", nombre, "preview");
+
+if (!fs.existsSync(previewPath) || fs.readdirSync(previewPath).length === 0) {
+  previewPath = path.join(__dirname, "images", nombre, "thumb");
+}");
 
   const imagenes = fs.readdirSync(previewPath).filter(f =>
   !f.startsWith(".") &&
