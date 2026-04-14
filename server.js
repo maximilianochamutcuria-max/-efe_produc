@@ -114,7 +114,7 @@ app.get("/albums", (req, res) => {
   ? fs.readdirSync(previewPath).filter(f => f.match(/\.(jpg|jpeg|png)$/i))
   : [];
 
-const portada = files.length > 0 ? files[0] : null;
+portada = files.length > 0 ? files[0] : null;
     }
 
     return {
