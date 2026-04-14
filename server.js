@@ -122,7 +122,7 @@ portada = files.length > 0 ? files[0] : null;
   portada: portada || "",
   preview: `/images/${nombre}/preview/`,
   original: `/images/${nombre}/original/`,
-  watermarked: `/images/${nombre}/watermarked/`
+  watermarked: `/images/${nombre}/watermarked/`, // 👈 ACÁ
   thumb: `/images/${nombre}/thumb/`,
 };
   });
@@ -146,13 +146,14 @@ app.get("/album/:nombre", (req, res) => {
   );
 
   res.json({
-    album: {
-      preview: `/images/${nombre}/preview/`,
-      original: `/images/${nombre}/original/`,
-      watermarked: `/images/${nombre}/watermarked/`
-    },
-    imagenes
-  });
+  album: {
+    preview: `/images/${nombre}/preview/`,
+    thumb: `/images/${nombre}/thumb/`, // 👈 AGREGAR
+    original: `/images/${nombre}/original/`,
+    watermarked: `/images/${nombre}/watermarked/`
+  },
+  imagenes
+});
 });
 // 🔥 VER PEDIDO
 app.get("/pedido/:id", async (req, res) => {
