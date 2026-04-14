@@ -110,13 +110,16 @@ app.get("/albums", (req, res) => {
     let portada = null;
 
     if (fs.existsSync(previewPath)) {
-      const files = fs.readdirSync(previewPath).filter(f => !f.startsWith("."));
-      portada = files.length > 0 ? files[0] : null;
+      const files = fs.existsSync(previewPath)
+  ? fs.readdirSync(previewPath).filter(f => f.match(/\.(jpg|jpeg|png)$/i))
+  : [];
+
+const portada = files.length > 0 ? files[0] : null;
     }
 
     return {
       nombre,
-      portada,
+      portada: portada || ""
       preview: `/images/${nombre}/preview/`,
       original: `/images/${nombre}/original/`,
       watermarked: `/images/${nombre}/watermarked/`
