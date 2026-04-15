@@ -681,6 +681,8 @@ carritoUI.onclick = () => abrirCarrito();
 
 function abrirCarrito() {
   document.getElementById("modalCarrito").style.display = "flex";
+  carritoUI.style.display = "none"; // 🔥 ESTA ES LA LÍNEA NUEVA
+
 
   const lista = document.getElementById("listaCarrito");
   lista.innerHTML = "";
@@ -715,6 +717,8 @@ function abrirCarrito() {
 
 function cerrarCarrito() {
   document.getElementById("modalCarrito").style.display = "none";
+
+  carritoUI.style.display = "block"; // 🔥 vuelve a aparecer
 }
 
 function eliminar(nombre) {
