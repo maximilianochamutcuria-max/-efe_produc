@@ -34,11 +34,9 @@ h1 { margin: 20px; }
 
 /* GALERÍA */
 .galeria {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  column-count: 4;
+  column-gap: 12px;
   padding: 20px;
-  grid-auto-flow: dense;
 }
 
 .foto {
@@ -217,7 +215,13 @@ h1 { margin: 20px; }
   font-size:25px;
   cursor:pointer;
 }
-
+.cerrar-aviso {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+}
 /* VISOR */
 #visor {
   position: fixed;
@@ -318,9 +322,7 @@ h1 { margin: 20px; }
   }
 
   .galeria {
-  grid-template-columns: repeat(2, 1fr);
-  padding: 10px;
-  gap: 8px;
+  column-count: 2;
 }
 
   .foto {
@@ -414,10 +416,15 @@ h1 { margin: 20px; }
 
 .box {
   width: 90%;
-  max-width: 500px;
+  max-width: 900px; /* 🔥 mismo tamaño que modal */
+  height: 80%;
   background: #f1f5f9;
   padding: 20px;
   border-radius: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .box.verde {
@@ -568,6 +575,9 @@ async function mostrarAlbum() {
       </div>
     `;
   });
+}
+function cerrarAviso() {
+  document.getElementById("pantallaAviso").style.display = "none";
 }
 
 async function abrirAlbum(nombre, desdeClick = false) {
@@ -857,6 +867,17 @@ window.addEventListener("popstate", () => {
     mostrarAlbum();
   }
 });
+document.addEventListener("DOMContentLoaded", () => {
+  const aviso = document.getElementById("pantallaAviso");
+
+  if (aviso) {
+    aviso.addEventListener("click", (e) => {
+      if (e.target.id === "pantallaAviso") {
+        cerrarAviso();
+      }
+    });
+  }
+});
 function mostrarTransferencia() {
   document.getElementById("transferenciaBox").style.display = "block";
   document.getElementById("totalTransferencia").innerText = total;
@@ -868,11 +889,11 @@ function copiarTexto(id) {
   navigator.clipboard.writeText(texto);
 
   alert("Copiado: " + texto);
-}function abrirAviso() {
-  document.getElementById("pantallaAviso").style.display = "flex";
-}function abrirAviso() {
+}
+function abrirAviso() {
   document.getElementById("pantallaAviso").style.display = "flex";
 }
+
 
 async function crearOrden() {
 
@@ -937,6 +958,8 @@ Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
 <div id="pantallaAviso" class="pantalla" style="display:none;">
   <div class="box">
+
+    <span class="cerrar-aviso" onclick="cerrarAviso()">✖</span>
 
     <p><b>Tené en cuenta...</b></p>
 
