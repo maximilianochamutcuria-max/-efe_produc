@@ -123,16 +123,20 @@ let offsets = [];
 // 📱 VERTICAL → 3 marcas
 if (isVertical) {
   offsets = [
-    -metadata.height * 0.35,
-    0,
-    metadata.height * 0.35
-  ];
+  -metadata.height * 0.4,
+  -metadata.height * 0.2,
+  0,
+  metadata.height * 0.2,
+  metadata.height * 0.4
+];
 } else {
   // 📸 HORIZONTAL → 2 marcas
-  offsets = [
-    -metadata.height * 0.25,
-    metadata.height * 0.25
-  ];
+ offsets = [
+  -metadata.height * 0.35,
+  -metadata.height * 0.15,
+  metadata.height * 0.15,
+  metadata.height * 0.35
+];
 }
 
 // 🔹 ARMAR COMPOSICIÓN

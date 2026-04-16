@@ -928,6 +928,14 @@ function validarTransferencia() {
     return;
   }
 
+  const email = document.getElementById("email").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+
+  if (!email || !telefono) {
+    alert("Completá email y teléfono");
+    return;
+  }
+
   abrirAviso();
 }
 
