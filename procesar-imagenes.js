@@ -1,6 +1,7 @@
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
+const forzar = process.argv.includes("--force");
 
 const basePath = path.join(__dirname, "images");
 
@@ -31,13 +32,14 @@ async function procesarAlbum(album) {
 
   // 🔥 SI YA EXISTE TODO → SALTEAR
   if (
-    fs.existsSync(previewOutput) &&
-    fs.existsSync(watermarkOutput) &&
-    fs.existsSync(thumbOutput)
-  ) {
-    console.log("⏩ Ya procesada:", file);
-    continue;
-  }
+  !forzar &&
+  fs.existsSync(previewOutput) &&
+  fs.existsSync(watermarkOutput) &&
+  fs.existsSync(thumbOutput)
+) {
+  console.log("⏩ Ya procesada:", file);
+  continue;
+}
 
   console.log("Procesando:", file);
 
