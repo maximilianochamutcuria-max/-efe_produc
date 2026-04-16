@@ -23,11 +23,6 @@ async function procesarAlbum(album) {
     f.toLowerCase().endsWith(".png")
   );
 
-  for (const file of files) {
-    const input = path.join(originalPath, file);
-    const previewOutput = path.join(previewPath, file);
-    const watermarkOutput = path.join(watermarkedPath, file);
-    const thumbOutput = path.join(thumbPath, file);
     for (const file of files) {
   const input = path.join(originalPath, file);
   const previewOutput = path.join(previewPath, file);
