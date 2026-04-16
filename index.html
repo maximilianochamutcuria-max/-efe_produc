@@ -496,7 +496,7 @@ h1 { margin: 20px; }
       <h4>Teléfono</h4>
       <input id="telefono" class="input" placeholder="Tu teléfono">
       <button class="btn-pagar" onclick="pagar()" style="display:none;">Pagar con MercadoPago</button>
-      <button class="btn-pagar" onclick="abrirAviso()">Transferencia</button>
+      <button class="btn-pagar" onclick="validarTransferencia()">Transferencia</button>
       <div id="transferenciaBox" class="transferencia-box" style="display:none;">
   <h3>Datos para transferencia</h3>
 
@@ -677,7 +677,14 @@ function actualizarCarrito() {
   carritoUI.innerText = `${seleccionadas.length} fotos | $${calcularTotal()}`;
 }
 
-carritoUI.onclick = () => abrirCarrito();
+carritoUI.onclick = () => {
+  if (seleccionadas.length === 0) {
+    alert("Seleccioná al menos una foto");
+    return;
+  }
+
+  abrirCarrito();
+};
 
 function abrirCarrito() {
   document.getElementById("modalCarrito").style.display = "flex";
@@ -723,14 +730,23 @@ function cerrarCarrito() {
 
 function eliminar(nombre) {
   seleccionadas = seleccionadas.filter(f => f !== nombre);
+
+  carrito = carrito.filter(f => !f.original.includes(nombre)); // 🔥 clave
+
   abrirCarrito();
   actualizarCarrito();
+  actualizarGaleria();
+  actualizarImagen(); // 🔥 ESTA LÍNEA ARREGLA EL VISOR
 }
 
 function vaciarCarrito() {
   seleccionadas = [];
+  carrito = []; // 🔥 MUY IMPORTANTE
+
   abrirCarrito();
   actualizarCarrito();
+  actualizarGaleria();
+  actualizarImagen(); // 🔥 sincroniza visor
 }
 
 async function pagar() {
@@ -851,6 +867,15 @@ function actualizarGaleria() {
       div.classList.remove("selected");
     }
   });
+  // 🔥 ACTUALIZA EL VISOR SI ESTÁ ABIERTO
+const btn = document.getElementById("btnCarritoVisor");
+if (btn) {
+  const nombre = imagenes[imagenActual];
+  const urlOriginal = `${window.location.origin}${albumActual.original}${nombre}`;
+  const existe = carrito.find(f => f.original === urlOriginal);
+
+  btn.innerHTML = existe ? "❌" : "🛒";
+}
 }
 
 const params = new URLSearchParams(window.location.search);
@@ -896,6 +921,14 @@ function copiarTexto(id) {
 }
 function abrirAviso() {
   document.getElementById("pantallaAviso").style.display = "flex";
+}
+function validarTransferencia() {
+  if (seleccionadas.length === 0) {
+    alert("Seleccioná al menos una foto");
+    return;
+  }
+
+  abrirAviso();
 }
 
 
