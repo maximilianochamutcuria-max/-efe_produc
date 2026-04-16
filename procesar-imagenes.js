@@ -28,6 +28,23 @@ async function procesarAlbum(album) {
     const previewOutput = path.join(previewPath, file);
     const watermarkOutput = path.join(watermarkedPath, file);
     const thumbOutput = path.join(thumbPath, file);
+    for (const file of files) {
+  const input = path.join(originalPath, file);
+  const previewOutput = path.join(previewPath, file);
+  const watermarkOutput = path.join(watermarkedPath, file);
+  const thumbOutput = path.join(thumbPath, file);
+
+  // 🔥 SI YA EXISTE TODO → SALTEAR
+  if (
+    fs.existsSync(previewOutput) &&
+    fs.existsSync(watermarkOutput) &&
+    fs.existsSync(thumbOutput)
+  ) {
+    console.log("⏩ Ya procesada:", file);
+    continue;
+  }
+
+  console.log("Procesando:", file);
 
     console.log("Procesando:", file);
 
@@ -54,7 +71,7 @@ if (isVerticalThumb) {
     .toFile(thumbOutput);
 
 } else {
-  // 📸 HORIZONTAL → como te gusta
+  // 📸 HORIZONTAL → equilibrado
   await imageThumb
     .resize({ width: 450 })
     .jpeg({ quality: 25 })
