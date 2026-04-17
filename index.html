@@ -488,6 +488,7 @@ h1 { margin: 20px; }
 
     <div class="der">
       <h3>Resumen</h3>
+      <div id="mensajePromo"></div>
       <div id="resumen"></div>
 
       <h4>Email</h4>
@@ -671,6 +672,29 @@ function calcularTotal() {
 
   return total;
 }
+function generarMensajePromo(cant) {
+  let faltan3 = 3 - (cant % 3);
+  let faltan5 = 5 - (cant % 5);
+  let faltan7 = 7 - (cant % 7);
+
+  if (cant < 3) {
+    return `Agregá ${3 - cant} foto(s) más y pagá el pack de 3 ($5500)`;
+  }
+
+  if (cant < 5) {
+    return `Agregá ${5 - cant} foto(s) más y accedé al pack de 5 ($7500)`;
+  }
+
+  if (cant < 7) {
+    return `Agregá ${7 - cant} foto(s) más y accedé al pack de 7 ($9500)`;
+  }
+
+  if (cant < 10) {
+    return `Agregá ${10 - cant} foto(s) más y accedé al pack de 10 ($12000)`;
+  }
+
+  return "";
+}
 
 
 function actualizarCarrito() {
@@ -708,6 +732,18 @@ function abrirCarrito() {
 
   let cant = seleccionadas.length;
   let total = calcularTotal();
+  const mensaje = generarMensajePromo(cant);
+
+document.getElementById("mensajePromo").innerHTML = mensaje
+  ? `<div style="
+      background:#eef4ff;
+      padding:10px;
+      border-radius:10px;
+      margin-bottom:10px;
+    ">
+      💡 ${mensaje}
+    </div>`
+  : "";
 
   let pack = "Individual";
   if (cant >= 10) pack = "Pack 10";
@@ -715,11 +751,24 @@ function abrirCarrito() {
   else if (cant >= 5) pack = "Pack 5";
   else if (cant >= 3) pack = "Pack 3";
 
-  document.getElementById("resumen").innerHTML = `
-    <p>${cant} fotos</p>
-    <p>${pack}</p>
-    <h2>$${total}</h2>
-  `;
+  let precioSinDescuento = cant * 2000;
+
+let tieneDescuento = total < precioSinDescuento;
+
+document.getElementById("resumen").innerHTML = `
+  <p>${cant} fotos</p>
+  <p>${pack}</p>
+
+  ${
+    tieneDescuento
+      ? `<p style="text-decoration: line-through; opacity:0.6;">
+          $${precioSinDescuento}
+        </p>`
+      : ""
+  }
+
+  <h2>$${total}</h2>
+`;
 }
 
 function cerrarCarrito() {
