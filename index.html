@@ -817,11 +817,18 @@ async function renderAlbums(lista, categoria) {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
+  const usados = new Set(); // 🔥 evita duplicados
+
   for (const albumObj of lista) {
 
     const album = typeof albumObj === "string"
       ? albumObj
       : albumObj.nombre;
+
+    // 🚫 si ya se agregó, lo salteamos
+    if (usados.has(album)) continue;
+
+    usados.add(album);
 
     let preview = "";
 
