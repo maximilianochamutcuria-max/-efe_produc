@@ -638,6 +638,8 @@ h1 { margin: 20px; }
 
 <script>
 const contenido = document.getElementById("contenido");
+const normalizar = (str) =>
+  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const carritoUI = document.getElementById("carrito"); // 👉 solo para mostrar
 let carrito = []; // 👉 este es el verdadero carrito (datos)
 
@@ -783,14 +785,30 @@ async function abrirCategoria(nombre) {
 
   window.albumsActuales = albums;
 
-renderAlbums(albums, categoria);
+const unicos = [];
+
+const nombres = new Set();
+
+for (const a of albums) {
+  const nombre = typeof a === "string" ? a : a.nombre;
+
+  if (!nombres.has(nombre)) {
+    nombres.add(nombre);
+    unicos.push(a);
+  }
+}
+
+window.albumsActuales = unicos;
+
+renderAlbums(unicos, categoria);
 
 document.getElementById("buscador").addEventListener("input", (e) => {
-  const texto = e.target.value.toLowerCase();
+  const texto = normalizar(e.target.value);
 
-  const filtrados = window.albumsActuales.filter(a =>
-    a.toLowerCase().includes(texto)
-  );
+  const filtrados = window.albumsActuales.filter(a => {
+    const nombre = typeof a === "string" ? a : a.nombre;
+    return normalizar(nombre).includes(texto);
+  });
 
   renderAlbums(filtrados, categoria);
 });
@@ -799,7 +817,11 @@ async function renderAlbums(lista, categoria) {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
-  for (const album of lista) {
+  for (const albumObj of lista) {
+
+    const album = typeof albumObj === "string"
+      ? albumObj
+      : albumObj.nombre;
 
     let preview = "";
 
