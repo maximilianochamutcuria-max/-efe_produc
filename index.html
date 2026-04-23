@@ -1178,23 +1178,9 @@ if (btn) {
 }
 }
 
-const params = new URLSearchParams(window.location.search);
-const albumURL = params.get("album");
-
-if (albumURL) {
-  abrirAlbum(albumURL);
-} else {
-  mostrarAlbum();
-}
+mostrarDeportes();
 window.addEventListener("popstate", () => {
-  const params = new URLSearchParams(window.location.search);
-  const albumURL = params.get("album");
-
-  if (albumURL) {
-    abrirAlbum(albumURL);
-  } else {
-    mostrarAlbum();
-  }
+  mostrarDeportes();
 });
 document.addEventListener("DOMContentLoaded", () => {
   const aviso = document.getElementById("pantallaAviso");
