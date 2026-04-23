@@ -717,6 +717,12 @@ async function mostrarAlbum() {
 
   for (const cat of categorias) {
 
+  const nombreCat = typeof cat === "string" ? cat : cat.nombre;
+
+  if (
+    ["preview", "thumb", "watermarked"].includes(nombreCat.toLowerCase())
+  ) continue;
+
   let preview = "";
 
   try {
@@ -1278,13 +1284,19 @@ function validarTransferencia() {
 }
 
 
+let enviando = false;
+
 async function crearOrden() {
+
+  if (enviando) return;
+  enviando = true;
 
   const emailInput = document.getElementById("email");
   const telefonoInput = document.getElementById("telefono");
 
   if (!emailInput || !telefonoInput) {
     alert("Faltan los campos de email o teléfono");
+    enviando = false;
     return;
   }
 
@@ -1293,19 +1305,45 @@ async function crearOrden() {
 
   if (!email || !telefono) {
     alert("Completá email y teléfono");
+    enviando = false;
     return;
   }
 
   const totalFinal = calcularTotal();
 
-  const pedidoId = Math.floor(1000 + Math.random() * 9000);
-  const codigo = Math.random().toString(36).substring(2, 6).toUpperCase() + "-" +
-                 Math.random().toString(36).substring(2, 6).toUpperCase();
+  try {
 
-  const fecha = new Date().toLocaleDateString();
+    // ✅ CREAR PEDIDO (ÚNICA VEZ)
+    const resPedido = await fetch("/crear-pedido", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fotos: carrito,
+        email,
+        telefono,
+        total: totalFinal
+      })
+    });
 
-  const linkAdmin = `https://efe-produc-21iy.onrender.com/pedido/${pedidoId}`;
-  const mensaje = `Hola! Te paso el resumen de mi pedido
+    const dataPedido = await resPedido.json();
+    console.log("RESPUESTA DEL SERVER:", dataPedido);
+
+    const pedidoId = dataPedido.pedidoId;
+
+    if (!pedidoId) {
+      alert("Error al crear pedido");
+      enviando = false;
+      return;
+    }
+
+    const codigo =
+      Math.random().toString(36).substring(2, 6).toUpperCase() +
+      "-" +
+      Math.random().toString(36).substring(2, 6).toUpperCase();
+
+    const fecha = new Date().toLocaleDateString();
+
+    const mensaje = `Hola! Te paso el resumen de mi pedido
 
 Pedido: #${pedidoId} / ${codigo}
 Tienda: efe_produc
@@ -1318,26 +1356,18 @@ Total: $${totalFinal}
 
 Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
-  const telefonoDestino = "5493816657619";
-  console.log("ENVIANDO PEDIDO:", pedidoId, carrito);
-  await fetch("/crear-pedido", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    pedidoId,
-    fotos: carrito, // 👈 array de fotos seleccionadas
-    email,
-    telefono,
-    total: totalFinal
-  })
-});
+    const telefonoDestino = "5493816657619";
 
-  const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
+    const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
-  window.location.href = url; // 👈 IMPORTANTE: mejor que window.open en mobile
-  
+    window.location.href = url;
+
+  } catch (error) {
+    console.log("ERROR:", error);
+    alert("Error al crear el pedido");
+  }
+
+  enviando = false;
 }
 mostrarDeportes();
 </script>

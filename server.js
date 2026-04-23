@@ -175,29 +175,32 @@ notification_url: "https://efe-produc-21iy.onrender.com/webhook",
 // 🔥 ARRANCAR SERVIDOR
 // 🔥 CREAR PEDIDO
 app.post("/crear-pedido", async (req, res) => {
-  const { pedidoId, fotos, email, telefono, total } = req.body;
+  const { fotos, email, telefono, total } = req.body;
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("Pedidos")
     .insert([
       {
-        id: pedidoId,
         fotos,
         email,
         telefono,
         total,
         estado: "pendiente"
       }
-    ]);
+    ])
+    .select()
+    .single();
 
   if (error) {
     console.log("❌ ERROR SUPABASE:", error);
     return res.status(500).json({ error: "Error al guardar pedido" });
   }
 
+  const pedidoId = data.id;
+
   console.log("📦 Pedido guardado en Supabase:", pedidoId);
 
-  res.json({ ok: true });
+  res.json({ ok: true, pedidoId });
 });
 app.get("/album/:categoria/:album", (req, res) => {
   const categoria = req.params.categoria;
