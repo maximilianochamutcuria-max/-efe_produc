@@ -157,13 +157,34 @@ await image
 }
 
 async function main() {
-  const albums = fs.readdirSync(basePath).filter(folder =>
-    fs.statSync(path.join(basePath, folder)).isDirectory()
-  );
+  const deportes = fs.readdirSync(basePath);
 
-  for (const album of albums) {
-    console.log("📁 Album:", album);
-    await procesarAlbum(album);
+  for (const deporte of deportes) {
+    const pathDeporte = path.join(basePath, deporte);
+
+    if (!fs.statSync(pathDeporte).isDirectory()) continue;
+
+    const categorias = fs.readdirSync(pathDeporte);
+
+    for (const categoria of categorias) {
+      const pathCategoria = path.join(pathDeporte, categoria);
+
+      if (!fs.statSync(pathCategoria).isDirectory()) continue;
+
+      const partidos = fs.readdirSync(pathCategoria);
+
+      for (const partido of partidos) {
+        const pathPartido = path.join(pathCategoria, partido);
+
+        if (!fs.statSync(pathPartido).isDirectory()) continue;
+
+        const albumPath = path.join(deporte, categoria, partido);
+
+        console.log("📁 Procesando:", albumPath);
+
+        await procesarAlbum(albumPath);
+      }
+    }
   }
 
   console.log("🔥 TODO LISTO");
