@@ -790,13 +790,24 @@ const unicos = [];
 const nombres = new Set();
 
 for (const a of albums) {
-  const nombre = typeof a === "string" ? a : a.nombre;
+  const nombreOriginal = typeof a === "string" ? a : a.nombre;
+
+const nombre = nombreOriginal
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .trim();
 
   if (!nombres.has(nombre)) {
-    nombres.add(nombre);
-    unicos.push(a);
-  }
+  nombres.add(nombre);
+  unicos.push(a);
 }
+}
+unicos.sort((a, b) => {
+  const n1 = typeof a === "string" ? a : a.nombre;
+  const n2 = typeof b === "string" ? b : b.nombre;
+  return n1.localeCompare(n2);
+});
 
 window.albumsActuales = unicos;
 
@@ -824,6 +835,9 @@ async function renderAlbums(lista, categoria) {
     const album = typeof albumObj === "string"
       ? albumObj
       : albumObj.nombre;
+      const clave = normalizar(album);
+if (usados.has(clave)) continue;
+usados.add(clave);
 
     // 🚫 si ya se agregó, lo salteamos
     if (usados.has(album)) continue;
