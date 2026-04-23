@@ -467,31 +467,33 @@ const upload = multer({ dest: "uploads/" });
 
 app.post("/subir", upload.array("fotos"), async (req, res) => {
   try {
-    const album = req.body.album;
+    const { deporte, categoria, partido } = req.body;
 
-    if (!album) {
-      return res.send("❌ Falta nombre del álbum");
+    if (!deporte || !categoria || !partido) {
+      return res.send("❌ Faltan datos (deporte, categoria o partido)");
     }
 
-    const albumPath = path.join(__dirname, "images", album);
-    const originalPath = path.join(albumPath, "original");
+    const album = path.join(deporte, categoria, partido);
 
-    // Crear carpetas
+    const basePath = path.join(__dirname, "images", album);
+    const originalPath = path.join(basePath, "original");
+
+    // Crear carpetas correctamente
     fs.mkdirSync(originalPath, { recursive: true });
 
-    // Mover archivos a /original
+    // Guardar imágenes
     for (const file of req.files) {
-  const uniqueName =
-    Date.now() +
-    "-" +
-    Math.random().toString(36).substring(7) +
-    "-" +
-    file.originalname;
+      const uniqueName =
+        Date.now() +
+        "-" +
+        Math.random().toString(36).substring(7) +
+        "-" +
+        file.originalname;
 
-  const newPath = path.join(originalPath, uniqueName);
+      const newPath = path.join(originalPath, uniqueName);
 
-  fs.renameSync(file.path, newPath);
-}
+      fs.renameSync(file.path, newPath);
+    }
 
     console.log("📸 Fotos subidas:", album);
 
@@ -499,8 +501,9 @@ app.post("/subir", upload.array("fotos"), async (req, res) => {
     await procesarAlbum(album);
 
     res.send(`
-      <h2>✅ Álbum creado</h2>
-      <a href="/admin-panel">⬅ Volver</a>
+      <h2>✅ Álbum creado correctamente</h2>
+      <p>${album}</p>
+      <a href="/admin-panel?pass=1234">⬅ Volver</a>
     `);
 
   } catch (error) {
@@ -575,10 +578,18 @@ app.get("/admin-panel", (req, res) => {
       <h3>📤 Subir álbum</h3>
 
       <form action="/subir" method="post" enctype="multipart/form-data">
-        <input type="text" name="album" placeholder="Nombre del álbum" required>
-        <input type="file" name="fotos" multiple required>
-        <button type="submit">Subir fotos</button>
-      </form>
+
+  <input type="text" name="deporte" placeholder="Deporte (ej: Futsal)" required>
+
+  <input type="text" name="categoria" placeholder="Categoría (ej: Primera Masculino)" required>
+
+  <input type="text" name="partido" placeholder="Partido (ej: EquipoA vs EquipoB)" required>
+
+  <input type="file" name="fotos" multiple required>
+
+  <button type="submit">Subir fotos</button>
+
+</form>
     </div>
 
   </body>
