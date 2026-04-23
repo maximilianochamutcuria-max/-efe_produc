@@ -640,6 +640,14 @@ h1 { margin: 20px; }
 const contenido = document.getElementById("contenido");
 const normalizar = (str) =>
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const normalizarPartido = (str) => {
+  return str
+    .toLowerCase()
+    .split("vs")
+    .map(s => s.trim())
+    .sort()
+    .join(" vs ");
+};
 const carritoUI = document.getElementById("carrito"); // 👉 solo para mostrar
 let carrito = []; // 👉 este es el verdadero carrito (datos)
 
@@ -828,21 +836,22 @@ async function renderAlbums(lista, categoria) {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
-  const usados = new Set(); // 🔥 evita duplicados
+  const usados = new Set();
 
   for (const albumObj of lista) {
 
     const album = typeof albumObj === "string"
       ? albumObj
       : albumObj.nombre;
-      const clave = normalizar(album);
-if (usados.has(clave)) continue;
-usados.add(clave);
 
-    // 🚫 si ya se agregó, lo salteamos
-    if (usados.has(album)) continue;
+    // 🔥 limpiar cosas tipo (1), (2)
+    const limpio = album.replace(/\(\d+\)/g, "").trim();
 
-    usados.add(album);
+    // 🔥 clave inteligente (invierte equipos automáticamente)
+    const clave = normalizarPartido(limpio);
+
+    if (usados.has(clave)) continue;
+    usados.add(clave);
 
     let preview = "";
 
