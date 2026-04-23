@@ -15,9 +15,60 @@ body {
 
 h1 { margin: 20px; }
 
+
 .container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: auto;
+  padding: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  justify-content: start;
+  gap: 30px;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  transition: 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* 🔥 CUADRADO */
+  object-fit: cover;
+}
+
+.card-title {
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.volver {
+  background: black;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.titulo-seccion {
+  font-size: 24px;
+  text-align: center;
+  margin: 10px 0 20px;
 }
 
 /* ÁLBUM */
@@ -97,12 +148,25 @@ h1 { margin: 20px; }
 
 /* BOTÓN VOLVER */
 .volver {
-  margin: 20px;
-  padding: 10px 20px;
+  display: inline-block;
+  margin: 0 0 20px 0;
+  padding: 10px 16px;
   background: black;
   color: white;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+.bloque {
+  max-width: 1000px;
+  margin: auto;
+  text-align: left;
+}
+
+.titulo-seccion {
+  font-size: 22px;
+  margin-bottom: 20px;
 }
 
 /* CARRITO */
@@ -149,22 +213,23 @@ h1 { margin: 20px; }
   overflow-y: auto;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px;
-  align-content: start;
-}
+
 
 .item {
   position:relative;
 }
 
+#listaCarrito {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
 .item img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 90px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .remove {
@@ -433,22 +498,23 @@ h1 { margin: 20px; }
 }
 .inicio {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 30px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
 }
 
 .card {
-  background: #f5f5f5;
+  background: white;
   border-radius: 12px;
-  padding: 15px;
+  padding: 20px;
   cursor: pointer;
+  text-align: center;
+  font-weight: bold;
   transition: 0.2s;
-  text-align: left;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .card:hover {
-  transform: scale(1.02);
+  transform: translateY(-5px);
 }
 
 .card img {
@@ -465,6 +531,51 @@ h1 { margin: 20px; }
 .card p {
   margin: 5px 0;
   color: gray;
+}
+
+.grid-deportes {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  flex-wrap: wrap; /* 🔥 importante */
+  gap: 20px;       /* 🔥 importante */
+}
+
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 20px;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+.card-deporte {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  transition: 0.3s;
+}
+
+.card-deporte:hover {
+  transform: scale(1.05);
+}
+
+.card-deporte img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: 0.4s;
+}
+
+.card-deporte:hover img {
+  transform: scale(1.08);
 }
 </style>
 </head>
@@ -557,25 +668,163 @@ document.addEventListener("touchend", e => {
 
 
 document.addEventListener("contextmenu", e => e.preventDefault());
+async function mostrarDeportes() {
+  carritoUI.style.display = "none"; // 🔥 AGREGAR ESTO
 
+  const res = await fetch("/preview/futsal");
+  const data = await res.json();
+
+  contenido.innerHTML = `
+    <div class="container">
+      <div class="titulo-seccion">Deportes</div>
+
+      <div class="grid-deportes">
+        <div class="card-deporte" onclick="mostrarAlbum()">
+          <img src="${data.preview}" onerror="this.src='/watermark.png'">
+          <div class="overlay">Futsal</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 async function mostrarAlbum() {
   carritoUI.style.display = "none";
 
   const res = await fetch("/albums");
+  const categorias = await res.json();
+
+  contenido.innerHTML = `
+  <div class="container">
+
+    <button class="volver" onclick="mostrarDeportes()">⬅ Volver</button>
+
+    <div class="titulo-seccion">Futsal</div>
+    <div class="grid-deportes" id="grid"></div>
+  </div>
+`;
+
+  const grid = document.getElementById("grid");
+
+  for (const cat of categorias) {
+
+  let preview = "";
+
+  try {
+    const resCat = await fetch(`/categoria/${encodeURIComponent(cat.nombre)}`);
+    const albums = await resCat.json();
+
+    for (const albumObj of albums) {
+
+  const album = typeof albumObj === "string" 
+    ? albumObj 
+    : albumObj.nombre;
+
+  try {
+    const resAlbum = await fetch(
+      `/album/${encodeURIComponent(cat.nombre)}/${encodeURIComponent(album)}`
+    );
+
+    const dataAlbum = await resAlbum.json();
+
+    if (dataAlbum.imagenes.length > 0) {
+
+      const randomIndex = Math.floor(Math.random() * dataAlbum.imagenes.length);
+      const img = dataAlbum.imagenes[randomIndex];
+
+      const ruta = `/images/Futsal/${cat.nombre}/${album}/thumb/${img}`;
+preview = ruta;
+
+
+      break; // 🔥 IMPORTANTE → apenas encuentra uno válido, corta
+    }
+
+  } catch (e) {
+    console.log("error buscando preview", e);
+  }
+}
+
+  } catch (e) {
+    console.log("Error preview", e);
+  }
+
+  grid.innerHTML += `
+  <div class="card-deporte" onclick="abrirCategoria('${encodeURIComponent(cat.nombre)}')">
+    <img src="${preview}" onerror="this.src='/watermark.png'">
+    <div class="overlay">${cat.nombre}</div>
+  </div>
+`;
+}
+}
+async function abrirCategoria(nombre) {
+  carritoUI.style.display = "none";
+
+  const categoria = decodeURIComponent(nombre);
+
+  const res = await fetch(`/categoria/${categoria}`);
   const albums = await res.json();
+  window.albumsActuales = albums;
 
-  contenido.className = "container inicio";
-  contenido.innerHTML = "";
+  contenido.innerHTML = `
+  <div class="container">
+    <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
+    <div class="titulo-seccion">${categoria}</div>
 
-  albums.forEach(album => {
-    contenido.innerHTML += `
-      <div class="card" onclick="abrirAlbum('${album.nombre}', true)">
-        <h3>${album.nombre}</h3>
-        <p>${album.cantidad || ""} fotos</p>
-        <img src="${album.preview + album.portada}">
+    <input 
+      type="text" 
+      id="buscador" 
+      placeholder="Buscar partido..." 
+      class="input"
+      style="max-width:400px; margin-bottom:20px;"
+    >
+
+    <div class="grid-deportes" id="grid"></div>
+  </div>
+`;
+
+  window.albumsActuales = albums;
+
+renderAlbums(albums, categoria);
+
+document.getElementById("buscador").addEventListener("input", (e) => {
+  const texto = e.target.value.toLowerCase();
+
+  const filtrados = window.albumsActuales.filter(a =>
+    a.toLowerCase().includes(texto)
+  );
+
+  renderAlbums(filtrados, categoria);
+});
+}
+async function renderAlbums(lista, categoria) {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  for (const album of lista) {
+
+    let preview = "";
+
+    try {
+      const res = await fetch(`/album/${categoria}/${album}`);
+      const data = await res.json();
+
+      if (data.imagenes.length > 0) {
+        const randomIndex = Math.floor(Math.random() * data.imagenes.length);
+        const img = data.imagenes[randomIndex];
+
+        preview = `/images/Futsal/${categoria}/${album}/thumb/${img}`;
+      }
+
+    } catch (e) {
+      console.log("error preview album", e);
+    }
+
+    grid.innerHTML += `
+      <div class="card-deporte" onclick="abrirAlbum('${categoria}/${album}', true)">
+        <img src="${preview}" onerror="this.src='/watermark.png'">
+        <div class="overlay">${album}</div>
       </div>
     `;
-  });
+  }
 }
 function cerrarAviso() {
   document.getElementById("pantallaAviso").style.display = "none";
@@ -584,12 +833,14 @@ function cerrarAviso() {
 async function abrirAlbum(nombre, desdeClick = false) {
   desdeMenu = desdeClick;
 
-  window.history.pushState({}, "", `?album=${nombre}`);
+  const [categoria, album] = nombre.split("/");
+
+  window.history.pushState({}, "", `?album=${encodeURIComponent(nombre)}`);
 
   seleccionadas = [];
   actualizarCarrito();
 
-  const res = await fetch(`/album/${nombre}`);
+  const res = await fetch(`/album/${categoria}/${album}`);
   const data = await res.json();
 
   window.albumActual = data.album;
@@ -598,7 +849,7 @@ async function abrirAlbum(nombre, desdeClick = false) {
   contenido.className = "container";
 
   contenido.innerHTML = `
-    ${desdeMenu ? `<button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>` : ""}
+    ${desdeMenu ? `<button class="volver" onclick="abrirCategoria('${encodeURIComponent(categoria)}')">⬅ Volver</button>` : ""}
     <div class="galeria"></div>
   `;
 
@@ -1048,7 +1299,10 @@ Enviá el comprobante por WhatsApp para recibir tus fotos.`;
   const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
   window.location.href = url; // 👈 IMPORTANTE: mejor que window.open en mobile
-}</script>
+  
+}
+mostrarDeportes();
+</script>
 
 <div id="pantallaAviso" class="pantalla" style="display:none;">
   <div class="box">

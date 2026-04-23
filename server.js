@@ -118,6 +118,7 @@ const supabase = createClient(
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/images", express.static("images"));
 
 
 // 🔥 SERVIR ARCHIVOS (ESTO ES LO QUE TE FALTABA)
@@ -198,67 +199,103 @@ app.post("/crear-pedido", async (req, res) => {
 
   res.json({ ok: true });
 });
+app.get("/album/:categoria/:album", (req, res) => {
+  const categoria = req.params.categoria;
+  const album = req.params.album;
+
+  const fs = require("fs");
+  const path = require("path");
+
+  const ruta = path.join(
+    __dirname,
+    "images",
+    "Futsal",
+    categoria,
+    album,
+    "preview"
+  );
+
+  try {
+    const imagenes = fs.readdirSync(ruta);
+
+    res.json({
+      album: {
+        preview: `/images/Futsal/${categoria}/${album}/preview/`,
+        thumb: `/images/Futsal/${categoria}/${album}/thumb/`,
+        watermarked: `/images/Futsal/${categoria}/${album}/watermarked/`,
+        original: `/images/Futsal/${categoria}/${album}/original/`
+      },
+      imagenes
+    });
+
+  } catch (error) {
+    res.json({ album: {}, imagenes: [] });
+  }
+});
+app.get("/preview/futsal", (req, res) => {
+  const basePath = path.join(__dirname, "images", "Futsal");
+
+  let preview = null;
+
+  const categorias = fs.readdirSync(basePath).filter(cat =>
+  fs.statSync(path.join(basePath, cat)).isDirectory()
+);
+
+  for (const cat of categorias) {
+    const catPath = path.join(basePath, cat);
+
+    const albums = fs.readdirSync(catPath).filter(album =>
+  fs.statSync(path.join(catPath, album)).isDirectory()
+);
+
+    for (const album of albums) {
+      const previewPath = path.join(catPath, album, "preview");
+
+      if (fs.existsSync(previewPath)) {
+        const files = fs.readdirSync(previewPath);
+        if (files.length > 0) {
+          preview = `/images/Futsal/${cat}/${album}/preview/${files[0]}`;
+          break;
+        }
+      }
+    }
+
+    if (preview) break;
+  }
+
+  res.json({ preview });
+});// 👈 🔥 ESTO FALTABA
 app.get("/albums", (req, res) => {
-  const basePath = path.join(__dirname, "images");
+  const basePath = path.join(__dirname, "images", "Futsal");
 
   if (!fs.existsSync(basePath)) {
     return res.json([]);
   }
 
-  const albums = fs.readdirSync(basePath).filter(folder => {
-    return fs.statSync(path.join(basePath, folder)).isDirectory();
-  });
+  const categorias = fs.readdirSync(basePath).filter(folder =>
+    fs.statSync(path.join(basePath, folder)).isDirectory()
+  );
 
-  const data = albums.map(nombre => {
-    const previewPath = path.join(basePath, nombre, "preview");
-
-    let portada = null;
-
-    if (fs.existsSync(previewPath)) {
-      const files = fs.existsSync(previewPath)
-  ? fs.readdirSync(previewPath).filter(f => f.match(/\.(jpg|jpeg|png)$/i))
-  : [];
-
-portada = files.length > 0 ? files[0] : null;
-    }
-
-    return {
-  nombre,
-  portada: portada || "",
-  preview: `/images/${nombre}/preview/`,
-  original: `/images/${nombre}/original/`,
-  watermarked: `/images/${nombre}/watermarked/`, // 👈 ACÁ
-  thumb: `/images/${nombre}/thumb/`,
-};
-  });
+  // devolvemos en formato que tu frontend espera
+  const data = categorias.map(nombre => ({ nombre }));
 
   res.json(data);
 });
-app.get("/album/:nombre", (req, res) => {
-  const nombre = req.params.nombre;
+app.get("/categoria/:cat", (req, res) => {
+  const categoria = decodeURIComponent(req.params.cat);
 
-  let previewPath = path.join(__dirname, "images", nombre, "preview");
+  const basePath = path.join(__dirname, "images", "Futsal", categoria);
 
-  if (!fs.existsSync(previewPath) || fs.readdirSync(previewPath).length === 0) {
-    previewPath = path.join(__dirname, "images", nombre, "thumb");
+  // 🔥 VALIDACIÓN CLAVE
+  if (!fs.existsSync(basePath)) {
+    return res.json([]);
   }
 
-  const imagenes = fs.readdirSync(previewPath).filter(f =>
-    !f.startsWith(".") &&
-    (f.toLowerCase().endsWith(".jpg") ||
-     f.toLowerCase().endsWith(".jpeg") ||
-     f.toLowerCase().endsWith(".png"))
+  const albums = fs.readdirSync(basePath).filter(folder =>
+    fs.statSync(path.join(basePath, folder)).isDirectory()
   );
 
-  res.json({
-  album: {
-    preview: `/images/${nombre}/preview/`,
-    thumb: `/images/${nombre}/thumb/`, // 👈 AGREGAR
-    original: `/images/${nombre}/original/`,
-    watermarked: `/images/${nombre}/watermarked/`
-  },
-  imagenes
-});
+  res.json(albums);
 });
 // 🔥 VER PEDIDO
 app.get("/pedido/:id", async (req, res) => {
