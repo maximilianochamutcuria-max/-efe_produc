@@ -674,7 +674,19 @@ document.addEventListener("touchend", e => {
 });
 
 
+document.addEventListener("DOMContentLoaded", () => {
 
+  const params = new URLSearchParams(window.location.search);
+  const album = params.get("album");
+
+  if (album) {
+    console.log("Abrir álbum directo:", album);
+    abrirAlbum(decodeURIComponent(album), false);
+  } else {
+    mostrarDeportes();
+  }
+
+});
 
 
 document.addEventListener("contextmenu", e => e.preventDefault());
@@ -1369,7 +1381,7 @@ Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
   enviando = false;
 }
-mostrarDeportes();
+
 </script>
 
 <div id="pantallaAviso" class="pantalla" style="display:none;">
