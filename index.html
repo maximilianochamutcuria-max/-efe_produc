@@ -1,800 +1,846 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@efe_produc</title>
-
-<style>
-body {
-  font-family: Arial;
-  background: #f5f5f5;
-  margin: 0;
-  text-align: center;
-}
-
-h1 { margin: 20px; }
-
-
-.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 20px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
-  justify-content: start;
-  gap: 30px;
-}
-
-.card {
-  background: white;
-  border-radius: 18px;
-  overflow: hidden;
-  cursor: pointer;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-  transition: 0.25s;
-}
-
-.card:hover {
-  transform: translateY(-6px) scale(1.02);
-}
-
-.card img {
-  width: 100%;
-  aspect-ratio: 1 / 1; /* 🔥 CUADRADO */
-  object-fit: cover;
-}
-
-.card-title {
-  padding: 12px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.volver {
-  background: black;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-.titulo-seccion {
-  font-size: 24px;
-  text-align: center;
-  margin: 10px 0 20px;
-}
-
-/* ÁLBUM */
-.album {
-  width: 300px;
-  margin: auto;
-  cursor: pointer;
-}
-
-.album img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-/* GALERÍA */
-.galeria {
-  column-count: 4;
-  column-gap: 12px;
-  padding: 20px;
-}
-
-.foto {
-  position: relative;
-  margin-bottom: 12px;
-  break-inside: avoid;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.foto:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-}
-
-.foto img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-/* CHECK */
-.check {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: 2px solid white;
-  background: rgba(0,0,0,0.4);
-  cursor: pointer;
-  z-index: 2;
-}
-
-.check::after {
-  content: "✔";
-  display: none;
-  color: white;
-  text-align: center;
-  line-height: 28px;
-}
-
-.foto.selected::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,0,0,0.35);
-  border-radius: 10px;
-  z-index: 1;
-  pointer-events: none; /* 🔥 ESTO SOLUCIONA TODO */
-}
-
-.foto.selected .check::after {
-  display: block;
-}
-
-/* BOTÓN VOLVER */
-.volver {
-  display: inline-block;
-  margin: 0 0 20px 0;
-  padding: 10px 16px;
-  background: black;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  font-size: 14px;
-}
-.bloque {
-  max-width: 1000px;
-  margin: auto;
-  text-align: left;
-}
-
-.titulo-seccion {
-  font-size: 22px;
-  margin-bottom: 20px;
-}
-
-/* CARRITO */
-#carrito {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: red;
-  color: black;
-  padding: 12px 25px;
-  border-radius: 25px;
-  cursor: pointer;
-
-  z-index: 9999; /* 🔥 CLAVE */
-}
-
-/* MODAL */
-#modalCarrito {
-  position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-
-.modal {
-  width:90%;
-  height:85%;
-  background:white;
-  border-radius:15px;
-  display:flex;
-  overflow:hidden;
-  position:relative;
-}
-
-/* IZQ */
-.izq {
-  flex: 1.5;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-
-
-.item {
-  position:relative;
-}
-
-#listaCarrito {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px;
-}
-
-.item img {
-  width: 100%;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.remove {
-  position:absolute;
-  top:-5px;
-  right:-5px;
-  background:red;
-  color:white;
-  border-radius:50%;
-  width:20px;
-  height:20px;
-  cursor:pointer;
-}
-
-/* DER */
-.der {
-  flex:1;
-  background:#f1f1f1;
-  padding:20px;
-  text-align:left;
-}
-
-/* NUEVO */
-.input {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-.btn-pagar {
-  margin-top:15px;
-  width:100%;
-  padding:12px;
-  background:black;
-  color:white;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-/* CERRAR */
-.cerrar-modal {
-  position:absolute;
-  top:10px;
-  right:20px;
-  font-size:25px;
-  cursor:pointer;
-}
-.cerrar-aviso {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 24px;
-  cursor: pointer;
-}
-/* VISOR */
-#visor {
-  position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.95);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-
-#visor img {
-  pointer-events: none;
-}
-.contenedor-img {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.contenedor-img img {
-  max-width: 85vw;
-  max-height: 85vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-}
-
-.cerrar {
-  position:absolute;
-  top:20px;
-  right:30px;
-  color:white;
-  font-size:30px;
-  cursor:pointer;
-}
-
-.flecha {
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:40px;
-  color:white;
-  cursor:pointer;
-}
-.cerrar {
-  z-index: 1001;
-}
-
-.flecha {
-  z-index: 1001;
-}
-
-
-.izquierda { left:30px; }
-.derecha { right:30px; }
-
-/* 🛒 BOTÓN CARRITO VISOR */
-.btn-carrito {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-
-  background: white;
-  color: black;
-
-  width: 45px;
-  height: 45px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-  cursor: pointer;
-
-  z-index: 1001;
-
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  transition: 0.2s;
-}
-
-.btn-carrito:hover {
-  transform: scale(1.15);
-}
-
-.btn-carrito:hover {
-  transform: scale(1.1);
-}
-
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-  h1 {
-    font-size: 20px;
-  }
-
-  .galeria {
-  column-count: 2;
-}
-
-  .foto {
-    margin-bottom: 8px;
-  }
-
-  .check {
-    width: 32px;
-    height: 32px;
-    bottom: 8px;
-    left: 8px;
-  }
-
-  .volver {
-    width: 90%;
-    margin: 10px auto;
-    display: block;
-  }
-
-  #carrito {
-    width: 90%;
-    text-align: center;
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .modal {
-    flex-direction: column;
-    height: 95%;
-  }
-
-  .izq {
-    height: 50%;
-    padding: 10px;
-  }
-
-  .der {
-  height: 50%;
-  padding: 15px;
-  overflow-y: auto;
-}
-
-  .grid {
-    justify-content: center;
-  }
-
-  .item img {
-    width: 70px;
-  }
-
-  .input {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .btn-pagar {
-  width: 100%;
-  font-size: 16px;
-  padding: 16px;
-  position: sticky;
-  bottom: 0;
-  background: black;
-  color: white;
-  border-radius: 10px;
-}
-
-  #visor img {
-    max-width: 95%;
-    max-height: 80%;
-  }
-
-  .flecha {
-    font-size: 30px;
-  }
-
-  .cerrar {
-    font-size: 26px;
-  }
-}.pantalla {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.box {
-  width: 90%;
-  max-width: 900px; /* 🔥 mismo tamaño que modal */
-  height: 80%;
-  background: #f1f5f9;
-  padding: 20px;
-  border-radius: 12px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.box.verde {
-  background: #e6f4ea;
-  border: 2px solid #2ecc71;
-}
-.inicio {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 25px;
-}
-
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  text-align: center;
-  font-weight: bold;
-  transition: 0.2s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.card img {
-  width: 100%;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.card h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.card p {
-  margin: 5px 0;
-  color: gray;
-}
-
-.grid-deportes {
-  display: flex;
-  justify-content: center;
-  margin-top: 40px;
-  flex-wrap: wrap; /* 🔥 importante */
-  gap: 20px;       /* 🔥 importante */
-}
-
-
-.overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 20px;
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-}
-.card-deporte {
-  width: 100%;
-  max-width: 320px;
-  border-radius: 20px;
-  overflow: hidden;
-  position: relative;
-  cursor: pointer;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  transition: 0.3s;
-}
-
-.card-deporte:hover {
-  transform: scale(1.05);
-}
-
-.card-deporte img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  transition: 0.4s;
-}
-
-.card-deporte:hover img {
-  transform: scale(1.08);
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@efe_produc</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      margin: 0;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 20px;
+    }
+
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+      justify-content: start;
+      gap: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      transition: 0.25s;
+    }
+
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+    }
+
+    .card img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      /* 🔥 CUADRADO */
+      object-fit: cover;
+    }
+
+    .card-title {
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .volver {
+      background: black;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .titulo-seccion {
+      font-size: 24px;
+      text-align: center;
+      margin: 10px 0 20px;
+    }
+
+    /* ÁLBUM */
+    .album {
+      width: 300px;
+      margin: auto;
+      cursor: pointer;
+    }
+
+    .album img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    /* GALERÍA */
+    .galeria {
+      column-count: 4;
+      column-gap: 12px;
+      padding: 20px;
+    }
+
+    .foto {
+      position: relative;
+      margin-bottom: 12px;
+      break-inside: avoid;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .foto:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .foto img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* CHECK */
+    .check {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 2px solid white;
+      background: rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .check::after {
+      content: "✔";
+      display: none;
+      color: white;
+      text-align: center;
+      line-height: 28px;
+    }
+
+    .foto.selected::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 0, 0, 0.35);
+      border-radius: 10px;
+      z-index: 1;
+      pointer-events: none;
+      /* 🔥 ESTO SOLUCIONA TODO */
+    }
+
+    .foto.selected .check::after {
+      display: block;
+    }
+
+    /* BOTÓN VOLVER */
+    .volver {
+      display: inline-block;
+      margin: 0 0 20px 0;
+      padding: 10px 16px;
+      background: black;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+    }
+
+    .bloque {
+      max-width: 1000px;
+      margin: auto;
+      text-align: left;
+    }
+
+    .titulo-seccion {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    /* CARRITO */
+    #carrito {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: red;
+      color: black;
+      padding: 12px 25px;
+      border-radius: 25px;
+      cursor: pointer;
+
+      z-index: 9999;
+      /* 🔥 CLAVE */
+    }
+
+    /* MODAL */
+    #modalCarrito {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      width: 90%;
+      height: 85%;
+      background: white;
+      border-radius: 15px;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* IZQ */
+    .izq {
+      flex: 1.5;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+
+
+    .item {
+      position: relative;
+    }
+
+    #listaCarrito {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 10px;
+    }
+
+    .item img {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .remove {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    /* DER */
+    .der {
+      flex: 1;
+      background: #f1f1f1;
+      padding: 20px;
+      text-align: left;
+    }
+
+    /* NUEVO */
+    .input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .btn-pagar {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* CERRAR */
+    .cerrar-modal {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    .cerrar-aviso {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* VISOR */
+    #visor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    #visor img {
+      pointer-events: none;
+    }
+
+    .contenedor-img {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .contenedor-img img {
+      max-width: 85vw;
+      max-height: 85vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .cerrar {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+    }
+
+    .flecha {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .cerrar {
+      z-index: 1001;
+    }
+
+    .flecha {
+      z-index: 1001;
+    }
+
+
+    .izquierda {
+      left: 30px;
+    }
+
+    .derecha {
+      right: 30px;
+    }
+
+    /* 🛒 BOTÓN CARRITO VISOR */
+    .btn-carrito {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+
+      background: white;
+      color: black;
+
+      width: 45px;
+      height: 45px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+      cursor: pointer;
+
+      z-index: 1001;
+
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      transition: 0.2s;
+    }
+
+    .btn-carrito:hover {
+      transform: scale(1.15);
+    }
+
+    .btn-carrito:hover {
+      transform: scale(1.1);
+    }
+
+    /* 📱 MOBILE */
+    @media (max-width: 768px) {
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .galeria {
+        column-count: 2;
+      }
+
+      .foto {
+        margin-bottom: 8px;
+      }
+
+      .check {
+        width: 32px;
+        height: 32px;
+        bottom: 8px;
+        left: 8px;
+      }
+
+      .volver {
+        width: 90%;
+        margin: 10px auto;
+        display: block;
+      }
+
+      #carrito {
+        width: 90%;
+        text-align: center;
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .modal {
+        flex-direction: column;
+        height: 95%;
+      }
+
+      .izq {
+        height: 50%;
+        padding: 10px;
+      }
+
+      .der {
+        height: 50%;
+        padding: 15px;
+        overflow-y: auto;
+      }
+
+      .grid {
+        justify-content: center;
+      }
+
+      .item img {
+        width: 70px;
+      }
+
+      .input {
+        font-size: 16px;
+        padding: 12px;
+      }
+
+      .btn-pagar {
+        width: 100%;
+        font-size: 16px;
+        padding: 16px;
+        position: sticky;
+        bottom: 0;
+        background: black;
+        color: white;
+        border-radius: 10px;
+      }
+
+      #visor img {
+        max-width: 95%;
+        max-height: 80%;
+      }
+
+      .flecha {
+        font-size: 30px;
+      }
+
+      .cerrar {
+        font-size: 26px;
+      }
+    }
+
+    .pantalla {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .box {
+      width: 90%;
+      max-width: 900px;
+      /* 🔥 mismo tamaño que modal */
+      height: 80%;
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .box.verde {
+      background: #e6f4ea;
+      border: 2px solid #2ecc71;
+    }
+
+    .inicio {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      text-align: center;
+      font-weight: bold;
+      transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 5px 0;
+      color: gray;
+    }
+
+    .grid-deportes {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      /* 🔥 importante */
+      gap: 20px;
+      /* 🔥 importante */
+    }
+
+
+    .overlay {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    }
+
+    .card-deporte {
+      width: 100%;
+      max-width: 320px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      transition: 0.3s;
+    }
+
+    .card-deporte:hover {
+      transform: scale(1.05);
+    }
+
+    .card-deporte img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      transition: 0.4s;
+    }
+
+    .card-deporte:hover img {
+      transform: scale(1.08);
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>@efe_produc</h1>
+  <h1>@efe_produc</h1>
 
-<div id="contenido" class="container"></div>
-<div id="carrito" style="display:none;">0 fotos | $0</div>
+  <div id="contenido" class="container"></div>
+  <div id="carrito" style="display:none;">0 fotos | $0</div>
 
-<div id="modalCarrito">
-  <div class="modal">
-    <span class="cerrar-modal" onclick="cerrarCarrito()">✖</span>
+  <div id="modalCarrito">
+    <div class="modal">
+      <span class="cerrar-modal" onclick="cerrarCarrito()">✖</span>
 
-    <div class="izq">
-      <h3>Carrito</h3>
-      <div class="grid" id="listaCarrito"></div>
-      <button onclick="vaciarCarrito()">Vaciar carrito</button>
-    </div>
+      <div class="izq">
+        <h3>Carrito</h3>
+        <div class="grid" id="listaCarrito"></div>
+        <button onclick="vaciarCarrito()">Vaciar carrito</button>
+      </div>
 
-    <div class="der">
-      <h3>Resumen</h3>
-      <div id="mensajePromo"></div>
-      <div id="resumen"></div>
+      <div class="der">
+        <h3>Resumen</h3>
+        <div id="mensajePromo"></div>
+        <div id="resumen"></div>
 
-      <h4>Email</h4>
-      <input id="email" class="input" placeholder="Tu email">
+        <h4>Email</h4>
+        <input id="email" class="input" placeholder="Tu email">
 
-      <h4>Teléfono</h4>
-      <input id="telefono" class="input" placeholder="Tu teléfono">
-      <button class="btn-pagar" onclick="pagar()" style="display:none;">Pagar con MercadoPago</button>
-      <button class="btn-pagar" onclick="validarTransferencia()">Transferencia</button>
-      <div id="transferenciaBox" class="transferencia-box" style="display:none;">
-  <h3>Datos para transferencia</h3>
+        <h4>Teléfono</h4>
+        <input id="telefono" class="input" placeholder="Tu teléfono">
+        <button class="btn-pagar" onclick="pagar()" style="display:none;">Pagar con MercadoPago</button>
+        <button class="btn-pagar" onclick="validarTransferencia()">Transferencia</button>
+        <div id="transferenciaBox" class="transferencia-box" style="display:none;">
+          <h3>Datos para transferencia</h3>
 
-  <p><b>Titular:</b> Juan Manuel Carabajal Monteros</p>
+          <p><b>Titular:</b> Juan Manuel Carabajal Monteros</p>
 
-  <p>
-    <b>CBU:</b> 
-    <span id="cbu">0000003100043282820177</span>
-    <button onclick="copiarTexto('cbu')">Copiar</button>
-  </p>
+          <p>
+            <b>CBU:</b>
+            <span id="cbu">0000003100043282820177</span>
+            <button onclick="copiarTexto('cbu')">Copiar</button>
+          </p>
 
-  <p>
-    <b>Alias:</b> 
-    <span id="alias">juanmacarabajal</span>
-    <button onclick="copiarTexto('alias')">Copiar</button>
-  </p>
+          <p>
+            <b>Alias:</b>
+            <span id="alias">juanmacarabajal</span>
+            <button onclick="copiarTexto('alias')">Copiar</button>
+          </p>
 
-  <p><b>Total:</b> $<span id="totalTransferencia"></span></p>
+          <p><b>Total:</b> $<span id="totalTransferencia"></span></p>
 
-  <p style="font-size:14px;opacity:0.7;">
-    Enviá el comprobante luego del pago
-  </p>
-</div>
-    </div>
-  </div>
-</div>
-
-<script>
-const contenido = document.getElementById("contenido");
-const normalizar = (str) =>
-  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  const normalizarPartido = (str) => {
-  return str
-    .toLowerCase()
-    .split("vs")
-    .map(s => s.trim())
-    .sort()
-    .join(" vs ");
-};
-const carritoUI = document.getElementById("carrito"); // 👉 solo para mostrar
-let carrito = []; // 👉 este es el verdadero carrito (datos)
-
-let seleccionadas = [];
-let imagenActual = 0;
-let desdeMenu = false;
-let startX = 0;
-
-document.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchend", e => {
-  const endX = e.changedTouches[0].clientX;
-  const diff = startX - endX;
-
-  if (Math.abs(diff) > 50) { // sensibilidad
-    if (diff > 0) {
-      cambiarImagen(1); // 👉 swipe izquierda = siguiente
-    } else {
-      cambiarImagen(-1); // 👉 swipe derecha = anterior
-    }
-  }
-});
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const params = new URLSearchParams(window.location.search);
-  const album = params.get("album");
-
-  if (album) {
-    console.log("Abrir álbum directo:", album);
-    abrirAlbum(decodeURIComponent(album), false);
-  } else {
-    mostrarDeportes();
-  }
-
-});
-
-
-document.addEventListener("contextmenu", e => e.preventDefault());
-async function mostrarDeportes() {
-  carritoUI.style.display = "none"; // 🔥 AGREGAR ESTO
-
-  const res = await fetch("/preview/futsal");
-  const data = await res.json();
-
-  contenido.innerHTML = `
-    <div class="container">
-      <div class="titulo-seccion">Deportes</div>
-
-      <div class="grid-deportes">
-        <div class="card-deporte" onclick="mostrarAlbum()">
-          <img src="${data.preview}" onerror="this.src='/watermark.png'">
-          <div class="overlay">Futsal</div>
+          <p style="font-size:14px;opacity:0.7;">
+            Enviá el comprobante luego del pago
+          </p>
         </div>
       </div>
     </div>
+  </div>
+
+  <script>
+    const contenido = document.getElementById("contenido");
+    const normalizar = (str) =>
+      str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const normalizarPartido = (str) => {
+      return str
+        .toLowerCase()
+        .split("vs")
+        .map(s => s.trim())
+        .sort()
+        .join(" vs ");
+    };
+    const carritoUI = document.getElementById("carrito"); // 👉 solo para mostrar
+    let carrito = []; // 👉 este es el verdadero carrito (datos)
+
+    let seleccionadas = [];
+    let imagenActual = 0;
+    let desdeMenu = false;
+    let startX = 0;
+
+    document.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+    });
+
+    document.addEventListener("touchend", e => {
+      const endX = e.changedTouches[0].clientX;
+      const diff = startX - endX;
+
+      if (Math.abs(diff) > 50) { // sensibilidad
+        if (diff > 0) {
+          cambiarImagen(1); // 👉 swipe izquierda = siguiente
+        } else {
+          cambiarImagen(-1); // 👉 swipe derecha = anterior
+        }
+      }
+    });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const params = new URLSearchParams(window.location.search);
+      const album = params.get("album");
+
+      if (album) {
+        console.log("Abrir álbum directo:", album);
+        // album viene desde la URL (puede venir 1 o más veces encodeado)
+        abrirAlbum(album, false);
+      } else {
+        mostrarDeportes();
+      }
+
+    });
+
+
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    async function mostrarDeportes() {
+      carritoUI.style.display = "none";
+
+      const res = await fetch("/deportes");
+      const deportes = await res.json();
+
+      contenido.innerHTML = `
+    <div class="container">
+      <div class="titulo-seccion">Deportes</div>
+      <div class="grid-deportes" id="gridDeportes"></div>
+    </div>
   `;
-}
-async function mostrarAlbum() {
-  carritoUI.style.display = "none";
 
-  const res = await fetch("/albums");
-  const categorias = await res.json();
+      const grid = document.getElementById("gridDeportes");
 
-  contenido.innerHTML = `
+      if (!deportes || deportes.length === 0) {
+        grid.innerHTML = "<p>No hay deportes cargados todavía</p>";
+        return;
+      }
+
+      for (const deporte of deportes) {
+        let preview = "";
+
+        try {
+          const r = await fetch(`/preview/${encodeURIComponent(deporte)}`);
+          const d = await r.json();
+          preview = d.preview || "/watermark.png";
+        } catch (e) {
+          preview = "/watermark.png";
+        }
+
+        grid.innerHTML += `
+      <div class="card-deporte" onclick="mostrarAlbum('${encodeURIComponent(deporte)}')">
+        <img src="${preview}" onerror="this.src='/watermark.png'">
+        <div class="overlay">${deporte}</div>
+      </div>
+    `;
+      }
+    }
+    async function mostrarAlbum(deporteEnc) {
+      carritoUI.style.display = "none";
+
+      const deporte = decodeURIComponent(deporteEnc || window.deporteActual || "Futsal");
+      window.deporteActual = deporte;
+
+      const res = await fetch(`/albums/${encodeURIComponent(deporte)}`);
+      const categorias = await res.json();
+
+      contenido.innerHTML = `
   <div class="container">
 
     <button class="volver" onclick="mostrarDeportes()">⬅ Volver</button>
 
-    <div class="titulo-seccion">Futsal</div>
+    <div class="titulo-seccion">${deporte}</div>
     <div class="grid-deportes" id="grid"></div>
   </div>
 `;
 
-  const grid = document.getElementById("grid");
+      const grid = document.getElementById("grid");
 
-  for (const cat of categorias) {
+      for (const cat of categorias) {
+        const nombreCat = typeof cat === "string" ? cat : cat.nombre;
 
-  const nombreCat = typeof cat === "string" ? cat : cat.nombre;
+        if (["preview", "thumb", "watermarked", "original"].includes(nombreCat.toLowerCase())) {
+          continue;
+        }
 
-  if (
-    ["preview", "thumb", "watermarked"].includes(nombreCat.toLowerCase())
-  ) continue;
+        let preview = "";
 
-  let preview = "";
+        try {
+          const resCat = await fetch(`/categoria/${encodeURIComponent(deporte)}/${encodeURIComponent(nombreCat)}`);
+          const albums = await resCat.json();
 
-  try {
-    const resCat = await fetch(`/categoria/${encodeURIComponent(cat.nombre)}`);
-    const albums = await resCat.json();
+          for (const albumObj of albums) {
+            const album = typeof albumObj === "string" ? albumObj : albumObj.nombre;
 
-    for (const albumObj of albums) {
+            try {
+              const resAlbum = await fetch(
+                `/album/${encodeURIComponent(deporte)}/${encodeURIComponent(nombreCat)}/${encodeURIComponent(album)}`
+              );
 
-  const album = typeof albumObj === "string" 
-    ? albumObj 
-    : albumObj.nombre;
+              const dataAlbum = await resAlbum.json();
 
-  try {
-    const resAlbum = await fetch(
-      `/album/${encodeURIComponent(cat.nombre)}/${encodeURIComponent(album)}`
-    );
+              if (dataAlbum.imagenes.length > 0) {
+                const randomIndex = Math.floor(Math.random() * dataAlbum.imagenes.length);
+                const img = dataAlbum.imagenes[randomIndex];
 
-    const dataAlbum = await resAlbum.json();
+                preview = `/images/${encodeURIComponent(deporte)}/${encodeURIComponent(nombreCat)}/${encodeURIComponent(album)}/thumb/${encodeURIComponent(img)}`;
+                break;
+              }
 
-    if (dataAlbum.imagenes.length > 0) {
+            } catch (e) {
+              console.log("error buscando preview", e);
+            }
+          }
 
-      const randomIndex = Math.floor(Math.random() * dataAlbum.imagenes.length);
-      const img = dataAlbum.imagenes[randomIndex];
+        } catch (e) {
+          console.log("Error preview", e);
+        }
 
-      const ruta = `/images/Futsal/${cat.nombre}/${album}/thumb/${img}`;
-preview = ruta;
-
-
-      break; // 🔥 IMPORTANTE → apenas encuentra uno válido, corta
+        grid.innerHTML += `
+      <div class="card-deporte" onclick="abrirCategoria('${encodeURIComponent(deporte)}','${encodeURIComponent(nombreCat)}')">
+        <img src="${preview}" onerror="this.src='/watermark.png'">
+        <div class="overlay">${nombreCat}</div>
+      </div>
+    `;
+      }
     }
+    async function abrirCategoria(deporteEnc, nombreEnc) {
+      carritoUI.style.display = "none";
 
-  } catch (e) {
-    console.log("error buscando preview", e);
-  }
-}
+      const deporte = decodeURIComponent(deporteEnc || window.deporteActual || "Futsal");
+      window.deporteActual = deporte;
 
-  } catch (e) {
-    console.log("Error preview", e);
-  }
+      const categoria = decodeURIComponent(nombreEnc);
 
-  grid.innerHTML += `
-  <div class="card-deporte" onclick="abrirCategoria('${encodeURIComponent(cat.nombre)}')">
-    <img src="${preview}" onerror="this.src='/watermark.png'">
-    <div class="overlay">${cat.nombre}</div>
-  </div>
-`;
-}
-}
-async function abrirCategoria(nombre) {
-  carritoUI.style.display = "none";
+      const res = await fetch(`/categoria/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}`);
+      const albums = await res.json();
+      window.albumsActuales = albums;
 
-  const categoria = decodeURIComponent(nombre);
-
-  const res = await fetch(`/categoria/${categoria}`);
-  const albums = await res.json();
-  window.albumsActuales = albums;
-
-  contenido.innerHTML = `
+      contenido.innerHTML = `
   <div class="container">
-    <button class="volver" onclick="mostrarAlbum()">⬅ Volver</button>
+    <button class="volver" onclick="mostrarAlbum('${encodeURIComponent(deporte)}')">⬅ Volver</button>
     <div class="titulo-seccion">${categoria}</div>
 
     <input 
@@ -809,254 +855,288 @@ async function abrirCategoria(nombre) {
   </div>
 `;
 
-  window.albumsActuales = albums;
+      const unicos = [];
+      const nombres = new Set();
 
-const unicos = [];
+      for (const a of albums) {
+        const nombreOriginal = typeof a === "string" ? a : a.nombre;
 
-const nombres = new Set();
+        const nombre = nombreOriginal
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .trim();
 
-for (const a of albums) {
-  const nombreOriginal = typeof a === "string" ? a : a.nombre;
-
-const nombre = nombreOriginal
-  .normalize("NFD")
-  .replace(/[\u0300-\u036f]/g, "")
-  .toLowerCase()
-  .trim();
-
-  if (!nombres.has(nombre)) {
-  nombres.add(nombre);
-  unicos.push(a);
-}
-}
-unicos.sort((a, b) => {
-  const n1 = typeof a === "string" ? a : a.nombre;
-  const n2 = typeof b === "string" ? b : b.nombre;
-  return n1.localeCompare(n2);
-});
-
-window.albumsActuales = unicos;
-
-renderAlbums(unicos, categoria);
-
-document.getElementById("buscador").addEventListener("input", (e) => {
-  const texto = normalizar(e.target.value);
-
-  const filtrados = window.albumsActuales.filter(a => {
-    const nombre = typeof a === "string" ? a : a.nombre;
-    return normalizar(nombre).includes(texto);
-  });
-
-  renderAlbums(filtrados, categoria);
-});
-}
-async function renderAlbums(lista, categoria) {
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-
-  const usados = new Set();
-
-  for (const albumObj of lista) {
-
-    const album = typeof albumObj === "string"
-      ? albumObj
-      : albumObj.nombre;
-
-    // 🔥 limpiar cosas tipo (1), (2)
-    const limpio = album.replace(/\(\d+\)/g, "").trim();
-
-    // 🔥 clave inteligente (invierte equipos automáticamente)
-    const clave = normalizarPartido(limpio);
-
-    if (usados.has(clave)) continue;
-    usados.add(clave);
-
-    let preview = "";
-
-    try {
-      const res = await fetch(`/album/${categoria}/${album}`);
-      const data = await res.json();
-
-      if (data.imagenes.length > 0) {
-        const randomIndex = Math.floor(Math.random() * data.imagenes.length);
-        const img = data.imagenes[randomIndex];
-
-        preview = `/images/Futsal/${categoria}/${album}/thumb/${img}`;
+        if (!nombres.has(nombre)) {
+          nombres.add(nombre);
+          unicos.push(a);
+        }
       }
 
-    } catch (e) {
-      console.log("error preview album", e);
-    }
+      unicos.sort((a, b) => {
+        const n1 = typeof a === "string" ? a : a.nombre;
+        const n2 = typeof b === "string" ? b : b.nombre;
+        return n1.localeCompare(n2);
+      });
 
-    grid.innerHTML += `
-      <div class="card-deporte" onclick="abrirAlbum('${categoria}/${album}', true)">
+      window.albumsActuales = unicos;
+
+      renderAlbums(unicos, deporte, categoria);
+
+      document.getElementById("buscador").addEventListener("input", (e) => {
+        const texto = normalizar(e.target.value);
+
+        const filtrados = window.albumsActuales.filter(a => {
+          const nombre = typeof a === "string" ? a : a.nombre;
+          return normalizar(nombre).includes(texto);
+        });
+
+        renderAlbums(filtrados, deporte, categoria);
+      });
+    }
+    async function renderAlbums(lista, deporte, categoria) {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+
+      const usados = new Set();
+
+      for (const albumObj of lista) {
+
+        const album = typeof albumObj === "string"
+          ? albumObj
+          : albumObj.nombre;
+
+        // 🔥 limpiar cosas tipo (1), (2)
+        const limpio = album.replace(/\(\d+\)/g, "").trim();
+
+        // 🔥 clave inteligente (invierte equipos automáticamente)
+        const clave = normalizarPartido(limpio);
+
+        if (usados.has(clave)) continue;
+        usados.add(clave);
+
+        let preview = "";
+
+        try {
+          const res = await fetch(`/album/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}`);
+          const data = await res.json();
+
+          if (data.imagenes.length > 0) {
+            const randomIndex = Math.floor(Math.random() * data.imagenes.length);
+            const img = data.imagenes[randomIndex];
+
+            preview = `/images/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/thumb/${encodeURIComponent(img)}`;
+          }
+
+        } catch (e) {
+          console.log("error preview album", e);
+        }
+
+        grid.innerHTML += `
+      <div class="card-deporte" onclick="abrirAlbum('${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}', true)">
         <img src="${preview}" onerror="this.src='/watermark.png'">
         <div class="overlay">${album}</div>
       </div>
     `;
-  }
-}
-function cerrarAviso() {
-  document.getElementById("pantallaAviso").style.display = "none";
-}
+      }
+    }
+    function cerrarAviso() {
+      document.getElementById("pantallaAviso").style.display = "none";
+    }
 
-async function abrirAlbum(nombre, desdeClick = false) {
-  desdeMenu = desdeClick;
+    async function abrirAlbum(nombre, desdeClick = false) {
+      desdeMenu = desdeClick;
 
-  const [categoria, album] = nombre.split("/");
+      const safeDecode = (str) => {
+        // soporta casos donde venga doble-encodeado (%2520 -> %20 -> " ")
+        let out = str;
+        for (let i = 0; i < 3; i++) {
+          try {
+            const dec = decodeURIComponent(out);
+            if (dec === out) break;
+            out = dec;
+          } catch {
+            break;
+          }
+        }
+        return out;
+      };
 
-  window.history.pushState({}, "", `?album=${encodeURIComponent(nombre)}`);
+      const partes = (nombre || "").split("/");
 
-  seleccionadas = [];
-  actualizarCarrito();
+      // Compatibilidad: links viejos venían como "categoria/album" (sin deporte)
+      let deporte = "";
+      let categoria = "";
+      let album = "";
 
-  const res = await fetch(`/album/${categoria}/${album}`);
-  const data = await res.json();
+      if (partes.length >= 3) {
+        deporte = safeDecode(partes[0] || "");
+        categoria = safeDecode(partes[1] || "");
+        album = safeDecode(partes.slice(2).join("/") || "");
+      } else {
+        deporte = window.deporteActual || "Futsal";
+        categoria = safeDecode(partes[0] || "");
+        album = safeDecode(partes.slice(1).join("/") || "");
+      }
 
-  window.albumActual = data.album;
-  window.imagenes = data.imagenes;
+      window.deporteActual = deporte;
 
-  contenido.className = "container";
+      // Guardar en URL una sola vez encodeado
+      const albumParam = [deporte, categoria, album].map(encodeURIComponent).join("/");
+      window.history.pushState({}, "", `?album=${albumParam}`);
 
-  contenido.innerHTML = `
-    ${desdeMenu ? `<button class="volver" onclick="abrirCategoria('${encodeURIComponent(categoria)}')">⬅ Volver</button>` : ""}
+      seleccionadas = [];
+      actualizarCarrito();
+
+      const res = await fetch(
+        `/album/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}`
+      );
+      const data = await res.json();
+
+      window.albumActual = data.album;
+      window.imagenes = data.imagenes;
+
+      contenido.className = "container";
+
+      contenido.innerHTML = `
+    ${desdeMenu ? `<button class="volver" onclick="abrirCategoria('${encodeURIComponent(deporte)}','${encodeURIComponent(categoria)}')">⬅ Volver</button>` : ""}
     <div class="galeria"></div>
   `;
 
-  carritoUI.style.display = "block";
+      carritoUI.style.display = "block";
 
-  const galeria = document.querySelector(".galeria");
+      const galeria = document.querySelector(".galeria");
 
-  imagenes.forEach(nombreImg => {
-    const div = document.createElement("div");
-    div.className = "foto";
+      imagenes.forEach(nombreImg => {
+        const div = document.createElement("div");
+        div.className = "foto";
 
-    div.innerHTML = `
+        div.innerHTML = `
       <img src="${albumActual.thumb + nombreImg}" onclick="verImagen('${nombreImg}')">
       <div class="check"></div>
     `;
 
-    div.querySelector(".check").onclick = (e) => {
-      e.stopPropagation();
-      toggleSeleccion(div, nombreImg);
+        div.querySelector(".check").onclick = (e) => {
+          e.stopPropagation();
+          toggleSeleccion(div, nombreImg);
+        };
+
+        galeria.appendChild(div);
+      });
+    }
+
+    function toggleSeleccion(div, nombre) {
+      div.classList.toggle("selected");
+
+      const ruta = `${window.location.origin}${albumActual.original}${nombre}`;
+
+      const existe = carrito.find(f => f.original === ruta);
+
+      if (existe) {
+        carrito = carrito.filter(f => f.original !== ruta);
+      } else {
+        carrito.push({ original: ruta });
+      }
+
+      console.log("CARRITO REAL:", carrito);
+
+      if (seleccionadas.includes(nombre)) {
+        seleccionadas = seleccionadas.filter(f => f !== nombre);
+      } else {
+        seleccionadas.push(nombre);
+      }
+
+      actualizarCarrito();
+    }
+
+    function calcularTotal() {
+      let cant = seleccionadas.length;
+
+      if (cant === 0) return 0;
+
+      let resto = cant % 10;
+      let bloques = Math.floor(cant / 10);
+
+      let total = bloques * 12000;
+
+      if (resto === 0) return total;
+
+      if (resto === 1) total += 2000;
+      else if (resto === 2) total += 4000;
+      else if (resto === 3) total += 5500;
+      else if (resto === 4) total += 7500;
+      else if (resto === 5) total += 7500;
+      else if (resto === 6) total += 9500;
+      else if (resto === 7) total += 9500;
+      else if (resto === 8) total += 11500;
+      else if (resto === 9) total += 13500;
+
+      return total;
+    }
+    function generarMensajePromo(cant) {
+      let faltan3 = 3 - (cant % 3);
+      let faltan5 = 5 - (cant % 5);
+      let faltan7 = 7 - (cant % 7);
+
+      if (cant < 3) {
+        return `Agregá ${3 - cant} foto(s) más y pagá el pack de 3 ($5500)`;
+      }
+
+      if (cant < 5) {
+        return `Agregá ${5 - cant} foto(s) más y accedé al pack de 5 ($7500)`;
+      }
+
+      if (cant < 7) {
+        return `Agregá ${7 - cant} foto(s) más y accedé al pack de 7 ($9500)`;
+      }
+
+      if (cant < 10) {
+        return `Agregá ${10 - cant} foto(s) más y accedé al pack de 10 ($12000)`;
+      }
+
+      return "";
+    }
+
+
+    function actualizarCarrito() {
+      carritoUI.innerText = `${seleccionadas.length} fotos | $${calcularTotal()}`;
+    }
+
+    carritoUI.onclick = () => {
+      if (seleccionadas.length === 0) {
+        alert("Seleccioná al menos una foto");
+        return;
+      }
+
+      abrirCarrito();
     };
 
-    galeria.appendChild(div);
-  });
-}
-
-function toggleSeleccion(div, nombre) {
-  div.classList.toggle("selected");
-
-  const ruta = `${window.location.origin}${albumActual.original}${nombre}`;
-
-  const existe = carrito.find(f => f.original === ruta);
-
-  if (existe) {
-    carrito = carrito.filter(f => f.original !== ruta);
-  } else {
-    carrito.push({ original: ruta });
-  }
-
-  console.log("CARRITO REAL:", carrito);
-
-  if (seleccionadas.includes(nombre)) {
-    seleccionadas = seleccionadas.filter(f => f !== nombre);
-  } else {
-    seleccionadas.push(nombre);
-  }
-
-  actualizarCarrito();
-}
-
-function calcularTotal() {
-  let cant = seleccionadas.length;
-
-  if (cant === 0) return 0;
-
-  let resto = cant % 10;
-  let bloques = Math.floor(cant / 10);
-
-  let total = bloques * 12000;
-
-  if (resto === 0) return total;
-
-  if (resto === 1) total += 2000;
-  else if (resto === 2) total += 4000;
-  else if (resto === 3) total += 5500;
-  else if (resto === 4) total += 7500;
-  else if (resto === 5) total += 7500;
-  else if (resto === 6) total += 9500;
-  else if (resto === 7) total += 9500;
-  else if (resto === 8) total += 11500;
-  else if (resto === 9) total += 13500;
-
-  return total;
-}
-function generarMensajePromo(cant) {
-  let faltan3 = 3 - (cant % 3);
-  let faltan5 = 5 - (cant % 5);
-  let faltan7 = 7 - (cant % 7);
-
-  if (cant < 3) {
-    return `Agregá ${3 - cant} foto(s) más y pagá el pack de 3 ($5500)`;
-  }
-
-  if (cant < 5) {
-    return `Agregá ${5 - cant} foto(s) más y accedé al pack de 5 ($7500)`;
-  }
-
-  if (cant < 7) {
-    return `Agregá ${7 - cant} foto(s) más y accedé al pack de 7 ($9500)`;
-  }
-
-  if (cant < 10) {
-    return `Agregá ${10 - cant} foto(s) más y accedé al pack de 10 ($12000)`;
-  }
-
-  return "";
-}
+    function abrirCarrito() {
+      document.getElementById("modalCarrito").style.display = "flex";
+      carritoUI.style.display = "none"; // 🔥 ESTA ES LA LÍNEA NUEVA
 
 
-function actualizarCarrito() {
-  carritoUI.innerText = `${seleccionadas.length} fotos | $${calcularTotal()}`;
-}
+      const lista = document.getElementById("listaCarrito");
+      lista.innerHTML = "";
 
-carritoUI.onclick = () => {
-  if (seleccionadas.length === 0) {
-    alert("Seleccioná al menos una foto");
-    return;
-  }
+      seleccionadas.forEach(nombre => {
+        const div = document.createElement("div");
+        div.className = "item";
 
-  abrirCarrito();
-};
-
-function abrirCarrito() {
-  document.getElementById("modalCarrito").style.display = "flex";
-  carritoUI.style.display = "none"; // 🔥 ESTA ES LA LÍNEA NUEVA
-
-
-  const lista = document.getElementById("listaCarrito");
-  lista.innerHTML = "";
-
-  seleccionadas.forEach(nombre => {
-    const div = document.createElement("div");
-    div.className = "item";
-
-    div.innerHTML = `
+        div.innerHTML = `
       <img src="${albumActual.preview + nombre}">
       <div class="remove" onclick="eliminar('${nombre}')">x</div>
     `;
 
-    lista.appendChild(div);
-  });
+        lista.appendChild(div);
+      });
 
-  let cant = seleccionadas.length;
-  let total = calcularTotal();
-  const mensaje = generarMensajePromo(cant);
+      let cant = seleccionadas.length;
+      let total = calcularTotal();
+      const mensaje = generarMensajePromo(cant);
 
-document.getElementById("mensajePromo").innerHTML = mensaje
-  ? `<div style="
+      document.getElementById("mensajePromo").innerHTML = mensaje
+        ? `<div style="
       background:#eef4ff;
       padding:10px;
       border-radius:10px;
@@ -1064,87 +1144,86 @@ document.getElementById("mensajePromo").innerHTML = mensaje
     ">
       💡 ${mensaje}
     </div>`
-  : "";
+        : "";
 
-  let pack = "Individual";
-  if (cant >= 10) pack = "Pack 10";
-  else if (cant >= 7) pack = "Pack 7";
-  else if (cant >= 5) pack = "Pack 5";
-  else if (cant >= 3) pack = "Pack 3";
+      let pack = "Individual";
+      if (cant >= 10) pack = "Pack 10";
+      else if (cant >= 7) pack = "Pack 7";
+      else if (cant >= 5) pack = "Pack 5";
+      else if (cant >= 3) pack = "Pack 3";
 
-  let precioSinDescuento = cant * 2000;
+      let precioSinDescuento = cant * 2000;
 
-let tieneDescuento = total < precioSinDescuento;
+      let tieneDescuento = total < precioSinDescuento;
 
-document.getElementById("resumen").innerHTML = `
+      document.getElementById("resumen").innerHTML = `
   <p>${cant} fotos</p>
   <p>${pack}</p>
 
-  ${
-    tieneDescuento
-      ? `<p style="text-decoration: line-through; opacity:0.6;">
+  ${tieneDescuento
+          ? `<p style="text-decoration: line-through; opacity:0.6;">
           $${precioSinDescuento}
         </p>`
-      : ""
-  }
+          : ""
+        }
 
   <h2>$${total}</h2>
 `;
-}
+    }
 
-function cerrarCarrito() {
-  document.getElementById("modalCarrito").style.display = "none";
+    function cerrarCarrito() {
+      document.getElementById("modalCarrito").style.display = "none";
 
-  carritoUI.style.display = "block"; // 🔥 vuelve a aparecer
-}
+      carritoUI.style.display = "block"; // 🔥 vuelve a aparecer
+    }
 
-function eliminar(nombre) {
-  seleccionadas = seleccionadas.filter(f => f !== nombre);
+    function eliminar(nombre) {
+      seleccionadas = seleccionadas.filter(f => f !== nombre);
 
-  carrito = carrito.filter(f => !f.original.includes(nombre)); // 🔥 clave
+      carrito = carrito.filter(f => !f.original.includes(nombre)); // 🔥 clave
 
-  abrirCarrito();
-  actualizarCarrito();
-  actualizarGaleria();
-  actualizarImagen(); // 🔥 ESTA LÍNEA ARREGLA EL VISOR
-}
+      abrirCarrito();
+      actualizarCarrito();
+      actualizarGaleria();
+      actualizarImagen(); // 🔥 ESTA LÍNEA ARREGLA EL VISOR
+    }
 
-function vaciarCarrito() {
-  seleccionadas = [];
-  carrito = []; // 🔥 MUY IMPORTANTE
+    function vaciarCarrito() {
+      seleccionadas = [];
+      carrito = []; // 🔥 MUY IMPORTANTE
 
-  abrirCarrito();
-  actualizarCarrito();
-  actualizarGaleria();
-  actualizarImagen(); // 🔥 sincroniza visor
-}
+      abrirCarrito();
+      actualizarCarrito();
+      actualizarGaleria();
+      actualizarImagen(); // 🔥 sincroniza visor
+    }
 
-async function pagar() {
-  const email = document.getElementById("email").value;
+    async function pagar() {
+      const email = document.getElementById("email").value;
 
-  if (!email) return alert("Ingresá tu email");
+      if (!email) return alert("Ingresá tu email");
 
-  const res = await fetch("/crear-preferencia", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({
-      fotos: seleccionadas,
-      total: calcularTotal(),
-      email
-    })
-  });
+      const res = await fetch("/crear-preferencia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fotos: seleccionadas,
+          total: calcularTotal(),
+          email
+        })
+      });
 
-  const data = await res.json();
-  window.location.assign(data.init_point);
-}
+      const data = await res.json();
+      window.location.assign(data.init_point);
+    }
 
-function verImagen(nombre) {
-  imagenActual = imagenes.indexOf(nombre);
+    function verImagen(nombre) {
+      imagenActual = imagenes.indexOf(nombre);
 
-  const visor = document.createElement("div");
-  visor.id = "visor";
+      const visor = document.createElement("div");
+      visor.id = "visor";
 
-  visor.innerHTML = `
+      visor.innerHTML = `
   <span class="cerrar" onclick="cerrarVisor()">✖</span>
 
   <span class="flecha izquierda" onclick="cambiarImagen(-1)">❮</span>
@@ -1161,201 +1240,202 @@ function verImagen(nombre) {
   
 `;
 
-  document.body.appendChild(visor);
-  actualizarImagen();
+      document.body.appendChild(visor);
+      actualizarImagen();
 
-  document.addEventListener("keydown", manejarTeclado);
-}
-
-function actualizarImagen() {
-  const nombre = imagenes[imagenActual];
-  const ruta = albumActual.watermarked + nombre;
-
-  document.getElementById("imgGrande").src = encodeURI(ruta);
-
-  // 🔥 CAMBIAR ICONO
-  const btn = document.getElementById("btnCarritoVisor");
-
-  if (btn) {
-    const urlOriginal = `${window.location.origin}${albumActual.original}${nombre}`;
-    const existe = carrito.find(f => f.original === urlOriginal);
-
-    btn.innerHTML = existe ? "❌" : "🛒";
-  }
-}
-
-function cambiarImagen(dir) {
-  const total = imagenes.length;
-
-  if (dir === 1) {
-    imagenActual = (imagenActual + 1) % total;
-  } else if (dir === -1) {
-    imagenActual = (imagenActual - 1 + total) % total;
-  }
-
-  actualizarImagen();
-}
-function agregarDesdeVisor() {
-  const nombre = imagenes[imagenActual];
-
-  const ruta = `${window.location.origin}${albumActual.original}${nombre}`;
-
-  const existe = carrito.find(f => f.original === ruta);
-
-  if (existe) {
-    carrito = carrito.filter(f => f.original !== ruta);
-    seleccionadas = seleccionadas.filter(f => f !== nombre);
-  } else {
-    carrito.push({ original: ruta });
-    seleccionadas.push(nombre);
-  }
-
-  actualizarCarrito();
-  actualizarImagen(); // 🔥 clave para cambiar icono
-}
-
-function cerrarVisor() {
-  document.getElementById("visor").remove();
-  document.removeEventListener("keydown", manejarTeclado);
-
-  actualizarGaleria(); // 🔥 esto hace la magia
-}
-
-function manejarTeclado(e) {
-  if (e.key === "ArrowRight") cambiarImagen(1);
-  if (e.key === "ArrowLeft") cambiarImagen(-1);
-  if (e.key === "Escape") cerrarVisor();
-}
-function actualizarGaleria() {
-  document.querySelectorAll(".foto").forEach(div => {
-    const img = div.querySelector("img");
-    const nombre = decodeURIComponent(img.src.split("/").pop());
-
-    if (seleccionadas.includes(nombre)) {
-      div.classList.add("selected");
-    } else {
-      div.classList.remove("selected");
+      document.addEventListener("keydown", manejarTeclado);
     }
-  });
-  // 🔥 ACTUALIZA EL VISOR SI ESTÁ ABIERTO
-const btn = document.getElementById("btnCarritoVisor");
-if (btn) {
-  const nombre = imagenes[imagenActual];
-  const urlOriginal = `${window.location.origin}${albumActual.original}${nombre}`;
-  const existe = carrito.find(f => f.original === urlOriginal);
 
-  btn.innerHTML = existe ? "❌" : "🛒";
-}
-}
+    function actualizarImagen() {
+      const nombre = imagenes[imagenActual];
+      const ruta = albumActual.watermarked + nombre;
 
-mostrarDeportes();
-window.addEventListener("popstate", () => {
-  mostrarDeportes();
-});
-document.addEventListener("DOMContentLoaded", () => {
-  const aviso = document.getElementById("pantallaAviso");
+      // No usar encodeURI acá porque puede romper caracteres como ñ si ya vienen encodeados
+      document.getElementById("imgGrande").src = ruta;
 
-  if (aviso) {
-    aviso.addEventListener("click", (e) => {
-      if (e.target.id === "pantallaAviso") {
-        cerrarAviso();
+      // 🔥 CAMBIAR ICONO
+      const btn = document.getElementById("btnCarritoVisor");
+
+      if (btn) {
+        const urlOriginal = `${window.location.origin}${albumActual.original}${nombre}`;
+        const existe = carrito.find(f => f.original === urlOriginal);
+
+        btn.innerHTML = existe ? "❌" : "🛒";
+      }
+    }
+
+    function cambiarImagen(dir) {
+      const total = imagenes.length;
+
+      if (dir === 1) {
+        imagenActual = (imagenActual + 1) % total;
+      } else if (dir === -1) {
+        imagenActual = (imagenActual - 1 + total) % total;
+      }
+
+      actualizarImagen();
+    }
+    function agregarDesdeVisor() {
+      const nombre = imagenes[imagenActual];
+
+      const ruta = `${window.location.origin}${albumActual.original}${nombre}`;
+
+      const existe = carrito.find(f => f.original === ruta);
+
+      if (existe) {
+        carrito = carrito.filter(f => f.original !== ruta);
+        seleccionadas = seleccionadas.filter(f => f !== nombre);
+      } else {
+        carrito.push({ original: ruta });
+        seleccionadas.push(nombre);
+      }
+
+      actualizarCarrito();
+      actualizarImagen(); // 🔥 clave para cambiar icono
+    }
+
+    function cerrarVisor() {
+      document.getElementById("visor").remove();
+      document.removeEventListener("keydown", manejarTeclado);
+
+      actualizarGaleria(); // 🔥 esto hace la magia
+    }
+
+    function manejarTeclado(e) {
+      if (e.key === "ArrowRight") cambiarImagen(1);
+      if (e.key === "ArrowLeft") cambiarImagen(-1);
+      if (e.key === "Escape") cerrarVisor();
+    }
+    function actualizarGaleria() {
+      document.querySelectorAll(".foto").forEach(div => {
+        const img = div.querySelector("img");
+        const nombre = decodeURIComponent(img.src.split("/").pop());
+
+        if (seleccionadas.includes(nombre)) {
+          div.classList.add("selected");
+        } else {
+          div.classList.remove("selected");
+        }
+      });
+      // 🔥 ACTUALIZA EL VISOR SI ESTÁ ABIERTO
+      const btn = document.getElementById("btnCarritoVisor");
+      if (btn) {
+        const nombre = imagenes[imagenActual];
+        const urlOriginal = `${window.location.origin}${albumActual.original}${nombre}`;
+        const existe = carrito.find(f => f.original === urlOriginal);
+
+        btn.innerHTML = existe ? "❌" : "🛒";
+      }
+    }
+
+    mostrarDeportes();
+    window.addEventListener("popstate", () => {
+      mostrarDeportes();
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+      const aviso = document.getElementById("pantallaAviso");
+
+      if (aviso) {
+        aviso.addEventListener("click", (e) => {
+          if (e.target.id === "pantallaAviso") {
+            cerrarAviso();
+          }
+        });
       }
     });
-  }
-});
-function mostrarTransferencia() {
-  document.getElementById("transferenciaBox").style.display = "block";
-  document.getElementById("totalTransferencia").innerText = total;
-}
-
-function copiarTexto(id) {
-  const texto = document.getElementById(id).innerText;
-
-  navigator.clipboard.writeText(texto);
-
-  alert("Copiado: " + texto);
-}
-function abrirAviso() {
-  document.getElementById("pantallaAviso").style.display = "flex";
-}
-function validarTransferencia() {
-  if (seleccionadas.length === 0) {
-    alert("Seleccioná al menos una foto");
-    return;
-  }
-
-  const email = document.getElementById("email").value.trim();
-  const telefono = document.getElementById("telefono").value.trim();
-
-  if (!email || !telefono) {
-    alert("Completá email y teléfono");
-    return;
-  }
-
-  abrirAviso();
-}
-
-
-let enviando = false;
-
-async function crearOrden() {
-
-  if (enviando) return;
-  enviando = true;
-
-  const emailInput = document.getElementById("email");
-  const telefonoInput = document.getElementById("telefono");
-
-  if (!emailInput || !telefonoInput) {
-    alert("Faltan los campos de email o teléfono");
-    enviando = false;
-    return;
-  }
-
-  const email = emailInput.value;
-  const telefono = telefonoInput.value;
-
-  if (!email || !telefono) {
-    alert("Completá email y teléfono");
-    enviando = false;
-    return;
-  }
-
-  const totalFinal = calcularTotal();
-
-  try {
-
-    // ✅ CREAR PEDIDO (ÚNICA VEZ)
-    const resPedido = await fetch("/crear-pedido", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fotos: carrito,
-        email,
-        telefono,
-        total: totalFinal
-      })
-    });
-
-    const dataPedido = await resPedido.json();
-    console.log("RESPUESTA DEL SERVER:", dataPedido);
-
-    const pedidoId = dataPedido.pedidoId;
-
-    if (!pedidoId) {
-      alert("Error al crear pedido");
-      enviando = false;
-      return;
+    function mostrarTransferencia() {
+      document.getElementById("transferenciaBox").style.display = "block";
+      document.getElementById("totalTransferencia").innerText = total;
     }
 
-    const codigo =
-      Math.random().toString(36).substring(2, 6).toUpperCase() +
-      "-" +
-      Math.random().toString(36).substring(2, 6).toUpperCase();
+    function copiarTexto(id) {
+      const texto = document.getElementById(id).innerText;
 
-    const fecha = new Date().toLocaleDateString();
+      navigator.clipboard.writeText(texto);
 
-    const mensaje = `Hola! Te paso el resumen de mi pedido
+      alert("Copiado: " + texto);
+    }
+    function abrirAviso() {
+      document.getElementById("pantallaAviso").style.display = "flex";
+    }
+    function validarTransferencia() {
+      if (seleccionadas.length === 0) {
+        alert("Seleccioná al menos una foto");
+        return;
+      }
+
+      const email = document.getElementById("email").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+
+      if (!email || !telefono) {
+        alert("Completá email y teléfono");
+        return;
+      }
+
+      abrirAviso();
+    }
+
+
+    let enviando = false;
+
+    async function crearOrden() {
+
+      if (enviando) return;
+      enviando = true;
+
+      const emailInput = document.getElementById("email");
+      const telefonoInput = document.getElementById("telefono");
+
+      if (!emailInput || !telefonoInput) {
+        alert("Faltan los campos de email o teléfono");
+        enviando = false;
+        return;
+      }
+
+      const email = emailInput.value;
+      const telefono = telefonoInput.value;
+
+      if (!email || !telefono) {
+        alert("Completá email y teléfono");
+        enviando = false;
+        return;
+      }
+
+      const totalFinal = calcularTotal();
+
+      try {
+
+        // ✅ CREAR PEDIDO (ÚNICA VEZ)
+        const resPedido = await fetch("/crear-pedido", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fotos: carrito,
+            email,
+            telefono,
+            total: totalFinal
+          })
+        });
+
+        const dataPedido = await resPedido.json();
+        console.log("RESPUESTA DEL SERVER:", dataPedido);
+
+        const pedidoId = dataPedido.pedidoId;
+
+        if (!pedidoId) {
+          alert("Error al crear pedido");
+          enviando = false;
+          return;
+        }
+
+        const codigo =
+          Math.random().toString(36).substring(2, 6).toUpperCase() +
+          "-" +
+          Math.random().toString(36).substring(2, 6).toUpperCase();
+
+        const fecha = new Date().toLocaleDateString();
+
+        const mensaje = `Hola! Te paso el resumen de mi pedido
 
 Pedido: #${pedidoId} / ${codigo}
 Tienda: efe_produc
@@ -1368,57 +1448,60 @@ Total: $${totalFinal}
 
 Enviá el comprobante por WhatsApp para recibir tus fotos.`;
 
-    const telefonoDestino = "5493816657619";
+        const telefonoDestino = "5493816657619";
 
-    const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
+        const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
-    window.location.href = url;
+        window.location.href = url;
 
-  } catch (error) {
-    console.log("ERROR:", error);
-    alert("Error al crear el pedido");
-  }
+      } catch (error) {
+        console.log("ERROR:", error);
+        alert("Error al crear el pedido");
+      }
 
-  enviando = false;
-}
+      enviando = false;
+    }
 
-</script>
+  </script>
 
-<div id="pantallaAviso" class="pantalla" style="display:none;">
-  <div class="box">
+  <div id="pantallaAviso" class="pantalla" style="display:none;">
+    <div class="box">
 
-    <span class="cerrar-aviso" onclick="cerrarAviso()">✖</span>
+      <span class="cerrar-aviso" onclick="cerrarAviso()">✖</span>
 
-    <p><b>Tené en cuenta...</b></p>
+      <p><b>Tené en cuenta...</b></p>
 
-    <p>
-      Las transferencias se procesan manualmente. Tendrás que enviarnos el comprobante de la transferencia al WhatsApp <b>3816657619</b>.
-    </p>
+      <p>
+        Las transferencias se procesan manualmente. Tendrás que enviarnos el comprobante de la transferencia al WhatsApp
+        <b>3816657619</b>.
+      </p>
 
-    <p>
-      El envío de las fotos puede demorar hasta 24 hs. En la próxima pantalla te mostraremos los datos para la transferencia y también te los enviaremos por WhatsApp.
-    </p>
+      <p>
+        El envío de las fotos puede demorar hasta 24 hs. En la próxima pantalla te mostraremos los datos para la
+        transferencia y también te los enviaremos por WhatsApp.
+      </p>
 
-    <button class="btn-pagar" onclick="crearOrden()">Crear orden</button>
+      <button class="btn-pagar" onclick="crearOrden()">Crear orden</button>
 
+    </div>
   </div>
-</div>
-<div id="pantallaDatos" class="pantalla" style="display:none;">
-  <div class="box verde">
+  <div id="pantallaDatos" class="pantalla" style="display:none;">
+    <div class="box verde">
 
-    <p><b>El pedido está listo, estos son los datos para la transferencia bancaria:</b></p>
+      <p><b>El pedido está listo, estos son los datos para la transferencia bancaria:</b></p>
 
-    <p><b>Nombre:</b> Maximiliano Chamut Curia</p>
-    <p><b>CVU:</b> 0000003100089071728987</p>
-    <p><b>Alias:</b> maximilianochamutmp</p>
+      <p><b>Nombre:</b> Maximiliano Chamut Curia</p>
+      <p><b>CVU:</b> 0000003100089071728987</p>
+      <p><b>Alias:</b> maximilianochamutmp</p>
 
-    <p><b>Total:</b> $<span id="totalFinal"></span></p>
+      <p><b>Total:</b> $<span id="totalFinal"></span></p>
 
-    <p style="opacity:0.7;">
-      Enviá el comprobante por WhatsApp para recibir tus fotos.
-    </p>
-// deploy
+      <p style="opacity:0.7;">
+        Enviá el comprobante por WhatsApp para recibir tus fotos.
+      </p>
+      // deploy
+    </div>
   </div>
-</div>
 </body>
+
 </html>

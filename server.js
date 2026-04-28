@@ -47,16 +47,16 @@ async function procesarAlbum(album) {
       .toFile(thumbOutput);
 
     const image = sharp(input);
-const metadata = await image.metadata();
+    const metadata = await image.metadata();
 
-const isVertical = metadata.height > metadata.width;
+    const isVertical = metadata.height > metadata.width;
 
-const fontSize = isVertical
-  ? Math.floor(metadata.width / 7)
-  : Math.floor(metadata.width / 10);
+    const fontSize = isVertical
+      ? Math.floor(metadata.width / 7)
+      : Math.floor(metadata.width / 10);
 
-function crearSVG(offsetY) {
-  return `
+    function crearSVG(offsetY) {
+      return `
   <svg width="${metadata.width}" height="${metadata.height}">
     <style>
       .title {
@@ -68,7 +68,7 @@ function crearSVG(offsetY) {
       }
     </style>
 
-    <g transform="rotate(-35 ${metadata.width/2} ${metadata.height/2})">
+    <g transform="rotate(-35 ${metadata.width / 2} ${metadata.height / 2})">
       <text 
         x="50%" 
         y="${50 + (offsetY / metadata.height) * 100}%" 
@@ -80,33 +80,33 @@ function crearSVG(offsetY) {
     </g>
   </svg>
   `;
-}
+    }
 
-let offsets = [];
+    let offsets = [];
 
-if (isVertical) {
-  offsets = [
-    -metadata.height * 0.35,
-    0,
-    metadata.height * 0.35
-  ];
-} else {
-  offsets = [
-    -metadata.height * 0.25,
-    metadata.height * 0.25
-  ];
-}
+    if (isVertical) {
+      offsets = [
+        -metadata.height * 0.35,
+        0,
+        metadata.height * 0.35
+      ];
+    } else {
+      offsets = [
+        -metadata.height * 0.25,
+        metadata.height * 0.25
+      ];
+    }
 
-const composites = offsets.map(offset => ({
-  input: Buffer.from(crearSVG(offset)),
-  top: 0,
-  left: 0
-}));
+    const composites = offsets.map(offset => ({
+      input: Buffer.from(crearSVG(offset)),
+      top: 0,
+      left: 0
+    }));
 
-await image
-  .composite(composites)
-  .jpeg({ quality: 90 })
-  .toFile(watermarkOutput);
+    await image
+      .composite(composites)
+      .jpeg({ quality: 90 })
+      .toFile(watermarkOutput);
   }
 }
 
@@ -149,16 +149,16 @@ app.post("/crear-preferencia", async (req, res) => {
           email: email,
         },
         metadata: {
-  fotos: fotos,
-  telefono: telefono,
-  pedidoId: pedidoId
-},
-notification_url: "https://efe-produc-21iy.onrender.com/webhook",
+          fotos: fotos,
+          telefono: telefono,
+          pedidoId: pedidoId
+        },
+        notification_url: "https://efe-produc-21iy.onrender.com/webhook",
         back_urls: {
-  success: "https://www.google.com",
-  failure: "https://www.google.com",
-  pending: "https://www.google.com",
-}
+          success: "https://www.google.com",
+          failure: "https://www.google.com",
+          pending: "https://www.google.com",
+        }
       },
     });
 
@@ -202,31 +202,57 @@ app.post("/crear-pedido", async (req, res) => {
 
   res.json({ ok: true, pedidoId });
 });
-app.get("/album/:categoria/:album", (req, res) => {
-  const categoria = req.params.categoria;
-  const album = req.params.album;
+// ✅ MULTI-DEPORTE
+const resolverNombreCarpeta = (baseDir, nombre) => {
+  if (!nombre) return null;
 
-  const fs = require("fs");
-  const path = require("path");
+  try {
+    const carpetas = fs.readdirSync(baseDir).filter(folder =>
+      fs.statSync(path.join(baseDir, folder)).isDirectory()
+    );
 
-  const ruta = path.join(
-    __dirname,
-    "images",
-    "Futsal",
-    categoria,
-    album,
-    "preview"
-  );
+    const buscado = nombre.toLowerCase();
+    return carpetas.find(c => c.toLowerCase() === buscado) || null;
+  } catch {
+    return null;
+  }
+};
+
+app.get("/deportes", (req, res) => {
+  const basePath = path.join(__dirname, "images");
+
+  if (!fs.existsSync(basePath)) {
+    return res.json([]);
+  }
+
+  const deportes = fs.readdirSync(basePath).filter(folder => {
+    const full = path.join(basePath, folder);
+    return fs.statSync(full).isDirectory();
+  });
+
+  res.json(deportes);
+});
+
+app.get("/album/:deporte/:categoria/:album", (req, res) => {
+  const baseImagesPath = path.join(__dirname, "images");
+
+  const deporteParam = decodeURIComponent(req.params.deporte);
+  const deporte = resolverNombreCarpeta(baseImagesPath, deporteParam) || deporteParam;
+
+  const categoria = decodeURIComponent(req.params.categoria);
+  const album = decodeURIComponent(req.params.album);
+
+  const ruta = path.join(baseImagesPath, deporte, categoria, album, "preview");
 
   try {
     const imagenes = fs.readdirSync(ruta);
 
     res.json({
       album: {
-        preview: `/images/Futsal/${categoria}/${album}/preview/`,
-        thumb: `/images/Futsal/${categoria}/${album}/thumb/`,
-        watermarked: `/images/Futsal/${categoria}/${album}/watermarked/`,
-        original: `/images/Futsal/${categoria}/${album}/original/`
+        preview: `/images/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/preview/`,
+        thumb: `/images/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/thumb/`,
+        watermarked: `/images/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/watermarked/`,
+        original: `/images/${encodeURIComponent(deporte)}/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/original/`
       },
       imagenes
     });
@@ -235,21 +261,31 @@ app.get("/album/:categoria/:album", (req, res) => {
     res.json({ album: {}, imagenes: [] });
   }
 });
-app.get("/preview/futsal", (req, res) => {
-  const basePath = path.join(__dirname, "images", "Futsal");
+
+app.get("/preview/:deporte", (req, res) => {
+  const baseImagesPath = path.join(__dirname, "images");
+
+  const deporteParam = decodeURIComponent(req.params.deporte);
+  const deporte = resolverNombreCarpeta(baseImagesPath, deporteParam) || deporteParam;
+
+  const basePath = path.join(baseImagesPath, deporte);
 
   let preview = null;
 
+  if (!fs.existsSync(basePath)) {
+    return res.json({ preview });
+  }
+
   const categorias = fs.readdirSync(basePath).filter(cat =>
-  fs.statSync(path.join(basePath, cat)).isDirectory()
-);
+    fs.statSync(path.join(basePath, cat)).isDirectory()
+  );
 
   for (const cat of categorias) {
     const catPath = path.join(basePath, cat);
 
     const albums = fs.readdirSync(catPath).filter(album =>
-  fs.statSync(path.join(catPath, album)).isDirectory()
-);
+      fs.statSync(path.join(catPath, album)).isDirectory()
+    );
 
     for (const album of albums) {
       const previewPath = path.join(catPath, album, "preview");
@@ -257,7 +293,7 @@ app.get("/preview/futsal", (req, res) => {
       if (fs.existsSync(previewPath)) {
         const files = fs.readdirSync(previewPath);
         if (files.length > 0) {
-          preview = `/images/Futsal/${cat}/${album}/preview/${files[0]}`;
+          preview = `/images/${encodeURIComponent(deporte)}/${encodeURIComponent(cat)}/${encodeURIComponent(album)}/preview/${encodeURIComponent(files[0])}`;
           break;
         }
       }
@@ -267,9 +303,15 @@ app.get("/preview/futsal", (req, res) => {
   }
 
   res.json({ preview });
-});// 👈 🔥 ESTO FALTABA
-app.get("/albums", (req, res) => {
-  const basePath = path.join(__dirname, "images", "Futsal");
+});
+
+app.get("/albums/:deporte", (req, res) => {
+  const baseImagesPath = path.join(__dirname, "images");
+
+  const deporteParam = decodeURIComponent(req.params.deporte);
+  const deporte = resolverNombreCarpeta(baseImagesPath, deporteParam) || deporteParam;
+
+  const basePath = path.join(baseImagesPath, deporte);
 
   if (!fs.existsSync(basePath)) {
     return res.json([]);
@@ -284,12 +326,113 @@ app.get("/albums", (req, res) => {
 
   res.json(data);
 });
+
+app.get("/categoria/:deporte/:cat", (req, res) => {
+  const baseImagesPath = path.join(__dirname, "images");
+
+  const deporteParam = decodeURIComponent(req.params.deporte);
+  const deporte = resolverNombreCarpeta(baseImagesPath, deporteParam) || deporteParam;
+
+  const categoria = decodeURIComponent(req.params.cat);
+
+  const basePath = path.join(baseImagesPath, deporte, categoria);
+
+  if (!fs.existsSync(basePath)) {
+    return res.json([]);
+  }
+
+  const albums = fs.readdirSync(basePath).filter(folder =>
+    fs.statSync(path.join(basePath, folder)).isDirectory()
+  );
+
+  res.json(albums);
+});
+
+// 🔁 Compatibilidad hacia atrás (solo Futsal)
+// (deja funcionando el frontend viejo si todavía llama a estos endpoints)
+app.get("/album/:categoria/:album", (req, res) => {
+  const categoria = decodeURIComponent(req.params.categoria);
+  const album = decodeURIComponent(req.params.album);
+
+  const ruta = path.join(__dirname, "images", "Futsal", categoria, album, "preview");
+
+  try {
+    const imagenes = fs.readdirSync(ruta);
+
+    res.json({
+      album: {
+        preview: `/images/Futsal/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/preview/`,
+        thumb: `/images/Futsal/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/thumb/`,
+        watermarked: `/images/Futsal/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/watermarked/`,
+        original: `/images/Futsal/${encodeURIComponent(categoria)}/${encodeURIComponent(album)}/original/`
+      },
+      imagenes
+    });
+
+  } catch (error) {
+    res.json({ album: {}, imagenes: [] });
+  }
+});
+
+app.get("/preview/futsal", (req, res) => {
+  const basePath = path.join(__dirname, "images", "Futsal");
+
+  let preview = null;
+
+  if (!fs.existsSync(basePath)) {
+    return res.json({ preview });
+  }
+
+  const categorias = fs.readdirSync(basePath).filter(cat =>
+    fs.statSync(path.join(basePath, cat)).isDirectory()
+  );
+
+  for (const cat of categorias) {
+    const catPath = path.join(basePath, cat);
+
+    const albums = fs.readdirSync(catPath).filter(album =>
+      fs.statSync(path.join(catPath, album)).isDirectory()
+    );
+
+    for (const album of albums) {
+      const previewPath = path.join(catPath, album, "preview");
+
+      if (fs.existsSync(previewPath)) {
+        const files = fs.readdirSync(previewPath);
+        if (files.length > 0) {
+          preview = `/images/Futsal/${encodeURIComponent(cat)}/${encodeURIComponent(album)}/preview/${encodeURIComponent(files[0])}`;
+          break;
+        }
+      }
+    }
+
+    if (preview) break;
+  }
+
+  res.json({ preview });
+});
+
+app.get("/albums", (req, res) => {
+  const basePath = path.join(__dirname, "images", "Futsal");
+
+  if (!fs.existsSync(basePath)) {
+    return res.json([]);
+  }
+
+  const categorias = fs.readdirSync(basePath).filter(folder =>
+    fs.statSync(path.join(basePath, folder)).isDirectory()
+  );
+
+  const data = categorias.map(nombre => ({ nombre }));
+
+  res.json(data);
+});
+
 app.get("/categoria/:cat", (req, res) => {
   const categoria = decodeURIComponent(req.params.cat);
 
   const basePath = path.join(__dirname, "images", "Futsal", categoria);
 
-  // 🔥 VALIDACIÓN CLAVE
   if (!fs.existsSync(basePath)) {
     return res.json([]);
   }
@@ -435,26 +578,26 @@ app.get("/pedido/:id", async (req, res) => {
       </div>
 `;
 
-if (pedido.estado !== "pagado") {
-  html += `<p class="pendiente">⚠️ Pedido pendiente de pago</p>`;
-} else {
-  html += `<div class="grid">`;
+  if (pedido.estado !== "pagado") {
+    html += `<p class="pendiente">⚠️ Pedido pendiente de pago</p>`;
+  } else {
+    html += `<div class="grid">`;
 
-  pedido.fotos.forEach(foto => {
-    const url = foto.original || foto;
+    pedido.fotos.forEach(foto => {
+      const url = foto.original || foto;
 
-    html += `
+      html += `
       <div class="foto">
         <img src="${url}">
         <a href="${url}" download class="btn">⬇ Descargar</a>
       </div>
     `;
-  });
+    });
 
-  html += `</div>`;
-}
+    html += `</div>`;
+  }
 
-html += `
+  html += `
     </div>
   </body>
   </html>
@@ -600,7 +743,7 @@ app.get("/admin-panel", (req, res) => {
   `);
 });
 
-  
+
 // 🔥 PANEL ADMIN (PEGAR ACÁ 👇)
 app.get("/admin", async (req, res) => {
 
@@ -684,7 +827,7 @@ app.get("/admin", async (req, res) => {
   </div>
 `;
   });
-html += `
+  html += `
 </body>
 </html>
 `;
