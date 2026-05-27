@@ -739,14 +739,28 @@
       }
 
       for (const deporte of deportes) {
+
         let preview = "";
 
-        try {
-          const r = await fetch(`/preview/${encodeURIComponent(deporte)}`);
-          const d = await r.json();
-          preview = d.preview || "/watermark.png";
-        } catch (e) {
-          preview = "/watermark.png";
+        // 🔥 PORTADA PERSONALIZADA SOLO PARA EVENTOS
+        if (deporte === "Eventos") {
+
+          preview = "/images/eventos-cover.png";
+
+        } else {
+
+          try {
+            const r = await fetch(`/preview/${encodeURIComponent(deporte)}`);
+            const d = await r.json();
+
+            preview = d.preview || "/watermark.png";
+
+          } catch (e) {
+
+            preview = "/watermark.png";
+
+          }
+
         }
 
         grid.innerHTML += `
@@ -945,6 +959,19 @@
     }
 
     async function abrirAlbum(nombre, desdeClick = false) {
+      // 🔒 PROTEGER ÁLBUM
+      const albumProtegido =
+        "Eventos/Colegio Belgrano/Acto del 25 de Mayo";
+
+      if (decodeURIComponent(nombre) === albumProtegido) {
+
+        const pass = prompt("Este álbum tiene contraseña");
+
+        if (pass !== "salita5") {
+          alert("Contraseña incorrecta");
+          return;
+        }
+      }
       desdeMenu = desdeClick;
 
       const safeDecode = (str) => {
@@ -1050,6 +1077,27 @@
     }
 
     function calcularTotal() {
+
+      // 🔒 ÁLBUM ESPECIAL EVENTO
+      const albumEspecial =
+        "Eventos/Colegio Belgrano/Acto del 25 de Mayo";
+
+      const albumActualNombre =
+        decodeURIComponent(
+          new URLSearchParams(window.location.search).get("album") || ""
+        );
+
+      // ✅ SOLO ESTE ÁLBUM
+      if (albumActualNombre === albumEspecial) {
+
+        return seleccionadas.length * 3000;
+
+      }
+
+      // =========================
+      // RESTO DE ÁLBUMES NORMAL
+      // =========================
+
       let cant = seleccionadas.length;
 
       if (cant === 0) return 0;
@@ -1152,7 +1200,21 @@
       else if (cant >= 5) pack = "Pack 5";
       else if (cant >= 3) pack = "Pack 3";
 
-      let precioSinDescuento = cant * 2000;
+      let precioSinDescuento;
+
+      const albumEspecial =
+        "Eventos/Colegio Belgrano/Acto del 25 de Mayo";
+
+      const albumActualNombre =
+        decodeURIComponent(
+          new URLSearchParams(window.location.search).get("album") || ""
+        );
+
+      if (albumActualNombre === albumEspecial) {
+        precioSinDescuento = cant * 3000;
+      } else {
+        precioSinDescuento = cant * 2000;
+      }
 
       let tieneDescuento = total < precioSinDescuento;
 
