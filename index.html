@@ -1181,26 +1181,6 @@
 
       let cant = seleccionadas.length;
       let total = calcularTotal();
-      const mensaje = generarMensajePromo(cant);
-
-      document.getElementById("mensajePromo").innerHTML = mensaje
-        ? `<div style="
-      background:#eef4ff;
-      padding:10px;
-      border-radius:10px;
-      margin-bottom:10px;
-    ">
-      💡 ${mensaje}
-    </div>`
-        : "";
-
-      let pack = "Individual";
-      if (cant >= 10) pack = "Pack 10";
-      else if (cant >= 7) pack = "Pack 7";
-      else if (cant >= 5) pack = "Pack 5";
-      else if (cant >= 3) pack = "Pack 3";
-
-      let precioSinDescuento;
 
       const albumEspecial =
         "Eventos/Colegio Belgrano/Acto del 25 de Mayo";
@@ -1209,6 +1189,35 @@
         decodeURIComponent(
           new URLSearchParams(window.location.search).get("album") || ""
         );
+
+      if (albumActualNombre === albumEspecial) {
+
+        document.getElementById("mensajePromo").innerHTML = "";
+
+      } else {
+
+        const mensaje = generarMensajePromo(cant);
+
+        document.getElementById("mensajePromo").innerHTML = mensaje
+          ? `<div style="
+background:#eef4ff;
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+">
+💡 ${mensaje}
+</div>`
+          : "";
+
+      }
+
+      let pack = "Individual";
+      if (cant >= 10) pack = "Pack 10";
+      else if (cant >= 7) pack = "Pack 7";
+      else if (cant >= 5) pack = "Pack 5";
+      else if (cant >= 3) pack = "Pack 3";
+
+      let precioSinDescuento;
 
       if (albumActualNombre === albumEspecial) {
         precioSinDescuento = cant * 3000;
